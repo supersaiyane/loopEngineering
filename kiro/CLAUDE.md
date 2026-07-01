@@ -4,18 +4,50 @@
 
 Last updated: 2026-07-10
 # All fixes through Fix 42C implemented. See CLAUDE-implemented.md for full history.
-# Next: Dry Run v10 to find new gaps.
+# Dry Run v10 complete (2026-07-10) — 3 new gaps found. Fix 43A/B/C pending.
 
 ---
-# No pending fixes. System is clean.
+## PENDING FIXES
+
+### Fix 43A — Lesson Age Clock Uses Written-At Not Gate-Fired-At
+**Severity:** MEDIUM
+**Root cause:** Stage-1-Fail lessons are written at SM-RETRO, not at the moment the gate fired.
+If retro is delayed (runs 2 days into Sprint N+1), the age check in Sprint N+2 reads
+"1 sprint old" when the issue is actually "2 sprints unresolved."
+**Fix:** Add `gate_fired_at: Sprint N` metadata to lessons at gate-fire time. LESSON AGE CHECK uses `gate_fired_at`, not `written_at`.
+**Files:** `docs/lessons.md` (template), `kiro/steering/team-orchestrator-sprint.md` (LESSON AGE CHECK block)
+
+---
+
+### Fix 43B — Ponytail Has No Rung Disqualification Escalation Path
+**Severity:** MEDIUM
+**Root cause:** When a dep at Rung 2 is disqualified (CVE, abandoned, license-incompatible),
+agents are stuck: Ponytail says "use the dep," security says "you cannot." No documented path.
+**Fix:** Add Rung Disqualification Protocol to ponytail.md — RDR (Rung Disqualification Record),
+same-rung alternative check, one-rung-at-a-time escalation, mandatory ADR, security sign-off for CVEs.
+**User artifact:** `docs/ponytail-rung-disqualification-guide.md` ← reference this
+**Files:** `kiro/steering/ponytail.md` (new section), `kiro/steering/team-orchestrator-rules.md` (GATE S2 escalation note)
+
+---
+
+### Fix 43C — No Cross-Tenant Isolation Test Enforcement at GATE S2
+**Severity:** HIGH
+**Root cause:** GATE S2 checks "coverage ≥ 80%" but has no specific requirement for
+cross-tenant isolation tests on `security/rbac` or `data/multi-tenant` stories.
+A story can pass GATE S2 with 83% coverage while completely missing tenant-boundary tests.
+The bug surfaces at SM-RETRO (Ralph Wiggum) instead of being caught at PR review — one gate too late for PCI-DSS.
+**Fix:** Add GATE S2 conditional item: "For stories tagged `security/rbac` or `data/multi-tenant`:
+at least ONE explicit cross-tenant access-denial test REQUIRED. Absence = GATE S2 FAIL regardless of coverage %."
+**Files:** `kiro/steering/team-orchestrator-rules.md` (GATE S2 checklist, new conditional item)
+
 ---
 
 
 
 ---
 
-## MASTER FIX REGISTER — All Fixes (Fix 1 → Fix 42C)
-Last synced: 2026-07-10 | Total: 47 sub-fixes across 42 fix groups | All implemented ✅
+## MASTER FIX REGISTER — All Fixes (Fix 1 → Fix 43C)
+Last synced: 2026-07-10 | Total: 50 sub-fixes across 43 fix groups | 47 implemented ✅ · 3 candidate 🔲
 
 | Fix | Name | Why It Was Needed | Status | File(s) |
 |-----|------|-------------------|--------|---------|
@@ -73,4 +105,7 @@ Last synced: 2026-07-10 | Total: 47 sub-fixes across 42 fix groups | All impleme
 | Fix 42A | Post-Discovery Bad-Loop Re-Check | Gate ran on original prompt only; discovery-revealed scope not re-gated | ✅ | discovery-engine.md (STEP 4B) |
 | Fix 42B | Stage-1 Lesson Age Enforcement | Stage-1-Fail lessons persisted indefinitely across sprints with no block | ✅ | team-orchestrator-sprint.md (LESSON AGE CHECK) |
 | Fix 42C | Deploy Self-Triggering Gate | 'deploy' was domain keyword but not high-risk verb; prod deploys escaped gate | ✅ | session-guards.md (self-triggering exception) |
+| Fix 43A | Lesson Age Clock Accuracy | Age check used written_at (retro time); delayed retros made stale lessons appear fresh | 🔲 CANDIDATE | docs/lessons.md, team-orchestrator-sprint.md (LESSON AGE CHECK) |
+| Fix 43B | Ponytail Rung Disqualification | No escalation path when Rung N dep is disqualified (CVE/abandoned/license) — agents stuck | 🔲 CANDIDATE | ponytail.md (new section), team-orchestrator-rules.md (GATE S2) · artifact: docs/ponytail-rung-disqualification-guide.md |
+| Fix 43C | Cross-Tenant Gate at S2 | GATE S2 coverage % check missed cross-tenant isolation tests; bugs surfaced at retro not PR | 🔲 CANDIDATE | team-orchestrator-rules.md (GATE S2 conditional item) |
 
