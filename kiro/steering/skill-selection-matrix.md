@@ -219,7 +219,9 @@ Note: SM activates in ONE mode per call (Fix 2). Mode determines which skills lo
 | Activity | Load These Skills | Skip |
 |----------|------------------|------|
 | GATE S1 (package approval) | supply_chain_sbom_slsa.md, vulnerability_management_cve_patching.md | others |
+| GATE S1 — CVE flags a dep (Fix 43B) | vulnerability_management_cve_patching.md → write RDR, check same-rung alternatives, sign off on replacement rung before DEVELOP. Full protocol: docs/ponytail-rung-disqualification-guide.md | others |
 | GATE S2 (feature review) | application_security_testing_sast_dast.md, api_security_owasp_top10.md, owasp_top10_review.md | others |
+| GATE S2 — rung escalation review (Fix 43B) | Verify RDR exists + same-rung alternatives documented + ADR written + security sign-off present. Any missing → GATE S2 FAIL. Ref: docs/ponytail-rung-disqualification-guide.md | others |
 | Secrets management | secrets_management.md | others |
 | Container security | container_kubernetes_security.md | others |
 | AI/ML security | ai_ml_security_prompt_injection.md | others |

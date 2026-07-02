@@ -89,6 +89,14 @@ Security is not a phase. It is a continuous gate. The `security_engineer` is emb
    □ Violations: revert to correct rung. Mark with `ponytail:` comment if shortcut has a known ceiling.
    Blocker: any role that skipped rungs 1-6 without justification → reject commit, rewrite at correct rung.
 
+   RUNG DISQUALIFICATION — if a lower rung was skipped due to CVE / license / abandonment (Fix 43B):
+   □ Rung Disqualification Record (RDR) must exist — package name, reason, evidence link
+   □ Same-rung alternatives must have been checked and ruled out
+   □ ADR must exist for any escalation past Rung 2
+   □ CVE disqualification → security_engineer sign-off in ADR before DEVELOP started
+   Missing RDR or ADR = GATE S2 FAIL (same severity as unjustified rung skip)
+   Full protocol: docs/ponytail-rung-disqualification-guide.md
+
 6. Security verdict written to Jira:
    jira.addComment(story_id,
      "SECURITY REVIEW [S2]: PASSED\n" +
@@ -97,6 +105,7 @@ Security is not a phase. It is a continuous gate. The `security_engineer` is emb
      "Secrets: clean (gitleaks)\n" +
      "New deps: <list> — all SBOM APPROVED\n" +
      "Ponytail: PASS — all new code at correct rung\n" +   // (Fix 39A) or: "FAIL — rung violation: <function/class> should use rung <N>: <reason>"
+     // If rung escalation occurred: "Ponytail: ESCALATION — Rung N disqualified (<reason>) → Rung M used | RDR: ✅ | ADR: <ADR-XXX> | Security sign-off: ✅" (Fix 43B)
      "Reviewer: security_engineer\n" +
      "Date: <ISO timestamp>"
    )

@@ -106,6 +106,6 @@ Last synced: 2026-07-10 | Total: 50 sub-fixes across 43 fix groups | 47 implemen
 | Fix 42B | Stage-1 Lesson Age Enforcement | Stage-1-Fail lessons persisted indefinitely across sprints with no block | ✅ | team-orchestrator-sprint.md (LESSON AGE CHECK) |
 | Fix 42C | Deploy Self-Triggering Gate | 'deploy' was domain keyword but not high-risk verb; prod deploys escaped gate | ✅ | session-guards.md (self-triggering exception) |
 | Fix 43A | Lesson Age Clock Accuracy | Age check used written_at (retro time); delayed retros made stale lessons appear fresh | 🔲 CANDIDATE | docs/lessons.md, team-orchestrator-sprint.md (LESSON AGE CHECK) |
-| Fix 43B | Ponytail Rung Disqualification | No escalation path when Rung N dep is disqualified (CVE/abandoned/license) — agents stuck | 🔲 CANDIDATE | ponytail.md (new section), team-orchestrator-rules.md (GATE S2) · artifact: docs/ponytail-rung-disqualification-guide.md |
+| Fix 43B | Ponytail Rung Disqualification | No escalation path when Rung N dep is disqualified (CVE/abandoned/license) — agents stuck | ✅ | ponytail.md (disqualification section), team-orchestrator-rules.md (GATE S2 item 5+6), skill-selection-matrix.md (S1/S2 rows) · artifact: docs/ponytail-rung-disqualification-guide.md |
 | Fix 43C | Cross-Tenant Gate at S2 | GATE S2 coverage % check missed cross-tenant isolation tests; bugs surfaced at retro not PR | 🔲 CANDIDATE | team-orchestrator-rules.md (GATE S2 conditional item) |
 
