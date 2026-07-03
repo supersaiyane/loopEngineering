@@ -76,9 +76,11 @@ inclusion: manual
    Log: `[COMPREHENSION-DEBT: score=N/4 | debt=low/medium/high/critical | modules-at-risk: <list> | action: <none/warning/review-sprint/escalate>]`
    If debt=high or critical → SM-RETRO BLOCKS Sprint N+1 start. Scrum Master must surface to user.
 
-   LESSON AGE CHECK (Fix 42B) — runs AFTER comprehension debt check, BEFORE Sprint N+1:
+   LESSON AGE CHECK (Fix 42B + Fix 43A) — runs AFTER comprehension debt check, BEFORE Sprint N+1:
    Scan `docs/lessons.md`. For each entry tagged [Stage 1-Fail]:
-     - If the lesson's sprint stamp is OLDER than the current sprint → "stale blocker"
+     - Read the `gate_fired_at` field (Fix 43A). If absent → treat as Sprint 0 (worst-case age).
+     - Do NOT use the lesson write date or retro date — retros can run late and inflate the age.
+     - If `gate_fired_at` sprint is OLDER than current sprint by ≥1 → "stale blocker"
      - A stale blocker = a failure that was known but NOT investigated across at least 1 full sprint
 
    ```

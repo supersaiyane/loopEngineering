@@ -97,6 +97,16 @@ Security is not a phase. It is a continuous gate. The `security_engineer` is emb
    Missing RDR or ADR = GATE S2 FAIL (same severity as unjustified rung skip)
    Full protocol: docs/ponytail-rung-disqualification-guide.md
 
+5b. CROSS-TENANT ISOLATION TEST — conditional, runs alongside item 5 (Fix 43C):
+   Applies when story labels include `security/rbac` OR `data/multi-tenant` OR `security/auth`
+   □ At least ONE explicit cross-tenant access-denial test MUST be present
+     Example: test proves tenant A cannot read/write/delete tenant B's data
+   □ Test must exercise the actual access control path (not a mock)
+   □ Absence of cross-tenant test = GATE S2 FAIL regardless of overall coverage %
+   WHY: 83% coverage can be achieved with zero tenant-boundary tests.
+   Cross-tenant privilege escalation is a PCI-DSS / SOC2 compliance failure —
+   it cannot be allowed to surface at SM-RETRO (Fix 40D) instead of GATE S2.
+
 6. Security verdict written to Jira:
    jira.addComment(story_id,
      "SECURITY REVIEW [S2]: PASSED\n" +

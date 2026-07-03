@@ -69,7 +69,13 @@ Stage 5 — CONSULT   On the next task, READ this entry before starting. Don't r
 **Trigger:** [situation that activates this lesson]
 **Body:** [what happened and what to do instead]
 **Review:** [date of last confirmation / upgrade]
+**gate_fired_at:** Sprint N   ← REQUIRED for Stage 1-Fail entries (Fix 43A)
 ```
+
+> **Fix 43A — gate_fired_at rule:** Stage 1-Fail entries MUST record `gate_fired_at: Sprint N`
+> at the moment the gate fired — not at retro write time. The LESSON AGE CHECK uses
+> `gate_fired_at` to compute staleness. If retro runs late, the clock is still accurate.
+> Missing `gate_fired_at` on a Stage 1-Fail entry = treated as Sprint 0 (worst-case age).
 
 Confidence lifecycle:
 - `low` → new entry, stage 1–2 only
