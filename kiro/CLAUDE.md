@@ -3,58 +3,20 @@
 # This file = pending work only. Read this every session. Skip CLAUDE-implemented.md unless debugging.
 
 Last updated: 2026-07-10
-# All fixes through Fix 43C implemented. See CLAUDE-implemented.md for full history.
-# Next: Dry Run v11 to find new gaps.
-
----
-# No pending fixes. System is clean.
----
-
-## PENDING FIXES
-
-*(none — all fixes through 43C implemented)*
-
----
-
-### Fix 43A — Lesson Age Clock Uses Written-At Not Gate-Fired-At
-**Severity:** MEDIUM
-**Root cause:** Stage-1-Fail lessons are written at SM-RETRO, not at the moment the gate fired.
-If retro is delayed (runs 2 days into Sprint N+1), the age check in Sprint N+2 reads
-"1 sprint old" when the issue is actually "2 sprints unresolved."
-**Fix:** Add `gate_fired_at: Sprint N` metadata to lessons at gate-fire time. LESSON AGE CHECK uses `gate_fired_at`, not `written_at`.
-**Files:** `docs/lessons.md` (template), `kiro/steering/team-orchestrator-sprint.md` (LESSON AGE CHECK block)
-
----
-
-### Fix 43B — Ponytail Has No Rung Disqualification Escalation Path
-**Severity:** MEDIUM
-**Root cause:** When a dep at Rung 2 is disqualified (CVE, abandoned, license-incompatible),
-agents are stuck: Ponytail says "use the dep," security says "you cannot." No documented path.
-**Fix:** Add Rung Disqualification Protocol to ponytail.md — RDR (Rung Disqualification Record),
-same-rung alternative check, one-rung-at-a-time escalation, mandatory ADR, security sign-off for CVEs.
-**User artifact:** `docs/ponytail-rung-disqualification-guide.md` ← reference this
-**Files:** `kiro/steering/ponytail.md` (new section), `kiro/steering/team-orchestrator-rules.md` (GATE S2 escalation note)
-
----
-
-### Fix 43C — No Cross-Tenant Isolation Test Enforcement at GATE S2
-**Severity:** HIGH
-**Root cause:** GATE S2 checks "coverage ≥ 80%" but has no specific requirement for
-cross-tenant isolation tests on `security/rbac` or `data/multi-tenant` stories.
-A story can pass GATE S2 with 83% coverage while completely missing tenant-boundary tests.
-The bug surfaces at SM-RETRO (Ralph Wiggum) instead of being caught at PR review — one gate too late for PCI-DSS.
-**Fix:** Add GATE S2 conditional item: "For stories tagged `security/rbac` or `data/multi-tenant`:
-at least ONE explicit cross-tenant access-denial test REQUIRED. Absence = GATE S2 FAIL regardless of coverage %."
-**Files:** `kiro/steering/team-orchestrator-rules.md` (GATE S2 checklist, new conditional item)
+# All fixes through Fix 43C implemented. Dry Run v11 complete (9.5/10). See CLAUDE-implemented.md for full history.
+# Gap found in v11: Fix 44A (LOW) — Mode 5 emits no advisory when security/rbac story ships without GATE S2.
+# Next: Implement Fix 44A, then push.
 
 ---
 
 
 
+
+
 ---
 
-## MASTER FIX REGISTER — All Fixes (Fix 1 → Fix 43C)
-Last synced: 2026-07-10 | Total: 50 sub-fixes across 43 fix groups | All implemented ✅
+## MASTER FIX REGISTER — All Fixes (Fix 1 → Fix 44A)
+Last synced: 2026-07-10 | Total: 51 sub-fixes across 44 fix groups | 50 implemented ✅ · 1 candidate 🔲
 
 | Fix | Name | Why It Was Needed | Status | File(s) |
 |-----|------|-------------------|--------|---------|
@@ -115,11 +77,12 @@ Last synced: 2026-07-10 | Total: 50 sub-fixes across 43 fix groups | All impleme
 | Fix 43A | Lesson Age Clock Accuracy | Age check used written_at (retro time); delayed retros made stale lessons appear fresh | ✅ | docs/lessons.md (gate_fired_at field), team-orchestrator-sprint.md (LESSON AGE CHECK) |
 | Fix 43B | Ponytail Rung Disqualification | No escalation path when Rung N dep is disqualified (CVE/abandoned/license) — agents stuck | ✅ | ponytail.md (disqualification section), team-orchestrator-rules.md (GATE S2 item 5+6), skill-selection-matrix.md (S1/S2 rows) · artifact: docs/ponytail-rung-disqualification-guide.md |
 | Fix 43C | Cross-Tenant Gate at S2 | GATE S2 coverage % check missed cross-tenant isolation tests; bugs surfaced at retro not PR | ✅ | team-orchestrator-rules.md (GATE S2 item 5b) |
+| Fix 44A | Mode 5 Security/RBAC Advisory | Mode 5 (Lean) skips security_engineer — no warning emitted when security/rbac story ships without GATE S2; cross-tenant test enforcement silently absent | 🔲 CANDIDATE | team-orchestrator-rules.md (Mode 5 advisory condition) |
 
 ---
 
 ## FEATURE / FIX DIVISION TABLE
-Last synced: 2026-07-10
+Last synced: 2026-07-10 | Found in: Dry Run v11
 **Type key:** 🚀 Feature (new capability) · 🔧 Fix (bug/gap patched) · 🛡️ Guard (runtime protection) · 🚪 Gate (quality enforcement) · 🏗️ Architecture (structural change)
 
 | Type | Fix | Capability / What Was Added | Category |
@@ -181,16 +144,18 @@ Last synced: 2026-07-10
 | 🔧 Fix | Fix 43A | Lesson Age Clock Accuracy — `gate_fired_at` field added; delayed retros no longer inflate age | Memory |
 | 🚀 Feature | Fix 43B | Ponytail Rung Disqualification Protocol — RDR + escalation path + ADR + artifact for users | Code Quality |
 | 🚪 Gate | Fix 43C | Cross-Tenant Isolation Test at GATE S2 — absence = GATE FAIL on rbac/multi-tenant stories | Security |
+| 🛡️ Guard | Fix 44A | Mode 5 Security/RBAC Advisory — warn when security/rbac story ships in Lean mode without GATE S2 | Security |
 
 ### Summary by Type
 
-| Type | Count | % of total |
-|------|-------|-----------|
-| 🚀 Feature (new capability) | 20 | 40% |
-| 🔧 Fix (bug / gap patched) | 18 | 36% |
-| 🛡️ Guard (runtime protection) | 6 | 12% |
-| 🚪 Gate (quality enforcement) | 7 | 14% |
-| 🏗️ Architecture (structural) | 5 | 10% |
+| Type | Count | % of total | Last added |
+|------|-------|-----------|------------|
+| 🚀 Feature (new capability) | 20 | 39% | Fix 43B |
+| 🔧 Fix (bug / gap patched) | 18 | 35% | Fix 43A |
+| 🛡️ Guard (runtime protection) | 7 | 14% | Fix 44A 🔲 |
+| 🚪 Gate (quality enforcement) | 7 | 14% | Fix 43C |
+| 🏗️ Architecture (structural) | 5 | 10% | Fix 41A |
 
 > Note: Some fixes span multiple types (e.g., Fix 19 is both a Fix and Architecture). Categorized by primary intent.
+> 🔲 = candidate (not yet implemented)
 
