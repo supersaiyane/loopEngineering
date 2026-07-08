@@ -4601,3 +4601,38 @@ LESSON AGE CHECK (Fix 42B) — before Sprint N+1:
 **File:** `kiro/steering/team-orchestrator-sprint.md`
 
 ---
+
+---
+
+### Fix 43A — Lesson Age Clock Uses Written-At Not Gate-Fired-At
+**Severity:** MEDIUM
+**Root cause:** Stage-1-Fail lessons are written at SM-RETRO, not at the moment the gate fired.
+If retro is delayed (runs 2 days into Sprint N+1), the age check in Sprint N+2 reads
+"1 sprint old" when the issue is actually "2 sprints unresolved."
+**Fix:** Add `gate_fired_at: Sprint N` metadata to lessons at gate-fire time. LESSON AGE CHECK uses `gate_fired_at`, not `written_at`.
+**Files:** `docs/lessons.md` (template), `kiro/steering/team-orchestrator-sprint.md` (LESSON AGE CHECK block)
+
+---
+
+### Fix 43B — Ponytail Has No Rung Disqualification Escalation Path
+**Severity:** MEDIUM
+**Root cause:** When a dep at Rung 2 is disqualified (CVE, abandoned, license-incompatible),
+agents are stuck: Ponytail says "use the dep," security says "you cannot." No documented path.
+**Fix:** Add Rung Disqualification Protocol to ponytail.md — RDR (Rung Disqualification Record),
+same-rung alternative check, one-rung-at-a-time escalation, mandatory ADR, security sign-off for CVEs.
+**User artifact:** `docs/ponytail-rung-disqualification-guide.md` ← reference this
+**Files:** `kiro/steering/ponytail.md` (new section), `kiro/steering/team-orchestrator-rules.md` (GATE S2 escalation note)
+
+---
+
+### Fix 43C — No Cross-Tenant Isolation Test Enforcement at GATE S2
+**Severity:** HIGH
+**Root cause:** GATE S2 checks "coverage ≥ 80%" but has no specific requirement for
+cross-tenant isolation tests on `security/rbac` or `data/multi-tenant` stories.
+A story can pass GATE S2 with 83% coverage while completely missing tenant-boundary tests.
+The bug surfaces at SM-RETRO (Ralph Wiggum) instead of being caught at PR review — one gate too late for PCI-DSS.
+**Fix:** Add GATE S2 conditional item: "For stories tagged `security/rbac` or `data/multi-tenant`:
+at least ONE explicit cross-tenant access-denial test REQUIRED. Absence = GATE S2 FAIL regardless of coverage %."
+**Files:** `kiro/steering/team-orchestrator-rules.md` (GATE S2 checklist, new conditional item)
+
+---
