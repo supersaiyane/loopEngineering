@@ -299,6 +299,7 @@ footer a:hover{color:#c4b5fd}
     <a href="#agents">Agents</a>
     <a href="#flow">Flow</a>
     <a href="#gates">Gates</a>
+    <a href="#adapters">Adapters</a>
     <a href="#features">Fixes</a>
   </div>
 </nav>
@@ -862,6 +863,168 @@ footer a:hover{color:#c4b5fd}
       <div class="skill-group"><h4>📊 Data / ML</h4><ul class="skill-list"><li>EDA Patterns</li><li>Feature Engineering</li><li>Model Evaluation</li><li>A/B Test Design</li><li>Pipeline Architecture</li><li>ML Serving / Embeddings</li><li>Statistical Analysis</li></ul></div>
       <div class="skill-group"><h4>🔧 Shared Skills</h4><ul class="skill-list"><li>Code Review Excellence</li><li>Debugging Methodology</li><li>Error Handling</li><li>Concurrency Safety</li><li>Performance Profiling</li><li>Refactoring Safely</li><li>Design System Gate</li><li>Infrastructure as Code</li></ul></div>
     </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ADAPTERS -->
+<div id="adapters" class="section-wrap">
+  <div class="section-label">Platform Adapters</div>
+  <h2>Use Loop Engineering Anywhere</h2>
+  <p class="section-sub">Four adapter files translate the orchestration system into the native format of each AI platform. Same rules, same gates, same 22 agents — wherever you work.</p>
+
+  <div class="adapters-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-bottom:2.5rem">
+
+    <!-- Kiro -->
+    <div class="glass" style="padding:2rem;border-color:rgba(124,58,237,.35);box-shadow:0 0 40px rgba(124,58,237,.08)">
+      <div style="display:flex;align-items:center;gap:.9rem;margin-bottom:1.2rem">
+        <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(99,102,241,.15));display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 0 20px rgba(124,58,237,.2)">🪝</div>
+        <div>
+          <div style="font-size:.6rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#7c3aed;font-family:'JetBrains Mono',monospace;margin-bottom:.2rem">Primary · Hook-native</div>
+          <h3 style="font-size:1.05rem;font-weight:800;color:#e2e8f0">Kiro IDE</h3>
+        </div>
+      </div>
+      <p style="font-size:.82rem;color:#64748b;line-height:1.65;margin-bottom:1.2rem">The native platform. Loop Engineering was built for Kiro. The hook fires on every <code>promptSubmit</code> event — no copy-paste required, no manual activation.</p>
+      <div style="background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.2);border-radius:10px;padding:1rem;margin-bottom:1rem">
+        <div style="font-size:.62rem;font-weight:700;color:#7c3aed;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;font-family:'JetBrains Mono',monospace">Setup</div>
+        <div style="font-size:.78rem;color:#94a3b8;line-height:1.7">
+          <div style="margin-bottom:.3rem">1. Clone or copy the <code>kiro/</code> folder</div>
+          <div style="margin-bottom:.3rem">2. Run <code>ln -s kiro .kiro</code> in your project root</div>
+          <div style="margin-bottom:.3rem">3. Open Kiro — the hook auto-loads on first prompt</div>
+          <div>4. Prefix with <code>[LOOP]</code> to force full routing</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:.4rem">
+        <span style="background:rgba(124,58,237,.12);color:#c4b5fd;border:1px solid rgba(124,58,237,.2);border-radius:5px;padding:.15rem .55rem;font-size:.62rem;font-weight:700">Auto-fires</span>
+        <span style="background:rgba(124,58,237,.12);color:#c4b5fd;border:1px solid rgba(124,58,237,.2);border-radius:5px;padding:.15rem .55rem;font-size:.62rem;font-weight:700">Hook-native</span>
+        <span style="background:rgba(124,58,237,.12);color:#c4b5fd;border:1px solid rgba(124,58,237,.2);border-radius:5px;padding:.15rem .55rem;font-size:.62rem;font-weight:700">No setup per project</span>
+      </div>
+    </div>
+
+    <!-- Claude -->
+    <div class="glass" style="padding:2rem;border-color:rgba(6,182,212,.3);box-shadow:0 0 40px rgba(6,182,212,.06)">
+      <div style="display:flex;align-items:center;gap:.9rem;margin-bottom:1.2rem">
+        <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(6,182,212,.2),rgba(20,184,166,.1));display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 0 20px rgba(6,182,212,.15)">🤖</div>
+        <div>
+          <div style="font-size:.6rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#06b6d4;font-family:'JetBrains Mono',monospace;margin-bottom:.2rem">System Prompt · Projects</div>
+          <h3 style="font-size:1.05rem;font-weight:800;color:#e2e8f0">Claude Projects</h3>
+        </div>
+      </div>
+      <p style="font-size:.82rem;color:#64748b;line-height:1.65;margin-bottom:1.2rem">Paste <code>claude-system-prompt.md</code> into the Claude Project's system prompt field. All 8 knowledge files attach as project documents. Full orchestration in every conversation.</p>
+      <div style="background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.15);border-radius:10px;padding:1rem;margin-bottom:1rem">
+        <div style="font-size:.62rem;font-weight:700;color:#06b6d4;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;font-family:'JetBrains Mono',monospace">Knowledge Files (attach all 8)</div>
+        <div style="font-size:.75rem;color:#475569;line-height:1.8;font-family:'JetBrains Mono',monospace">
+          elite-team-orchestrator.kiro.hook<br>
+          team-orchestrator-core.md<br>
+          team-orchestrator-sprint.md<br>
+          team-orchestrator-rules.md<br>
+          orchestrator-routing.md<br>
+          discovery-engine.md<br>
+          ponytail.md<br>
+          lessons.md
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:.4rem">
+        <span style="background:rgba(6,182,212,.1);color:#67e8f9;border:1px solid rgba(6,182,212,.2);border-radius:5px;padding:.15rem .55rem;font-size:.62rem;font-weight:700">System prompt</span>
+        <span style="background:rgba(6,182,212,.1);color:#67e8f9;border:1px solid rgba(6,182,212,.2);border-radius:5px;padding:.15rem .55rem;font-size:.62rem;font-weight:700">8 knowledge files</span>
+        <span style="background:rgba(6,182,212,.1);color:#67e8f9;border:1px solid rgba(6,182,212,.2);border-radius:5px;padding:.15rem .55rem;font-size:.62rem;font-weight:700">All gates enforced</span>
+      </div>
+    </div>
+
+    <!-- ChatGPT -->
+    <div class="glass" style="padding:2rem;border-color:rgba(16,185,129,.25);box-shadow:0 0 40px rgba(16,185,129,.05)">
+      <div style="display:flex;align-items:center;gap:.9rem;margin-bottom:1.2rem">
+        <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(20,184,166,.1));display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 0 20px rgba(16,185,129,.15)">🗨️</div>
+        <div>
+          <div style="font-size:.6rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#10b981;font-family:'JetBrains Mono',monospace;margin-bottom:.2rem">Custom GPT · Projects</div>
+          <h3 style="font-size:1.05rem;font-weight:800;color:#e2e8f0">ChatGPT</h3>
+        </div>
+      </div>
+      <p style="font-size:.82rem;color:#64748b;line-height:1.65;margin-bottom:1.2rem">Paste <code>chatgpt-system-prompt.md</code> into a Custom GPT or ChatGPT Project. Attach the same 8 knowledge files. Or paste it as the first message in any single chat — limited but functional.</p>
+      <div style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.15);border-radius:10px;padding:1rem;margin-bottom:1rem">
+        <div style="font-size:.62rem;font-weight:700;color:#10b981;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;font-family:'JetBrains Mono',monospace">3 Options</div>
+        <div style="font-size:.78rem;color:#94a3b8;line-height:1.7">
+          <div style="margin-bottom:.3rem"><span style="color:#10b981;font-weight:700">Custom GPT</span> — best, persistent across sessions</div>
+          <div style="margin-bottom:.3rem"><span style="color:#10b981;font-weight:700">ChatGPT Project</span> — good, system prompt + files attached</div>
+          <div><span style="color:#64748b;font-weight:700">Single Chat</span> — limited, paste prompt as first message</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:.4rem">
+        <span style="background:rgba(16,185,129,.1);color:#6ee7b7;border:1px solid rgba(16,185,129,.2);border-radius:5px;padding:.15rem .55rem;font-size:.62rem;font-weight:700">Custom GPT</span>
+        <span style="background:rgba(16,185,129,.1);color:#6ee7b7;border:1px solid rgba(16,185,129,.2);border-radius:5px;padding:.15rem .55rem;font-size:.62rem;font-weight:700">3 tiers</span>
+        <span style="background:rgba(16,185,129,.1);color:#6ee7b7;border:1px solid rgba(16,185,129,.2);border-radius:5px;padding:.15rem .55rem;font-size:.62rem;font-weight:700">Cross-platform</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Adapter files table -->
+  <div style="background:rgba(10,16,32,.8);border:1px solid rgba(124,58,237,.2);border-radius:16px;overflow:hidden;backdrop-filter:blur(20px)">
+    <div style="padding:1.2rem 1.5rem;border-bottom:1px solid rgba(124,58,237,.15);display:flex;align-items:center;gap:.8rem">
+      <span style="font-size:.62rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#7c3aed;font-family:'JetBrains Mono',monospace">kiro/adapters/</span>
+      <span style="font-size:.72rem;color:#475569">4 files · All synced to Fix 43C · Dry Run v11 · 9.5/10</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="border-bottom:1px solid rgba(124,58,237,.1)">
+          <th style="padding:.65rem 1.5rem;text-align:left;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569">File</th>
+          <th style="padding:.65rem 1.5rem;text-align:left;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569">Platform</th>
+          <th style="padding:.65rem 1.5rem;text-align:left;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569">Purpose</th>
+          <th style="padding:.65rem 1.5rem;text-align:left;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569">Where to paste</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03)">
+          <td style="padding:.75rem 1.5rem"><code style="color:#a78bfa">claude-system-prompt.md</code></td>
+          <td style="padding:.75rem 1.5rem"><span style="font-size:.72rem;color:#67e8f9;font-weight:600">Claude</span></td>
+          <td style="padding:.75rem 1.5rem;font-size:.78rem;color:#64748b">Full orchestration system prompt, all 22 agents, all gates</td>
+          <td style="padding:.75rem 1.5rem;font-size:.75rem;color:#475569">Project system prompt field</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03)">
+          <td style="padding:.75rem 1.5rem"><code style="color:#a78bfa">claude-setup-guide.md</code></td>
+          <td style="padding:.75rem 1.5rem"><span style="font-size:.72rem;color:#67e8f9;font-weight:600">Claude</span></td>
+          <td style="padding:.75rem 1.5rem;font-size:.78rem;color:#64748b">Step-by-step guide: Project creation, 8 knowledge files, verification</td>
+          <td style="padding:.75rem 1.5rem;font-size:.75rem;color:#475569">Reference / README</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03)">
+          <td style="padding:.75rem 1.5rem"><code style="color:#a78bfa">chatgpt-system-prompt.md</code></td>
+          <td style="padding:.75rem 1.5rem"><span style="font-size:.72rem;color:#6ee7b7;font-weight:600">ChatGPT</span></td>
+          <td style="padding:.75rem 1.5rem;font-size:.78rem;color:#64748b">Adapted system prompt for GPT-4 model family</td>
+          <td style="padding:.75rem 1.5rem;font-size:.75rem;color:#475569">Custom GPT instructions field</td>
+        </tr>
+        <tr>
+          <td style="padding:.75rem 1.5rem"><code style="color:#a78bfa">chatgpt-setup-guide.md</code></td>
+          <td style="padding:.75rem 1.5rem"><span style="font-size:.72rem;color:#6ee7b7;font-weight:600">ChatGPT</span></td>
+          <td style="padding:.75rem 1.5rem;font-size:.78rem;color:#64748b">Custom GPT creation walkthrough: 3-tier options, knowledge upload</td>
+          <td style="padding:.75rem 1.5rem;font-size:.75rem;color:#475569">Reference / README</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Platform comparison -->
+  <div style="margin-top:1.5rem;background:rgba(10,16,32,.7);border:1px solid rgba(124,58,237,.15);border-radius:16px;overflow:hidden;backdrop-filter:blur(20px)">
+    <div style="padding:1rem 1.5rem;border-bottom:1px solid rgba(124,58,237,.1)">
+      <span style="font-size:.62rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#7c3aed;font-family:'JetBrains Mono',monospace">Platform Comparison</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="border-bottom:1px solid rgba(124,58,237,.1)">
+          <th style="padding:.6rem 1.5rem;text-align:left;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569">Capability</th>
+          <th style="padding:.6rem 1.5rem;text-align:center;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#a78bfa">Kiro IDE</th>
+          <th style="padding:.6rem 1.5rem;text-align:center;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#67e8f9">Claude</th>
+          <th style="padding:.6rem 1.5rem;text-align:center;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6ee7b7">ChatGPT</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03)"><td style="padding:.6rem 1.5rem;font-size:.78rem;color:#64748b">Auto-fires on every prompt</td><td style="text-align:center;padding:.6rem">✅</td><td style="text-align:center;padding:.6rem">✅</td><td style="text-align:center;padding:.6rem">✅</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03)"><td style="padding:.6rem 1.5rem;font-size:.78rem;color:#64748b">File system access (codebase)</td><td style="text-align:center;padding:.6rem">✅</td><td style="text-align:center;padding:.6rem">⚠️ limited</td><td style="text-align:center;padding:.6rem">⚠️ limited</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03)"><td style="padding:.6rem 1.5rem;font-size:.78rem;color:#64748b">Persistent session memory</td><td style="text-align:center;padding:.6rem">✅</td><td style="text-align:center;padding:.6rem">✅ Projects</td><td style="text-align:center;padding:.6rem">✅ Custom GPT</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03)"><td style="padding:.6rem 1.5rem;font-size:.78rem;color:#64748b">All 22 agents active</td><td style="text-align:center;padding:.6rem">✅</td><td style="text-align:center;padding:.6rem">✅</td><td style="text-align:center;padding:.6rem">✅</td></tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03)"><td style="padding:.6rem 1.5rem;font-size:.78rem;color:#64748b">Gates S1 + S2 enforced</td><td style="text-align:center;padding:.6rem">✅</td><td style="text-align:center;padding:.6rem">✅</td><td style="text-align:center;padding:.6rem">✅</td></tr>
+        <tr><td style="padding:.6rem 1.5rem;font-size:.78rem;color:#64748b">Code execution / terminal</td><td style="text-align:center;padding:.6rem">✅</td><td style="text-align:center;padding:.6rem">✅ Code tool</td><td style="text-align:center;padding:.6rem">✅ Code interpreter</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
