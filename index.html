@@ -4,297 +4,317 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Loop Engineering — Elite AI Orchestration System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #050810;
-    --bg2: #0a0f1e;
-    --bg3: #0f1629;
-    --accent: #6366f1;
-    --accent2: #8b5cf6;
-    --accent3: #06b6d4;
-    --green: #10b981;
-    --yellow: #f59e0b;
-    --red: #ef4444;
-    --pink: #ec4899;
-    --text: #e2e8f0;
-    --muted: #64748b;
-    --border: rgba(99,102,241,0.2);
-    --card: rgba(15,22,41,0.8);
-    --glow: rgba(99,102,241,0.15);
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html { scroll-behavior: smooth; }
-  body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; overflow-x: hidden; }
+:root {
+  --bg:      #02040a;
+  --bg2:     #060c18;
+  --bg3:     #0a1020;
+  --violet:  #7c3aed;
+  --purple:  #a855f7;
+  --indigo:  #6366f1;
+  --cyan:    #06b6d4;
+  --teal:    #14b8a6;
+  --emerald: #10b981;
+  --pink:    #ec4899;
+  --rose:    #f43f5e;
+  --amber:   #f59e0b;
+  --text:    #f1f5f9;
+  --muted:   #64748b;
+  --subtle:  #1e293b;
+  --border:  rgba(124,58,237,0.25);
+  --glass:   rgba(10,16,32,0.6);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow-x:hidden}
+code{font-family:'JetBrains Mono',monospace;font-size:.82em;background:rgba(124,58,237,.12);padding:.1em .35em;border-radius:4px;color:#c4b5fd}
 
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:var(--bg); }
-  ::-webkit-scrollbar-thumb { background:var(--accent); border-radius:3px; }
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--violet),var(--cyan));border-radius:3px}
 
-  /* ── NAV ── */
-  nav {
-    position: fixed; top:0; left:0; right:0; z-index:100;
-    backdrop-filter: blur(20px); background: rgba(5,8,16,0.85);
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items:center; justify-content:space-between;
-    padding: 0 2rem; height: 60px;
-  }
-  .nav-logo { font-size:1rem; font-weight:700; letter-spacing:.05em; }
-  .nav-logo span { color: var(--accent); }
-  .nav-links { display:flex; gap:1.5rem; }
-  .nav-links a { color:var(--muted); text-decoration:none; font-size:.8rem; font-weight:500; letter-spacing:.05em; text-transform:uppercase; transition:.2s; }
-  .nav-links a:hover { color:var(--text); }
+/* ── NOISE OVERLAY ── */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
 
-  /* ── HERO ── */
-  #hero {
-    min-height: 100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    text-align:center; padding: 80px 2rem 4rem; position:relative; overflow:hidden;
-  }
-  .hero-bg {
-    position:absolute; inset:0; z-index:0;
-    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,.18) 0%, transparent 70%),
-                radial-gradient(ellipse 50% 40% at 80% 80%, rgba(139,92,246,.12) 0%, transparent 60%),
-                radial-gradient(ellipse 40% 30% at 20% 60%, rgba(6,182,212,.08) 0%, transparent 60%);
-  }
-  .hero-grid {
-    position:absolute; inset:0; z-index:0;
-    background-image: linear-gradient(rgba(99,102,241,.05) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(99,102,241,.05) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
-  }
-  .badge {
-    display:inline-flex; align-items:center; gap:.5rem;
-    background: rgba(99,102,241,.12); border:1px solid rgba(99,102,241,.3);
-    border-radius:999px; padding:.3rem 1rem; font-size:.75rem; font-weight:600;
-    letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin-bottom:1.5rem;
-    position:relative; z-index:1;
-  }
-  .badge-dot { width:6px; height:6px; background:var(--green); border-radius:50%; animation:pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.5)} }
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  backdrop-filter:blur(24px) saturate(180%);
+  background:rgba(2,4,10,0.8);
+  border-bottom:1px solid rgba(124,58,237,.2);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2.5rem;height:62px;
+}
+.nav-logo{font-size:.95rem;font-weight:900;letter-spacing:.08em;background:linear-gradient(135deg,#a78bfa,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-links{display:flex;gap:2rem}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;transition:.25s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--violet),var(--cyan));transform:scaleX(0);transition:.25s}
+.nav-links a:hover{color:var(--text)}
+.nav-links a:hover::after{transform:scaleX(1)}
 
-  h1 { font-size: clamp(2.5rem, 6vw, 5rem); font-weight:800; line-height:1.1; letter-spacing:-.03em; position:relative; z-index:1; max-width:900px; }
-  h1 .grad { background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 30%, #6366f1 60%, #06b6d4 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-  .hero-sub { margin: 1.5rem auto 0; max-width:600px; color:var(--muted); font-size:1.05rem; line-height:1.7; position:relative; z-index:1; }
-  .hero-stats { display:flex; gap:2rem; justify-content:center; flex-wrap:wrap; margin-top:3rem; position:relative; z-index:1; }
-  .stat { text-align:center; }
-  .stat-n { font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,#a5b4fc,#06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-  .stat-l { font-size:.75rem; color:var(--muted); font-weight:600; letter-spacing:.06em; text-transform:uppercase; margin-top:.2rem; }
-  .hero-cta { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:2.5rem; position:relative; z-index:1; }
-  .btn { padding:.7rem 1.6rem; border-radius:8px; font-size:.85rem; font-weight:600; cursor:pointer; transition:.2s; text-decoration:none; letter-spacing:.02em; }
-  .btn-primary { background:var(--accent); color:#fff; border:none; box-shadow:0 0 30px rgba(99,102,241,.4); }
-  .btn-primary:hover { background:#4f46e5; transform:translateY(-1px); box-shadow:0 0 40px rgba(99,102,241,.6); }
-  .btn-ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
-  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+/* ── HERO ── */
+#hero{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:90px 2rem 5rem;position:relative;overflow:hidden;
+}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;animation:drift 12s ease-in-out infinite alternate}
+.orb1{width:600px;height:600px;background:radial-gradient(circle,#7c3aed,transparent);top:-200px;left:-150px;animation-delay:0s}
+.orb2{width:500px;height:500px;background:radial-gradient(circle,#06b6d4,transparent);bottom:-100px;right:-100px;animation-delay:-4s}
+.orb3{width:400px;height:400px;background:radial-gradient(circle,#ec4899,transparent);top:30%;left:60%;animation-delay:-8s;opacity:.2}
+@keyframes drift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(40px,30px) scale(1.08)}}
 
-  /* ── SECTIONS ── */
-  section { padding: 5rem 2rem; max-width:1200px; margin:0 auto; }
-  .section-label { font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:.75rem; }
-  h2 { font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight:800; letter-spacing:-.02em; margin-bottom:.75rem; }
-  .section-sub { color:var(--muted); font-size:.95rem; line-height:1.7; max-width:600px; margin-bottom:3rem; }
-  .divider { height:1px; background:linear-gradient(90deg, transparent, var(--border), transparent); margin: 0; }
+.hero-grid{
+  position:absolute;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(124,58,237,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,.07) 1px,transparent 1px);
+  background-size:72px 72px;
+  mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,black 20%,transparent 100%);
+}
 
-  /* ── HOW IT WORKS ── */
-  .how-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:1.5rem; }
-  .how-card {
-    background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1.75rem;
-    position:relative; overflow:hidden; transition:.3s;
-  }
-  .how-card::before { content:''; position:absolute; inset:0; border-radius:16px; opacity:0; background:var(--glow); transition:.3s; }
-  .how-card:hover::before { opacity:1; }
-  .how-card:hover { border-color:rgba(99,102,241,.5); transform:translateY(-2px); }
-  .how-num { font-size:.7rem; font-weight:800; letter-spacing:.1em; color:var(--accent); text-transform:uppercase; margin-bottom:.5rem; }
-  .how-card h3 { font-size:1.05rem; font-weight:700; margin-bottom:.5rem; }
-  .how-card p { color:var(--muted); font-size:.85rem; line-height:1.6; }
-  .how-icon { font-size:1.8rem; margin-bottom:.75rem; }
+.badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.4);
+  border-radius:999px;padding:.35rem 1.1rem;font-size:.7rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:#c4b5fd;margin-bottom:1.8rem;
+  position:relative;z-index:1;backdrop-filter:blur(12px);
+  box-shadow:0 0 24px rgba(124,58,237,.2),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.badge-dot{width:7px;height:7px;background:var(--emerald);border-radius:50%;box-shadow:0 0 8px var(--emerald);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.6)}}
 
-  /* ── PHASES ── */
-  .phases { display:grid; grid-template-columns:repeat(3,1fr); gap:0; position:relative; }
-  .phases::before { content:''; position:absolute; top:50px; left:16.66%; right:16.66%; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3)); z-index:0; }
-  .phase {
-    text-align:center; padding:1.5rem 1rem; position:relative; z-index:1;
-    background:var(--card); border:1px solid var(--border); border-radius:16px; margin:.5rem;
-    transition:.3s;
-  }
-  .phase:hover { border-color:rgba(99,102,241,.5); transform:translateY(-3px); }
-  .phase-icon { width:56px; height:56px; border-radius:14px; margin:0 auto 1rem; display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
-  .phase-think .phase-icon { background:rgba(99,102,241,.15); box-shadow:0 0 20px rgba(99,102,241,.2); }
-  .phase-design .phase-icon { background:rgba(139,92,246,.15); box-shadow:0 0 20px rgba(139,92,246,.2); }
-  .phase-develop .phase-icon { background:rgba(6,182,212,.15); box-shadow:0 0 20px rgba(6,182,212,.2); }
-  .phase h3 { font-size:1rem; font-weight:700; margin-bottom:.4rem; }
-  .phase p { color:var(--muted); font-size:.8rem; line-height:1.5; }
-  .phase-tags { display:flex; flex-wrap:wrap; gap:.4rem; justify-content:center; margin-top:.8rem; }
-  .tag { background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.2); border-radius:999px; padding:.2rem .6rem; font-size:.68rem; font-weight:600; color:#a5b4fc; }
+h1{font-size:clamp(2.8rem,6.5vw,5.5rem);font-weight:900;line-height:1.05;letter-spacing:-.04em;position:relative;z-index:1;max-width:960px}
+.grad-title{background:linear-gradient(135deg,#e0e7ff 0%,#a78bfa 25%,#818cf8 50%,#38bdf8 75%,#34d399 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{margin:1.8rem auto 0;max-width:620px;color:#94a3b8;font-size:1.05rem;line-height:1.75;position:relative;z-index:1}
 
-  /* ── FLOWCHART ── */
-  #flowchart { max-width:1200px; margin:0 auto; padding:5rem 2rem; }
-  .flow-container { background:var(--bg2); border:1px solid var(--border); border-radius:20px; padding:2rem; overflow-x:auto; }
-  svg.flow { width:100%; min-width:900px; }
+.hero-stats{display:flex;gap:1px;justify-content:center;flex-wrap:wrap;margin-top:3.5rem;position:relative;z-index:1;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.2);border-radius:20px;overflow:hidden;backdrop-filter:blur(12px)}
+.stat{text-align:center;padding:1.5rem 2rem;flex:1;min-width:110px;position:relative}
+.stat+.stat::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:1px;background:rgba(124,58,237,.2)}
+.stat-n{font-size:2rem;font-weight:900;background:linear-gradient(135deg,#c4b5fd,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.stat-l{font-size:.65rem;color:var(--muted);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:.4rem}
 
-  /* ── MODES ── */
-  .modes-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1.2rem; }
-  .mode-card {
-    background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.4rem;
-    transition:.3s; cursor:default;
-  }
-  .mode-card:hover { border-color:rgba(99,102,241,.5); transform:translateY(-2px); }
-  .mode-num { font-size:2rem; font-weight:900; line-height:1; }
-  .m1 .mode-num { color:var(--accent); }
-  .m2 .mode-num { color:var(--accent2); }
-  .m3 .mode-num { color:var(--green); }
-  .m4 .mode-num { color:var(--yellow); }
-  .m5 .mode-num { color:var(--accent3); }
-  .mode-label { font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:.25rem 0 .6rem; }
-  .mode-card h3 { font-size:.95rem; font-weight:700; margin-bottom:.4rem; }
-  .mode-card p { color:var(--muted); font-size:.78rem; line-height:1.5; }
-  .mode-badge { display:inline-block; padding:.15rem .5rem; border-radius:4px; font-size:.65rem; font-weight:700; margin-top:.6rem; }
-  .mode-agents { font-size:.72rem; color:var(--muted); margin-top:.4rem; }
+.hero-cta{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2.5rem;position:relative;z-index:1}
+.btn{padding:.75rem 1.8rem;border-radius:10px;font-size:.85rem;font-weight:700;cursor:pointer;transition:.25s;text-decoration:none;letter-spacing:.02em;display:inline-flex;align-items:center;gap:.5rem}
+.btn-primary{background:linear-gradient(135deg,var(--violet),var(--indigo));color:#fff;border:none;box-shadow:0 0 32px rgba(124,58,237,.45),inset 0 1px 0 rgba(255,255,255,.15)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 48px rgba(124,58,237,.65),inset 0 1px 0 rgba(255,255,255,.15)}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1px solid rgba(124,58,237,.3);backdrop-filter:blur(12px)}
+.btn-ghost:hover{border-color:rgba(124,58,237,.6);background:rgba(124,58,237,.08);transform:translateY(-2px)}
 
-  /* ── AGENTS ── */
-  .agents-phase { margin-bottom:3rem; }
-  .phase-header { display:flex; align-items:center; gap:1rem; margin-bottom:1.2rem; }
-  .phase-pill { padding:.3rem .9rem; border-radius:999px; font-size:.7rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
-  .pill-think { background:rgba(99,102,241,.15); color:#a5b4fc; border:1px solid rgba(99,102,241,.3); }
-  .pill-design { background:rgba(139,92,246,.15); color:#c4b5fd; border:1px solid rgba(139,92,246,.3); }
-  .pill-develop { background:rgba(6,182,212,.15); color:#67e8f9; border:1px solid rgba(6,182,212,.3); }
-  .phase-line { flex:1; height:1px; background:var(--border); }
-  .agents-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1rem; }
-  .agent-card {
-    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.1rem 1.2rem;
-    transition:.3s; position:relative; overflow:hidden;
-  }
-  .agent-card::after { content:''; position:absolute; inset:0; opacity:0; transition:.3s; }
-  .agent-card:hover { transform:translateY(-2px); }
-  .agent-icon { font-size:1.4rem; margin-bottom:.5rem; }
-  .agent-role { font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:.2rem; }
-  .agent-card h4 { font-size:.88rem; font-weight:700; margin-bottom:.3rem; }
-  .agent-artifact { font-size:.72rem; color:var(--muted); line-height:1.4; }
-  .skill-count { display:inline-block; margin-top:.5rem; background:rgba(99,102,241,.1); border:1px solid rgba(99,102,241,.2); border-radius:4px; padding:.1rem .4rem; font-size:.62rem; font-weight:700; color:#a5b4fc; }
+/* ── TICKER ── */
+.ticker-wrap{background:linear-gradient(90deg,rgba(124,58,237,.08),rgba(6,182,212,.08));border-top:1px solid rgba(124,58,237,.15);border-bottom:1px solid rgba(6,182,212,.15);padding:.65rem 0;overflow:hidden}
+.ticker-inner{display:flex;gap:3rem;animation:ticker 40s linear infinite;white-space:nowrap}
+.ticker-inner:hover{animation-play-state:paused}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-item{font-size:.7rem;color:#94a3b8;display:flex;align-items:center;gap:.5rem;font-weight:500}
+.ticker-item .dot{width:5px;height:5px;background:var(--emerald);border-radius:50%;box-shadow:0 0 6px var(--emerald)}
 
-  /* ── SKILLS ── */
-  .skills-section { background:var(--bg2); border-radius:20px; padding:3rem 2rem; margin:0 1rem; }
-  .skills-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem; }
-  .skill-group { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1rem; }
-  .skill-group h4 { font-size:.78rem; font-weight:700; color:var(--accent); margin-bottom:.6rem; }
-  .skill-list { list-style:none; }
-  .skill-list li { font-size:.7rem; color:var(--muted); padding:.15rem 0; display:flex; align-items:center; gap:.4rem; }
-  .skill-list li::before { content:'›'; color:var(--accent); font-weight:700; }
+/* ── SECTIONS ── */
+.section-wrap{padding:6rem 2rem;max-width:1240px;margin:0 auto}
+.section-label{font-size:.65rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;background:linear-gradient(90deg,var(--violet),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.8rem}
+h2{font-size:clamp(1.9rem,3.2vw,2.8rem);font-weight:800;letter-spacing:-.03em;margin-bottom:.8rem;line-height:1.1}
+.section-sub{color:#94a3b8;font-size:.95rem;line-height:1.75;max-width:580px;margin-bottom:3rem}
+.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,.25),rgba(6,182,212,.25),transparent);max-width:1240px;margin:0 auto}
 
-  /* ── GATES ── */
-  .gates-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.2rem; }
-  .gate-card {
-    background:var(--card); border-radius:14px; padding:1.4rem; border-left:3px solid;
-    border-top:1px solid var(--border); border-right:1px solid var(--border); border-bottom:1px solid var(--border);
-    transition:.3s;
-  }
-  .gate-card:hover { transform:translateY(-2px); }
-  .g-s1 { border-left-color:var(--yellow); }
-  .g-s2 { border-left-color:var(--red); }
-  .g-guard1 { border-left-color:var(--accent); }
-  .g-guard2 { border-left-color:var(--pink); }
-  .gate-label { font-size:.65rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; margin-bottom:.4rem; }
-  .g-s1 .gate-label { color:var(--yellow); }
-  .g-s2 .gate-label { color:var(--red); }
-  .g-guard1 .gate-label { color:var(--accent); }
-  .g-guard2 .gate-label { color:var(--pink); }
-  .gate-card h3 { font-size:.95rem; font-weight:700; margin-bottom:.6rem; }
-  .gate-items { list-style:none; }
-  .gate-items li { font-size:.75rem; color:var(--muted); padding:.2rem 0; display:flex; gap:.5rem; }
-  .gate-items li::before { content:'✓'; font-weight:700; flex-shrink:0; }
-  .g-s1 .gate-items li::before { color:var(--yellow); }
-  .g-s2 .gate-items li::before { color:var(--red); }
-  .g-guard1 .gate-items li::before { color:var(--accent); }
-  .g-guard2 .gate-items li::before { color:var(--pink); }
+/* ── GLASS CARD ── */
+.glass{
+  background:rgba(10,16,32,.65);backdrop-filter:blur(20px) saturate(160%);
+  border:1px solid rgba(124,58,237,.2);border-radius:16px;
+  position:relative;overflow:hidden;transition:.3s cubic-bezier(.4,0,.2,1);
+}
+.glass::before{content:'';position:absolute;inset:0;border-radius:16px;background:linear-gradient(135deg,rgba(124,58,237,.05),transparent 60%);pointer-events:none}
+.glass:hover{border-color:rgba(124,58,237,.5);transform:translateY(-3px);box-shadow:0 8px 40px rgba(124,58,237,.18),0 0 0 1px rgba(124,58,237,.1)}
 
-  /* ── OUTPUTS ── */
-  .outputs-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem; }
-  .output-card {
-    background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.1rem;
-    transition:.3s;
-  }
-  .output-card:hover { border-color:rgba(99,102,241,.4); transform:translateY(-2px); }
-  .output-phase { font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin-bottom:.4rem; }
-  .op-think { color:var(--accent); }
-  .op-design { color:var(--accent2); }
-  .op-develop { color:var(--accent3); }
-  .output-card h4 { font-size:.85rem; font-weight:700; margin-bottom:.25rem; }
-  .output-card p { font-size:.72rem; color:var(--muted); }
+/* ── HOW IT WORKS ── */
+.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
+.how-card{padding:1.8rem}
+.how-num{font-size:.62rem;font-weight:800;letter-spacing:.14em;color:var(--violet);text-transform:uppercase;margin-bottom:.6rem;font-family:'JetBrains Mono',monospace}
+.how-icon{font-size:2rem;margin-bottom:.9rem;display:block}
+.how-card h3{font-size:1rem;font-weight:700;margin-bottom:.5rem;color:#e2e8f0}
+.how-card p{color:#64748b;font-size:.83rem;line-height:1.65}
 
-  /* ── FIXES TICKER ── */
-  .ticker-wrap { background:var(--bg2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:.6rem 0; overflow:hidden; }
-  .ticker-inner { display:flex; gap:3rem; animation:ticker 40s linear infinite; white-space:nowrap; }
-  .ticker-inner:hover { animation-play-state:paused; }
-  @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-  .ticker-item { font-size:.72rem; color:var(--muted); display:flex; align-items:center; gap:.5rem; }
-  .ticker-item .dot { width:5px; height:5px; background:var(--green); border-radius:50%; }
+/* ── PHASES ── */
+.phases{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.phase{padding:2rem 1.5rem;text-align:center}
+.phase-icon-wrap{width:64px;height:64px;border-radius:18px;margin:0 auto 1.2rem;display:flex;align-items:center;justify-content:center;font-size:1.6rem}
+.phase-think .phase-icon-wrap{background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(99,102,241,.1));box-shadow:0 0 30px rgba(124,58,237,.2)}
+.phase-design .phase-icon-wrap{background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(236,72,153,.1));box-shadow:0 0 30px rgba(168,85,247,.2)}
+.phase-develop .phase-icon-wrap{background:linear-gradient(135deg,rgba(6,182,212,.2),rgba(20,184,166,.1));box-shadow:0 0 30px rgba(6,182,212,.2)}
+.phase h3{font-size:1.1rem;font-weight:800;margin-bottom:.5rem}
+.phase p{color:#64748b;font-size:.82rem;line-height:1.6}
+.phase-tags{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;margin-top:1rem}
+.tag{border-radius:999px;padding:.2rem .65rem;font-size:.65rem;font-weight:700;border:1px solid}
+.phase-think .tag{background:rgba(124,58,237,.12);color:#c4b5fd;border-color:rgba(124,58,237,.25)}
+.phase-design .tag{background:rgba(168,85,247,.12);color:#d8b4fe;border-color:rgba(168,85,237,.25)}
+.phase-develop .tag{background:rgba(6,182,212,.1);color:#67e8f9;border-color:rgba(6,182,212,.2)}
 
-  /* ── DISCOVERY ── */
-  .discovery-row { display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start; }
-  .discovery-questions { list-style:none; counter-reset:q; }
-  .discovery-questions li {
-    counter-increment:q; display:flex; gap:1rem; padding:.8rem 0;
-    border-bottom:1px solid rgba(99,102,241,.1);
-  }
-  .discovery-questions li::before { content:counter(q); width:24px; height:24px; background:rgba(99,102,241,.15); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:.72rem; font-weight:800; color:var(--accent); flex-shrink:0; }
-  .discovery-questions li span { font-size:.82rem; color:var(--muted); line-height:1.5; padding-top:.1rem; }
-  .score-table { background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
-  .score-row { display:grid; grid-template-columns:auto 1fr auto; gap:1rem; align-items:center; padding:.75rem 1.2rem; border-bottom:1px solid rgba(255,255,255,.04); }
-  .score-row:last-child { border:none; }
-  .score-range { font-size:.75rem; font-weight:700; color:var(--text); }
-  .score-bar-wrap { background:rgba(255,255,255,.05); border-radius:999px; height:6px; }
-  .score-bar { border-radius:999px; height:6px; }
-  .score-label { font-size:.7rem; font-weight:700; }
+/* ── FLOWCHART ── */
+.flow-container{background:linear-gradient(135deg,rgba(10,16,32,.9),rgba(6,12,24,.95));border:1px solid rgba(124,58,237,.2);border-radius:20px;padding:2rem;overflow-x:auto;backdrop-filter:blur(20px)}
+svg.flow{width:100%;min-width:900px}
 
-  /* ── PONYTAIL ── */
-  .rungs { position:relative; padding-left:2rem; }
-  .rungs::before { content:''; position:absolute; left:.8rem; top:0; bottom:0; width:2px; background:linear-gradient(180deg, var(--accent), var(--accent2), var(--accent3)); }
-  .rung { position:relative; padding:.8rem 1rem 1rem 1.2rem; margin-bottom:1rem; background:var(--card); border:1px solid var(--border); border-radius:10px; }
-  .rung::before { content:''; position:absolute; left:-1.3rem; top:1rem; width:12px; height:12px; background:var(--bg2); border:2px solid var(--accent); border-radius:50%; z-index:1; }
-  .rung-n { font-size:.62rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:.2rem; }
-  .rung h4 { font-size:.88rem; font-weight:700; margin-bottom:.2rem; }
-  .rung p { font-size:.75rem; color:var(--muted); }
+/* ── MODES ── */
+.modes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1.2rem}
+.mode-card{padding:1.6rem}
+.mode-num{font-size:2.2rem;font-weight:900;line-height:1;font-family:'JetBrains Mono',monospace}
+.m1 .mode-num{background:linear-gradient(135deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.m2 .mode-num{background:linear-gradient(135deg,#d946ef,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.m3 .mode-num{background:linear-gradient(135deg,#34d399,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.m4 .mode-num{background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.m5 .mode-num{background:linear-gradient(135deg,#38bdf8,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.mode-label{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:.3rem 0 .7rem;font-family:'JetBrains Mono',monospace}
+.mode-card h3{font-size:.95rem;font-weight:700;margin-bottom:.4rem;color:#e2e8f0}
+.mode-card p{color:#64748b;font-size:.78rem;line-height:1.6}
+.mode-badge{display:inline-block;padding:.18rem .6rem;border-radius:5px;font-size:.62rem;font-weight:700;margin-top:.7rem;font-family:'JetBrains Mono',monospace}
+.mode-trigger{font-size:.68rem;color:#475569;margin-top:.4rem}
 
-  /* ── FOOTER ── */
-  footer {
-    border-top:1px solid var(--border); padding:2.5rem 2rem; text-align:center;
-    color:var(--muted); font-size:.78rem;
-  }
-  footer .foot-logo { font-size:1.1rem; font-weight:800; margin-bottom:.5rem; }
-  footer .foot-logo span { color:var(--accent); }
-  footer a { color:var(--accent); text-decoration:none; }
+/* ── AGENTS ── */
+.agents-phase{margin-bottom:3.5rem}
+.phase-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
+.phase-pill{padding:.3rem 1rem;border-radius:999px;font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.pill-think{background:rgba(124,58,237,.15);color:#c4b5fd;border:1px solid rgba(124,58,237,.3);box-shadow:0 0 12px rgba(124,58,237,.15)}
+.pill-design{background:rgba(168,85,247,.15);color:#d8b4fe;border:1px solid rgba(168,85,247,.3);box-shadow:0 0 12px rgba(168,85,247,.15)}
+.pill-develop{background:rgba(6,182,212,.12);color:#67e8f9;border:1px solid rgba(6,182,212,.25);box-shadow:0 0 12px rgba(6,182,212,.12)}
+.phase-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(124,58,237,.2),transparent)}
+.agents-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
+.agent-card{padding:1.2rem 1.3rem}
+.agent-icon{font-size:1.5rem;margin-bottom:.6rem;display:block}
+.agent-role{font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#475569;margin-bottom:.2rem;font-family:'JetBrains Mono',monospace}
+.agent-card h4{font-size:.88rem;font-weight:700;margin-bottom:.3rem;color:#e2e8f0}
+.agent-artifact{font-size:.72rem;color:#64748b;line-height:1.5}
+.skill-count{display:inline-block;margin-top:.6rem;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.25);border-radius:5px;padding:.12rem .5rem;font-size:.6rem;font-weight:700;color:#a78bfa;font-family:'JetBrains Mono',monospace}
 
-  /* ── RESPONSIVE ── */
-  @media(max-width:768px) {
-    .phases { grid-template-columns:1fr; }
-    .phases::before { display:none; }
-    .discovery-row { grid-template-columns:1fr; }
-    nav .nav-links { display:none; }
-    h1 { font-size:2.2rem; }
-  }
+/* ── GATES ── */
+.gates-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem}
+.gate-card{padding:1.6rem;border-radius:16px;backdrop-filter:blur(20px)}
+.gate-s1{background:linear-gradient(135deg,rgba(245,158,11,.06),rgba(10,16,32,.8));border:1px solid rgba(245,158,11,.25);box-shadow:0 0 30px rgba(245,158,11,.06)}
+.gate-s2{background:linear-gradient(135deg,rgba(244,63,94,.06),rgba(10,16,32,.8));border:1px solid rgba(244,63,94,.25);box-shadow:0 0 30px rgba(244,63,94,.06)}
+.gate-g1{background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(10,16,32,.8));border:1px solid rgba(124,58,237,.3);box-shadow:0 0 30px rgba(124,58,237,.08)}
+.gate-g2{background:linear-gradient(135deg,rgba(236,72,153,.06),rgba(10,16,32,.8));border:1px solid rgba(236,72,153,.25);box-shadow:0 0 30px rgba(236,72,153,.06)}
+.gate-label{font-size:.6rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.5rem;font-family:'JetBrains Mono',monospace}
+.gate-s1 .gate-label{color:#fbbf24}.gate-s2 .gate-label{color:#fb7185}.gate-g1 .gate-label{color:#a78bfa}.gate-g2 .gate-label{color:#f472b6}
+.gate-card h3{font-size:.95rem;font-weight:700;margin-bottom:.8rem;color:#e2e8f0}
+.gate-items{list-style:none}
+.gate-items li{font-size:.75rem;color:#64748b;padding:.22rem 0;display:flex;gap:.5rem;line-height:1.4}
+.gate-items li::before{font-weight:700;flex-shrink:0}
+.gate-s1 .gate-items li::before{content:'◆';color:#fbbf24;font-size:.5rem;margin-top:.3rem}
+.gate-s2 .gate-items li::before{content:'◆';color:#fb7185;font-size:.5rem;margin-top:.3rem}
+.gate-g1 .gate-items li::before{content:'◆';color:#a78bfa;font-size:.5rem;margin-top:.3rem}
+.gate-g2 .gate-items li::before{content:'◆';color:#f472b6;font-size:.5rem;margin-top:.3rem}
+
+/* ── OUTPUTS ── */
+.outputs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem}
+.output-card{padding:1.2rem}
+.output-phase{font-size:.58rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;font-family:'JetBrains Mono',monospace}
+.op-think{color:#a78bfa}.op-design{color:#d8b4fe}.op-develop{color:#67e8f9}
+.output-card h4{font-size:.85rem;font-weight:700;margin-bottom:.25rem;color:#e2e8f0}
+.output-card p{font-size:.72rem;color:#64748b;line-height:1.5}
+
+/* ── DISCOVERY ── */
+.discovery-row{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:start}
+.discovery-questions{list-style:none;counter-reset:q}
+.discovery-questions li{counter-increment:q;display:flex;gap:1rem;padding:.9rem 0;border-bottom:1px solid rgba(124,58,237,.08)}
+.discovery-questions li::before{content:counter(q);width:26px;height:26px;background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(99,102,241,.1));border:1px solid rgba(124,58,237,.3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:#a78bfa;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+.discovery-questions li span{font-size:.82rem;color:#64748b;line-height:1.6;padding-top:.15rem}
+.score-table{background:rgba(10,16,32,.7);border:1px solid rgba(124,58,237,.2);border-radius:16px;overflow:hidden;backdrop-filter:blur(20px)}
+.score-row{display:grid;grid-template-columns:60px 1fr 130px;gap:1rem;align-items:center;padding:.8rem 1.3rem;border-bottom:1px solid rgba(255,255,255,.03)}
+.score-row:last-child{border:none}
+.score-range{font-size:.72rem;font-weight:700;color:#e2e8f0;font-family:'JetBrains Mono',monospace}
+.score-bar-wrap{background:rgba(255,255,255,.04);border-radius:999px;height:6px}
+.score-bar{border-radius:999px;height:6px}
+.score-mode{font-size:.68rem;font-weight:700;text-align:right}
+
+/* ── PONYTAIL ── */
+.rungs{position:relative;padding-left:2.5rem}
+.rungs::before{content:'';position:absolute;left:1rem;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--violet),var(--purple),var(--cyan));border-radius:1px}
+.rung{position:relative;padding:.9rem 1.2rem 1.1rem;margin-bottom:1rem;border-radius:12px}
+.rung::before{content:'';position:absolute;left:-1.6rem;top:1.1rem;width:14px;height:14px;background:var(--bg2);border:2px solid var(--violet);border-radius:50%;z-index:1;box-shadow:0 0 10px rgba(124,58,237,.4)}
+.rung-n{font-size:.58rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--violet);margin-bottom:.2rem;font-family:'JetBrains Mono',monospace}
+.rung h4{font-size:.88rem;font-weight:700;margin-bottom:.2rem;color:#e2e8f0}
+.rung p{font-size:.75rem;color:#64748b;line-height:1.55}
+
+/* ── SKILLS ── */
+.skills-wrap{background:linear-gradient(135deg,rgba(124,58,237,.04),rgba(6,182,212,.02));border:1px solid rgba(124,58,237,.15);border-radius:20px;padding:2.5rem;margin:0 1rem}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:1rem}
+.skill-group{background:rgba(10,16,32,.7);border:1px solid rgba(124,58,237,.15);border-radius:12px;padding:1.1rem;backdrop-filter:blur(12px);transition:.25s}
+.skill-group:hover{border-color:rgba(124,58,237,.35);background:rgba(124,58,237,.05)}
+.skill-group h4{font-size:.75rem;font-weight:700;color:#a78bfa;margin-bottom:.7rem;display:flex;align-items:center;gap:.4rem}
+.skill-list{list-style:none}
+.skill-list li{font-size:.68rem;color:#475569;padding:.14rem 0;display:flex;align-items:center;gap:.4rem;transition:.2s}
+.skill-list li:hover{color:#94a3b8}
+.skill-list li::before{content:'›';color:#7c3aed;font-weight:700;font-size:.9rem}
+
+/* ── FEATURES TABLE ── */
+.fix-filter{background:rgba(10,16,32,.7);border:1px solid rgba(124,58,237,.2);border-radius:8px;padding:.35rem .9rem;font-size:.72rem;font-weight:600;color:var(--muted);cursor:pointer;transition:.25s;backdrop-filter:blur(12px)}
+.fix-filter:hover{border-color:rgba(124,58,237,.5);color:var(--text)}
+.fix-filter.active{background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.5);color:#c4b5fd;box-shadow:0 0 16px rgba(124,58,237,.15)}
+#fix-table-wrap{background:rgba(10,16,32,.8);border:1px solid rgba(124,58,237,.2);border-radius:16px;overflow:hidden;backdrop-filter:blur(20px)}
+#fix-tbody tr{border-bottom:1px solid rgba(255,255,255,.03);transition:.15s}
+#fix-tbody tr:last-child{border:none}
+#fix-tbody tr:hover{background:rgba(124,58,237,.05)}
+#fix-tbody td{padding:.7rem 1.1rem;font-size:.79rem;vertical-align:top}
+.type-pill{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .6rem;border-radius:6px;font-size:.65rem;font-weight:700;white-space:nowrap}
+.tp-Feature{background:rgba(124,58,237,.15);color:#c4b5fd;border:1px solid rgba(124,58,237,.2)}
+.tp-Fix{background:rgba(6,182,212,.1);color:#67e8f9;border:1px solid rgba(6,182,212,.2)}
+.tp-Guard{background:rgba(236,72,153,.1);color:#f9a8d4;border:1px solid rgba(236,72,153,.2)}
+.tp-Gate{background:rgba(244,63,94,.1);color:#fda4af;border:1px solid rgba(244,63,94,.2)}
+.tp-Architecture{background:rgba(245,158,11,.1);color:#fcd34d;border:1px solid rgba(245,158,11,.2)}
+.cat-pill{display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.62rem;font-weight:600;background:rgba(255,255,255,.04);color:#475569;font-family:'JetBrains Mono',monospace}
+.fix-id{font-size:.7rem;font-weight:700;color:#818cf8;white-space:nowrap;font-family:'JetBrains Mono',monospace}
+.fix-desc{color:#94a3b8;line-height:1.45}
+.fix-candidate{color:#fbbf24!important}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid rgba(124,58,237,.15);padding:3rem 2rem;text-align:center;color:#475569;font-size:.78rem;position:relative;overflow:hidden}
+footer::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,58,237,.03),rgba(6,182,212,.02))}
+.foot-logo{font-size:1.2rem;font-weight:900;margin-bottom:.6rem;background:linear-gradient(135deg,#a78bfa,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
+footer a{color:#818cf8;text-decoration:none;transition:.2s}
+footer a:hover{color:#c4b5fd}
+
+/* ── SUMMARY PILLS ── */
+.sum-pills{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:2.5rem}
+.sum-pill{display:flex;align-items:center;gap:.5rem;border-radius:999px;padding:.38rem 1rem;font-size:.76rem;font-weight:700;border:1px solid}
+.sp-feat{background:rgba(124,58,237,.1);color:#c4b5fd;border-color:rgba(124,58,237,.3)}
+.sp-fix{background:rgba(6,182,212,.08);color:#67e8f9;border-color:rgba(6,182,212,.2)}
+.sp-guard{background:rgba(236,72,153,.08);color:#f9a8d4;border-color:rgba(236,72,153,.2)}
+.sp-gate{background:rgba(244,63,94,.08);color:#fda4af;border-color:rgba(244,63,94,.2)}
+.sp-arch{background:rgba(245,158,11,.08);color:#fcd34d;border-color:rgba(245,158,11,.2)}
+.sum-pill .sp-count{font-size:.65rem;color:rgba(255,255,255,.3);font-weight:500}
+
+@media(max-width:768px){
+  .phases,.discovery-row{grid-template-columns:1fr}
+  nav .nav-links{display:none}
+  h1{font-size:2.4rem}
+  .hero-stats{flex-direction:column}
+  .stat+.stat::before{display:none}
+}
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo">LOOP<span>.</span>ENGINEERING</div>
+  <div class="nav-logo">LOOP · ENGINEERING</div>
   <div class="nav-links">
-    <a href="#how">How It Works</a>
+    <a href="#how">System</a>
     <a href="#modes">Modes</a>
     <a href="#agents">Agents</a>
-    <a href="#flow">Flowchart</a>
+    <a href="#flow">Flow</a>
     <a href="#gates">Gates</a>
-    <a href="#outputs">Outputs</a>
-    <a href="#features">Features</a>
+    <a href="#features">Fixes</a>
   </div>
 </nav>
 
 <!-- HERO -->
 <section id="hero" style="max-width:100%;padding-top:80px;">
-  <div class="hero-bg"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
   <div class="hero-grid"></div>
+
   <div class="badge"><span class="badge-dot"></span>Dry Run v11 · 9.5/10 Ship Confidence · Fix 43C</div>
-  <h1>The <span class="grad">Elite AI Engineering</span><br>Orchestration System</h1>
+
+  <h1>The <span class="grad-title">Elite AI Engineering</span><br>Orchestration System</h1>
   <p class="hero-sub">22 specialist AI agents. 5 execution modes. 3 structured phases. Security gates, ponytail dependency rungs, and 51 implemented fixes — all wired into a single hook.</p>
+
   <div class="hero-stats">
     <div class="stat"><div class="stat-n">22</div><div class="stat-l">Specialist Agents</div></div>
     <div class="stat"><div class="stat-n">5</div><div class="stat-l">Execution Modes</div></div>
@@ -303,9 +323,10 @@
     <div class="stat"><div class="stat-n">130+</div><div class="stat-l">Skill Files</div></div>
     <div class="stat"><div class="stat-n">9.5/10</div><div class="stat-l">Ship Confidence</div></div>
   </div>
+
   <div class="hero-cta">
-    <a href="https://github.com/supersaiyane/loopEngineering" class="btn btn-primary" target="_blank">View on GitHub</a>
-    <a href="#how" class="btn btn-ghost">How It Works</a>
+    <a href="https://github.com/supersaiyane/loopEngineering" class="btn btn-primary" target="_blank">⭐ View on GitHub</a>
+    <a href="#how" class="btn btn-ghost">How It Works ↓</a>
   </div>
 </section>
 
@@ -319,10 +340,11 @@
     <div class="ticker-item"><span class="dot"></span>Fix 41B — Comprehension Debt Rubric at SM-RETRO</div>
     <div class="ticker-item"><span class="dot"></span>Fix 40A — 5-Stage Memory Progression</div>
     <div class="ticker-item"><span class="dot"></span>Fix 38A — 25-Signal Confidence Scoring</div>
+    <div class="ticker-item"><span class="dot"></span>Fix 37 — Ponytail 7-Rung Lazy Senior Dev</div>
+    <div class="ticker-item"><span class="dot"></span>Fix 36 — SYSTEM AUTHORITY: Kiro Native Behavior Suppressed</div>
     <div class="ticker-item"><span class="dot"></span>Fix 32 — Foundation Doc Templates (6 templates)</div>
     <div class="ticker-item"><span class="dot"></span>Fix 27B — MEDIUM Confidence Pause Gate</div>
-    <div class="ticker-item"><span class="dot"></span>Fix 26D — STRIDE-BRIDGE Mitigation Extraction</div>
-    <!-- duplicate for infinite scroll -->
+    <div class="ticker-item"><span class="dot"></span>Fix 19 — Hook Rewrite as Thin Router</div>
     <div class="ticker-item"><span class="dot"></span>Fix 43C — Cross-Tenant Isolation Gate</div>
     <div class="ticker-item"><span class="dot"></span>Fix 43B — Ponytail Rung Disqualification Protocol</div>
     <div class="ticker-item"><span class="dot"></span>Fix 43A — Lesson Age Clock (gate_fired_at)</div>
@@ -330,874 +352,566 @@
     <div class="ticker-item"><span class="dot"></span>Fix 41B — Comprehension Debt Rubric at SM-RETRO</div>
     <div class="ticker-item"><span class="dot"></span>Fix 40A — 5-Stage Memory Progression</div>
     <div class="ticker-item"><span class="dot"></span>Fix 38A — 25-Signal Confidence Scoring</div>
+    <div class="ticker-item"><span class="dot"></span>Fix 37 — Ponytail 7-Rung Lazy Senior Dev</div>
+    <div class="ticker-item"><span class="dot"></span>Fix 36 — SYSTEM AUTHORITY: Kiro Native Behavior Suppressed</div>
     <div class="ticker-item"><span class="dot"></span>Fix 32 — Foundation Doc Templates (6 templates)</div>
     <div class="ticker-item"><span class="dot"></span>Fix 27B — MEDIUM Confidence Pause Gate</div>
-    <div class="ticker-item"><span class="dot"></span>Fix 26D — STRIDE-BRIDGE Mitigation Extraction</div>
+    <div class="ticker-item"><span class="dot"></span>Fix 19 — Hook Rewrite as Thin Router</div>
   </div>
 </div>
 
 <!-- HOW IT WORKS -->
-<section id="how">
+<div id="how" class="section-wrap">
   <div class="section-label">The System</div>
   <h2>How the Orchestrator Works</h2>
-  <p class="section-sub">A single hook intercepts every prompt, scores it, selects the right mode, activates the right agents in order, and enforces quality gates — all without any manual routing.</p>
+  <p class="section-sub">A single hook intercepts every prompt, scores it, selects the right mode, activates agents in the right order, and enforces quality gates — fully automatic.</p>
   <div class="how-grid">
-    <div class="how-card">
-      <div class="how-icon">🎯</div>
-      <div class="how-num">Step 01</div>
-      <h3>Prompt Interception</h3>
-      <p>Every prompt hits the <code>elite-team-orchestrator.kiro.hook</code> on <code>promptSubmit</code>. GUARD 1 reads <code>decisions.md</code> + <code>lessons.md</code> FIRST before any processing begins.</p>
-    </div>
-    <div class="how-card">
-      <div class="how-icon">🔬</div>
-      <div class="how-num">Step 02</div>
-      <h3>Confidence Scoring</h3>
-      <p>25 signals scored across the prompt. HIGH (≥3 signals) auto-routes. MEDIUM (2 signals) pauses for user confirmation. LOW triggers the 7-question Discovery Engine.</p>
-    </div>
-    <div class="how-card">
-      <div class="how-icon">🗺️</div>
-      <div class="how-num">Step 03</div>
-      <h3>Mode Selection</h3>
-      <p>Discovery scores 0–21 across 7 dimensions and maps to one of 5 execution modes. The mode determines which agents activate, in which order, with what skill files.</p>
-    </div>
-    <div class="how-card">
-      <div class="how-icon">⚡</div>
-      <div class="how-num">Step 04</div>
-      <h3>Agent Pipeline</h3>
-      <p>Agents activate sequentially by phase (THINK → DESIGN → DEVELOP). Each reads only the 2–4 skill files relevant to its current story — targeted, not broadcast.</p>
-    </div>
-    <div class="how-card">
-      <div class="how-icon">🔒</div>
-      <div class="how-num">Step 05</div>
-      <h3>Gate Enforcement</h3>
-      <p>GATE S1 (pre-code security check) and GATE S2 (post-code quality + cross-tenant test) block progress if any item fails. No skipping. No "we'll fix it later."</p>
-    </div>
-    <div class="how-card">
-      <div class="how-icon">📚</div>
-      <div class="how-num">Step 06</div>
-      <h3>Memory + Lessons</h3>
-      <p>Every sprint retro writes to <code>lessons.md</code> with a <code>gate_fired_at</code> timestamp. Next session start, HIGH-confidence lessons apply immediately — constraints never drift.</p>
-    </div>
+    <div class="glass how-card"><span class="how-icon">🎯</span><div class="how-num">Step 01</div><h3>Prompt Interception</h3><p>Every prompt hits <code>elite-team-orchestrator.kiro.hook</code> on <code>promptSubmit</code>. GUARD 1 reads <code>decisions.md</code> + <code>lessons.md</code> before any processing.</p></div>
+    <div class="glass how-card"><span class="how-icon">🔬</span><div class="how-num">Step 02</div><h3>Confidence Scoring</h3><p>25 signals scored across the prompt. HIGH (≥3) auto-routes. MEDIUM (2 signals) pauses for confirmation. LOW triggers the 7-question Discovery Engine.</p></div>
+    <div class="glass how-card"><span class="how-icon">🗺️</span><div class="how-num">Step 03</div><h3>Mode Selection</h3><p>Discovery scores 0–21 across 7 dimensions and maps to one of 5 execution modes. The mode determines which agents activate and in what order.</p></div>
+    <div class="glass how-card"><span class="how-icon">⚡</span><div class="how-num">Step 04</div><h3>Agent Pipeline</h3><p>Agents activate sequentially by phase. Each reads only the 2–4 skill files relevant to the current story — targeted, not broadcast.</p></div>
+    <div class="glass how-card"><span class="how-icon">🔒</span><div class="how-num">Step 05</div><h3>Gate Enforcement</h3><p>GATE S1 (pre-code security) and GATE S2 (post-code quality + cross-tenant test) block progress if any item fails. No exceptions.</p></div>
+    <div class="glass how-card"><span class="how-icon">📚</span><div class="how-num">Step 06</div><h3>Memory + Lessons</h3><p>Every sprint retro writes to <code>lessons.md</code> with a <code>gate_fired_at</code> timestamp. HIGH-confidence lessons apply at next session start automatically.</p></div>
   </div>
-</section>
+</div>
 
-<div class="divider" style="max-width:1200px;margin:0 auto;"></div>
+<div class="divider"></div>
 
 <!-- PHASES -->
-<section id="phases">
+<div id="phases" class="section-wrap">
   <div class="section-label">Execution Phases</div>
   <h2>Think → Design → Develop</h2>
   <p class="section-sub">Three strictly-ordered phases. You never skip a phase. You never re-derive what a prior phase decided. You never advance without a gate passing.</p>
   <div class="phases">
-    <div class="phase phase-think">
-      <div class="phase-icon">💡</div>
+    <div class="glass phase phase-think">
+      <div class="phase-icon-wrap">💡</div>
       <h3>THINK</h3>
-      <p>Why + What. Market signal, strategy, constraints. No code, no architecture.</p>
-      <div class="phase-tags">
-        <span class="tag">Market Research</span>
-        <span class="tag">TAM/SAM/SOM</span>
-        <span class="tag">Tech Strategy</span>
-        <span class="tag">Risk Register</span>
-      </div>
+      <p>Why + What. Market signal, strategy, constraints. No code, no architecture — only insight.</p>
+      <div class="phase-tags"><span class="tag">Market Research</span><span class="tag">TAM/SAM/SOM</span><span class="tag">Tech Strategy</span><span class="tag">Risk Register</span></div>
     </div>
-    <div class="phase phase-design">
-      <div class="phase-icon">📐</div>
+    <div class="glass phase phase-design">
+      <div class="phase-icon-wrap">📐</div>
       <h3>DESIGN</h3>
-      <p>How. Architecture, contracts, data model, security posture, sprint plan.</p>
-      <div class="phase-tags">
-        <span class="tag">ADRs</span>
-        <span class="tag">STRIDE</span>
-        <span class="tag">Schema DDL</span>
-        <span class="tag">PRD</span>
-        <span class="tag">Sprint Plan</span>
-      </div>
+      <p>How. Architecture, contracts, data model, security posture, sprint plan. Decisions are final.</p>
+      <div class="phase-tags"><span class="tag">ADRs</span><span class="tag">STRIDE</span><span class="tag">Schema DDL</span><span class="tag">PRD</span><span class="tag">Sprint Plan</span></div>
     </div>
-    <div class="phase phase-develop">
-      <div class="phase-icon">⚙️</div>
+    <div class="glass phase phase-develop">
+      <div class="phase-icon-wrap">⚙️</div>
       <h3>DEVELOP</h3>
-      <p>Build. Agile sprints, implementation, tests, CI/CD, SLOs, retro.</p>
-      <div class="phase-tags">
-        <span class="tag">Code</span>
-        <span class="tag">Tests</span>
-        <span class="tag">CI/CD</span>
-        <span class="tag">Runbooks</span>
-        <span class="tag">Retro</span>
-      </div>
+      <p>Build. Agile sprints, implementation, tests, CI/CD, SLOs, retro, lessons written.</p>
+      <div class="phase-tags"><span class="tag">Code</span><span class="tag">Tests</span><span class="tag">CI/CD</span><span class="tag">Runbooks</span><span class="tag">Retro</span></div>
     </div>
   </div>
-</section>
+</div>
 
-<div class="divider" style="max-width:1200px;margin:0 auto;"></div>
+<div class="divider"></div>
 
-<!-- END-TO-END FLOWCHART -->
-<div id="flow" style="max-width:1200px;margin:0 auto;padding:5rem 2rem;">
+<!-- FLOWCHART -->
+<div id="flow" class="section-wrap">
   <div class="section-label">End-to-End Flow</div>
   <h2>Agent Activation Pipeline</h2>
   <p class="section-sub">From a single user prompt to shipped product — every agent, gate, and document in sequence.</p>
-
   <div class="flow-container">
     <svg class="flow" viewBox="0 0 1100 1400" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L8,3 z" fill="#6366f1" opacity=".7"/>
-        </marker>
-        <marker id="arr-g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L8,3 z" fill="#10b981" opacity=".7"/>
-        </marker>
-        <marker id="arr-y" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L8,3 z" fill="#f59e0b" opacity=".7"/>
-        </marker>
-        <filter id="glow-f"><feGaussianBlur stdDeviation="3" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#7c3aed" opacity=".8"/></marker>
+        <marker id="arr-g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#10b981" opacity=".8"/></marker>
+        <marker id="arr-y" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#f59e0b" opacity=".8"/></marker>
+        <linearGradient id="gv" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#6366f1"/></linearGradient>
+        <linearGradient id="gc" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#06b6d4"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient>
+        <linearGradient id="gp" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient>
       </defs>
 
-      <!-- ── USER PROMPT ── -->
-      <rect x="375" y="20" width="350" height="52" rx="12" fill="#1e1b4b" stroke="#6366f1" stroke-width="1.5"/>
-      <text x="550" y="42" text-anchor="middle" fill="#a5b4fc" font-size="11" font-weight="700" font-family="system-ui">USER PROMPT</text>
-      <text x="550" y="60" text-anchor="middle" fill="#64748b" font-size="10" font-family="system-ui">"Build a SaaS billing platform with Stripe"</text>
-      <line x1="550" y1="72" x2="550" y2="105" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
+      <!-- USER PROMPT -->
+      <rect x="375" y="20" width="350" height="52" rx="12" fill="rgba(124,58,237,.12)" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="550" y="42" text-anchor="middle" fill="#c4b5fd" font-size="11" font-weight="700" font-family="system-ui">USER PROMPT</text>
+      <text x="550" y="60" text-anchor="middle" fill="#475569" font-size="10" font-family="JetBrains Mono,monospace">"Build a SaaS billing platform with Stripe"</text>
+      <line x1="550" y1="72" x2="550" y2="105" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
 
-      <!-- ── HOOK ── -->
-      <rect x="325" y="108" width="450" height="52" rx="12" fill="#0f172a" stroke="#6366f1" stroke-width="1.5"/>
+      <!-- HOOK -->
+      <rect x="310" y="108" width="480" height="52" rx="12" fill="rgba(99,102,241,.08)" stroke="#6366f1" stroke-width="1.5"/>
       <text x="550" y="130" text-anchor="middle" fill="#818cf8" font-size="11" font-weight="700" font-family="system-ui">elite-team-orchestrator.kiro.hook</text>
-      <text x="550" y="148" text-anchor="middle" fill="#64748b" font-size="10" font-family="system-ui">GUARD 1 fires · reads decisions.md + lessons.md</text>
-      <line x1="550" y1="160" x2="550" y2="193" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
+      <text x="550" y="148" text-anchor="middle" fill="#475569" font-size="10" font-family="system-ui">GUARD 1 fires · reads decisions.md + lessons.md FIRST</text>
+      <line x1="550" y1="160" x2="550" y2="193" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
 
-      <!-- ── CONFIDENCE ── -->
-      <rect x="350" y="196" width="400" height="52" rx="12" fill="#0f172a" stroke="#f59e0b" stroke-width="1.5"/>
+      <!-- CONFIDENCE -->
+      <rect x="340" y="196" width="420" height="52" rx="12" fill="rgba(245,158,11,.07)" stroke="#f59e0b" stroke-width="1.5"/>
       <text x="550" y="218" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="700" font-family="system-ui">CONFIDENCE SCORING — 25 Signals</text>
-      <text x="550" y="236" text-anchor="middle" fill="#64748b" font-size="10" font-family="system-ui">HIGH ≥3 signals · MEDIUM = 2 · LOW &lt;2 → Discovery</text>
+      <text x="550" y="236" text-anchor="middle" fill="#475569" font-size="10" font-family="system-ui">HIGH ≥3 signals · MEDIUM = 2 · LOW &lt;2 → Discovery</text>
 
-      <!-- branches -->
-      <line x1="350" y1="222" x2="220" y2="222" stroke="#6366f1" stroke-width="1" stroke-dasharray="3,2"/>
-      <line x1="220" y1="222" x2="220" y2="290" stroke="#6366f1" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr)"/>
-      <text x="185" y="258" text-anchor="middle" fill="#a5b4fc" font-size="9" font-family="system-ui">HIGH</text>
+      <line x1="340" y1="222" x2="210" y2="222" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3,2"/>
+      <line x1="210" y1="222" x2="210" y2="293" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr)"/>
+      <text x="175" y="258" text-anchor="middle" fill="#a78bfa" font-size="9" font-family="system-ui">HIGH</text>
 
-      <line x1="750" y1="222" x2="880" y2="222" stroke="#6366f1" stroke-width="1" stroke-dasharray="3,2"/>
-      <line x1="880" y1="222" x2="880" y2="290" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-y)"/>
-      <text x="915" y="258" text-anchor="middle" fill="#fbbf24" font-size="9" font-family="system-ui">LOW</text>
+      <line x1="760" y1="222" x2="890" y2="222" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3,2"/>
+      <line x1="890" y1="222" x2="890" y2="293" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-y)"/>
+      <text x="925" y="258" text-anchor="middle" fill="#fbbf24" font-size="9" font-family="system-ui">LOW</text>
 
-      <line x1="550" y1="248" x2="550" y2="290" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr-g)"/>
-      <text x="570" y="272" fill="#10b981" font-size="9" font-family="system-ui">MEDIUM</text>
+      <line x1="550" y1="248" x2="550" y2="293" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr-g)"/>
+      <text x="575" y="273" fill="#10b981" font-size="9" font-family="system-ui">MEDIUM</text>
 
       <!-- LOW → Discovery -->
-      <rect x="815" y="293" width="170" height="50" rx="10" fill="#0f172a" stroke="#f59e0b" stroke-width="1"/>
-      <text x="900" y="314" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="700" font-family="system-ui">DISCOVERY ENGINE</text>
-      <text x="900" y="330" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">7 Questions · Score 0–21</text>
+      <rect x="820" y="296" width="175" height="48" rx="10" fill="rgba(245,158,11,.07)" stroke="#f59e0b" stroke-width="1"/>
+      <text x="907" y="317" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="700" font-family="system-ui">DISCOVERY ENGINE</text>
+      <text x="907" y="333" text-anchor="middle" fill="#475569" font-size="9" font-family="system-ui">7 Questions · Score 0–21</text>
 
-      <!-- HIGH → Mode 1 direct -->
-      <rect x="130" y="293" width="178" height="50" rx="10" fill="#0f172a" stroke="#6366f1" stroke-width="1"/>
-      <text x="219" y="314" text-anchor="middle" fill="#a5b4fc" font-size="10" font-weight="700" font-family="system-ui">MODE SELECTOR</text>
-      <text x="219" y="330" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">Auto-route → Mode 1</text>
+      <!-- HIGH → Mode -->
+      <rect x="118" y="296" width="182" height="48" rx="10" fill="rgba(124,58,237,.08)" stroke="#7c3aed" stroke-width="1"/>
+      <text x="209" y="317" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="700" font-family="system-ui">MODE SELECTOR</text>
+      <text x="209" y="333" text-anchor="middle" fill="#475569" font-size="9" font-family="system-ui">Auto-route → Mode 1</text>
 
       <!-- MEDIUM → pause -->
-      <rect x="420" y="293" width="260" height="50" rx="10" fill="#0f172a" stroke="#10b981" stroke-width="1"/>
-      <text x="550" y="314" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700" font-family="system-ui">PAUSE — Confirm scope?</text>
-      <text x="550" y="330" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">Y → Mode 1/2 · N → Mode 2/Discovery</text>
+      <rect x="408" y="296" width="284" height="48" rx="10" fill="rgba(16,185,129,.06)" stroke="#10b981" stroke-width="1"/>
+      <text x="550" y="317" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700" font-family="system-ui">PAUSE — Confirm scope?</text>
+      <text x="550" y="333" text-anchor="middle" fill="#475569" font-size="9" font-family="system-ui">Y → Mode 1/2 · N → Mode 2/Discovery</text>
 
-      <!-- converge to MODE BOX -->
-      <line x1="219" y1="343" x2="219" y2="390" stroke="#6366f1" stroke-width="1" stroke-dasharray="3,2"/>
-      <line x1="219" y1="390" x2="410" y2="390" stroke="#6366f1" stroke-width="1" stroke-dasharray="3,2"/>
-      <line x1="550" y1="343" x2="550" y2="390" stroke="#6366f1" stroke-width="1" stroke-dasharray="3,2"/>
-      <line x1="900" y1="343" x2="900" y2="390" stroke="#6366f1" stroke-width="1" stroke-dasharray="3,2"/>
-      <line x1="900" y1="390" x2="690" y2="390" stroke="#6366f1" stroke-width="1" stroke-dasharray="3,2"/>
-      <line x1="550" y1="390" x2="550" y2="408" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- converge -->
+      <line x1="209" y1="344" x2="209" y2="388" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3,2"/>
+      <line x1="209" y1="388" x2="420" y2="388" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3,2"/>
+      <line x1="550" y1="344" x2="550" y2="388" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3,2"/>
+      <line x1="907" y1="344" x2="907" y2="388" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3,2"/>
+      <line x1="907" y1="388" x2="680" y2="388" stroke="#7c3aed" stroke-width="1" stroke-dasharray="3,2"/>
+      <line x1="550" y1="388" x2="550" y2="406" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arr)"/>
 
       <!-- MODE SELECTED -->
-      <rect x="310" y="410" width="480" height="52" rx="12" fill="#1e1b4b" stroke="#6366f1" stroke-width="2"/>
-      <text x="550" y="432" text-anchor="middle" fill="#a5b4fc" font-size="12" font-weight="700" font-family="system-ui">MODE SELECTED</text>
-      <text x="550" y="452" text-anchor="middle" fill="#64748b" font-size="10" font-family="system-ui">Mode 1 (Full Army) · Mode 2 (Solo) · Mode 3 (Direct) · Mode 4 (Hybrid) · Mode 5 (Lean)</text>
+      <rect x="295" y="408" width="510" height="52" rx="12" fill="rgba(124,58,237,.15)" stroke="#7c3aed" stroke-width="2"/>
+      <text x="550" y="430" text-anchor="middle" fill="#c4b5fd" font-size="12" font-weight="800" font-family="system-ui">MODE SELECTED</text>
+      <text x="550" y="450" text-anchor="middle" fill="#64748b" font-size="10" font-family="system-ui">Mode 1 (Full Army) · Mode 2 (Solo) · Mode 3 (Direct) · Mode 4 (Hybrid) · Mode 5 (Lean)</text>
 
-      <!-- ─────────────── THINK PHASE ─────────────── -->
-      <rect x="20" y="490" width="1060" height="28" rx="6" fill="rgba(99,102,241,0.08)" stroke="rgba(99,102,241,0.2)" stroke-width="1"/>
-      <text x="550" y="509" text-anchor="middle" fill="#818cf8" font-size="11" font-weight="700" letter-spacing="3" font-family="system-ui">THINK PHASE</text>
+      <!-- THINK BAND -->
+      <rect x="20" y="490" width="1060" height="28" rx="6" fill="rgba(124,58,237,.06)" stroke="rgba(124,58,237,.2)" stroke-width="1"/>
+      <text x="550" y="509" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="700" letter-spacing="4" font-family="system-ui">THINK PHASE</text>
+      <line x1="550" y1="460" x2="550" y2="520" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
 
-      <line x1="550" y1="462" x2="550" y2="520" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
+      <!-- THINK agents -->
+      <rect x="40" y="524" width="210" height="76" rx="10" fill="rgba(124,58,237,.07)" stroke="rgba(124,58,237,.35)" stroke-width="1"/>
+      <text x="70" y="546" fill="#a78bfa" font-size="18" font-family="system-ui">🔍</text>
+      <text x="100" y="546" fill="#c4b5fd" font-size="10" font-weight="700" font-family="system-ui">market_researcher</text>
+      <text x="56" y="564" fill="#475569" font-size="9" font-family="system-ui">Segments · TAM/SAM/SOM</text>
+      <text x="56" y="579" fill="#475569" font-size="9" font-family="system-ui">Competitive gaps · Positioning</text>
+      <rect x="56" y="586" width="76" height="11" rx="3" fill="rgba(124,58,237,.12)"/>
+      <text x="94" y="595" text-anchor="middle" fill="#a78bfa" font-size="8" font-weight="700" font-family="JetBrains Mono,monospace">5 skill files</text>
 
-      <!-- THINK agents row -->
-      <!-- market_researcher -->
-      <rect x="40" y="524" width="200" height="76" rx="10" fill="#0f172a" stroke="rgba(99,102,241,0.4)" stroke-width="1"/>
-      <text x="70" y="545" fill="#6366f1" font-size="18" font-family="system-ui">🔍</text>
-      <text x="100" y="545" fill="#a5b4fc" font-size="10" font-weight="700" font-family="system-ui">market_researcher</text>
-      <text x="56" y="563" fill="#64748b" font-size="9" font-family="system-ui">Segments · TAM/SAM/SOM</text>
-      <text x="56" y="578" fill="#64748b" font-size="9" font-family="system-ui">Competitive gaps · Positioning</text>
-      <rect x="56" y="585" width="80" height="12" rx="3" fill="rgba(99,102,241,0.1)"/>
-      <text x="96" y="594" text-anchor="middle" fill="#818cf8" font-size="8" font-weight="700" font-family="system-ui">5 skill files</text>
+      <rect x="268" y="524" width="210" height="76" rx="10" fill="rgba(124,58,237,.07)" stroke="rgba(124,58,237,.35)" stroke-width="1"/>
+      <text x="298" y="546" fill="#a78bfa" font-size="18" font-family="system-ui">🧠</text>
+      <text x="328" y="546" fill="#c4b5fd" font-size="10" font-weight="700" font-family="system-ui">cto</text>
+      <text x="284" y="564" fill="#475569" font-size="9" font-family="system-ui">Tech strategy · Build vs Buy</text>
+      <text x="284" y="579" fill="#475569" font-size="9" font-family="system-ui">Vendor approvals · Risk register</text>
+      <rect x="284" y="586" width="76" height="11" rx="3" fill="rgba(124,58,237,.12)"/>
+      <text x="322" y="595" text-anchor="middle" fill="#a78bfa" font-size="8" font-weight="700" font-family="JetBrains Mono,monospace">6 skill files</text>
 
-      <!-- cto -->
-      <rect x="260" y="524" width="200" height="76" rx="10" fill="#0f172a" stroke="rgba(99,102,241,0.4)" stroke-width="1"/>
-      <text x="290" y="545" fill="#6366f1" font-size="18" font-family="system-ui">🧠</text>
-      <text x="320" y="545" fill="#a5b4fc" font-size="10" font-weight="700" font-family="system-ui">cto</text>
-      <text x="276" y="563" fill="#64748b" font-size="9" font-family="system-ui">Tech strategy · Build vs Buy</text>
-      <text x="276" y="578" fill="#64748b" font-size="9" font-family="system-ui">Vendor approvals · Risk register</text>
-      <rect x="276" y="585" width="80" height="12" rx="3" fill="rgba(99,102,241,0.1)"/>
-      <text x="316" y="594" text-anchor="middle" fill="#818cf8" font-size="8" font-weight="700" font-family="system-ui">6 skill files</text>
+      <rect x="496" y="524" width="580" height="76" rx="10" fill="rgba(16,185,129,.04)" stroke="rgba(16,185,129,.2)" stroke-width="1" stroke-dasharray="4,2"/>
+      <text x="786" y="546" text-anchor="middle" fill="#10b981" font-size="10" font-weight="700" font-family="system-ui">THINK OUTPUTS</text>
+      <text x="786" y="563" text-anchor="middle" fill="#475569" font-size="9" font-family="system-ui">market_research.md · competitive_analysis.md · tech_strategy.md</text>
+      <text x="786" y="579" text-anchor="middle" fill="#475569" font-size="9" font-family="system-ui">risk_register.md · build_vs_buy.md</text>
+      <rect x="692" y="586" width="186" height="11" rx="3" fill="rgba(16,185,129,.1)"/>
+      <text x="785" y="595" text-anchor="middle" fill="#10b981" font-size="8" font-weight="700" font-family="system-ui">→ feeds DESIGN phase inputs</text>
 
-      <!-- THINK output -->
-      <rect x="480" y="524" width="580" height="76" rx="10" fill="rgba(99,102,241,0.05)" stroke="rgba(99,102,241,0.2)" stroke-width="1" stroke-dasharray="4,2"/>
-      <text x="770" y="545" text-anchor="middle" fill="#818cf8" font-size="10" font-weight="700" font-family="system-ui">THINK OUTPUTS</text>
-      <text x="770" y="562" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">market_research.md · competitive_analysis.md · tech_strategy.md</text>
-      <text x="770" y="578" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">risk_register.md · build_vs_buy.md</text>
-      <rect x="676" y="585" width="186" height="12" rx="3" fill="rgba(16,185,129,0.1)"/>
-      <text x="769" y="594" text-anchor="middle" fill="#10b981" font-size="8" font-weight="700" font-family="system-ui">→ feeds DESIGN phase inputs</text>
+      <line x1="550" y1="600" x2="550" y2="630" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
 
-      <!-- arrow down -->
-      <line x1="550" y1="600" x2="550" y2="630" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
+      <!-- DESIGN BAND -->
+      <rect x="20" y="633" width="1060" height="28" rx="6" fill="rgba(168,85,247,.06)" stroke="rgba(168,85,247,.2)" stroke-width="1"/>
+      <text x="550" y="652" text-anchor="middle" fill="#d8b4fe" font-size="11" font-weight="700" letter-spacing="4" font-family="system-ui">DESIGN PHASE</text>
 
-      <!-- ─────────────── DESIGN PHASE ─────────────── -->
-      <rect x="20" y="633" width="1060" height="28" rx="6" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
-      <text x="550" y="652" text-anchor="middle" fill="#c4b5fd" font-size="11" font-weight="700" letter-spacing="3" font-family="system-ui">DESIGN PHASE</text>
+      <rect x="40" y="672" width="188" height="74" rx="10" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.35)" stroke-width="1"/>
+      <text x="56" y="692" fill="#d8b4fe" font-size="10" font-weight="700" font-family="system-ui">product_manager</text>
+      <text x="56" y="709" fill="#475569" font-size="9" font-family="system-ui">PRD · User stories · AC</text>
+      <text x="56" y="724" fill="#475569" font-size="9" font-family="system-ui">Label Map · Gantt v0</text>
 
-      <!-- Design agents row 1 -->
-      <rect x="40" y="672" width="190" height="76" rx="10" fill="#0f172a" stroke="rgba(139,92,246,0.4)" stroke-width="1"/>
-      <text x="56" y="693" fill="#c4b5fd" font-size="10" font-weight="700" font-family="system-ui">product_manager</text>
-      <text x="56" y="710" fill="#64748b" font-size="9" font-family="system-ui">PRD · User stories · AC</text>
-      <text x="56" y="725" fill="#64748b" font-size="9" font-family="system-ui">Label Map · Gantt v0</text>
+      <rect x="242" y="672" width="173" height="74" rx="10" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.35)" stroke-width="1"/>
+      <text x="258" y="692" fill="#d8b4fe" font-size="10" font-weight="700" font-family="system-ui">architect</text>
+      <text x="258" y="709" fill="#475569" font-size="9" font-family="system-ui">ADRs · API contracts</text>
+      <text x="258" y="724" fill="#475569" font-size="9" font-family="system-ui">Data model · STRIDE</text>
 
-      <rect x="245" y="672" width="175" height="76" rx="10" fill="#0f172a" stroke="rgba(139,92,246,0.4)" stroke-width="1"/>
-      <text x="261" y="693" fill="#c4b5fd" font-size="10" font-weight="700" font-family="system-ui">architect</text>
-      <text x="261" y="710" fill="#64748b" font-size="9" font-family="system-ui">ADRs · API contracts</text>
-      <text x="261" y="725" fill="#64748b" font-size="9" font-family="system-ui">Data model · STRIDE</text>
+      <rect x="429" y="672" width="185" height="74" rx="10" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.35)" stroke-width="1"/>
+      <text x="445" y="692" fill="#d8b4fe" font-size="10" font-weight="700" font-family="system-ui">database_architect</text>
+      <text x="445" y="709" fill="#475569" font-size="9" font-family="system-ui">Schema DDL · ER diagram</text>
+      <text x="445" y="724" fill="#475569" font-size="9" font-family="system-ui">Migration plan · GDPR</text>
 
-      <rect x="435" y="672" width="185" height="76" rx="10" fill="#0f172a" stroke="rgba(139,92,246,0.4)" stroke-width="1"/>
-      <text x="451" y="693" fill="#c4b5fd" font-size="10" font-weight="700" font-family="system-ui">database_architect</text>
-      <text x="451" y="710" fill="#64748b" font-size="9" font-family="system-ui">Schema DDL · ER diagram</text>
-      <text x="451" y="725" fill="#64748b" font-size="9" font-family="system-ui">Migration plan · GDPR</text>
+      <rect x="628" y="672" width="175" height="74" rx="10" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.35)" stroke-width="1"/>
+      <text x="644" y="692" fill="#d8b4fe" font-size="10" font-weight="700" font-family="system-ui">cloud_architect</text>
+      <text x="644" y="709" fill="#475569" font-size="9" font-family="system-ui">VPC · IAM · Landing zone</text>
+      <text x="644" y="724" fill="#475569" font-size="9" font-family="system-ui">Multi-region · FinOps</text>
 
-      <rect x="635" y="672" width="175" height="76" rx="10" fill="#0f172a" stroke="rgba(139,92,246,0.4)" stroke-width="1"/>
-      <text x="651" y="693" fill="#c4b5fd" font-size="10" font-weight="700" font-family="system-ui">cloud_architect</text>
-      <text x="651" y="710" fill="#64748b" font-size="9" font-family="system-ui">VPC · IAM · Landing zone</text>
-      <text x="651" y="725" fill="#64748b" font-size="9" font-family="system-ui">Multi-region · FinOps baseline</text>
-
-      <rect x="825" y="672" width="175" height="76" rx="10" fill="#0f172a" stroke="rgba(139,92,246,0.4)" stroke-width="1"/>
-      <text x="841" y="693" fill="#c4b5fd" font-size="10" font-weight="700" font-family="system-ui">security_engineer</text>
-      <text x="841" y="710" fill="#64748b" font-size="9" font-family="system-ui">STRIDE model · Auth design</text>
-      <text x="841" y="725" fill="#64748b" font-size="9" font-family="system-ui">OWASP · Secrets · Compliance</text>
+      <rect x="817" y="672" width="178" height="74" rx="10" fill="rgba(168,85,247,.07)" stroke="rgba(168,85,247,.35)" stroke-width="1"/>
+      <text x="833" y="692" fill="#d8b4fe" font-size="10" font-weight="700" font-family="system-ui">security_engineer</text>
+      <text x="833" y="709" fill="#475569" font-size="9" font-family="system-ui">STRIDE · Auth design</text>
+      <text x="833" y="724" fill="#475569" font-size="9" font-family="system-ui">OWASP · Secrets · Compliance</text>
 
       <!-- GATE S1 -->
-      <line x1="550" y1="748" x2="550" y2="770" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#arr-y)"/>
-      <rect x="280" y="773" width="540" height="40" rx="10" fill="rgba(245,158,11,0.08)" stroke="#f59e0b" stroke-width="1.5"/>
-      <text x="550" y="791" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="700" font-family="system-ui">⛩ GATE S1 — Pre-Code Security Check</text>
-      <text x="550" y="807" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">STRIDE complete · Auth model approved · secrets plan · OWASP reviewed · ADR signed off</text>
+      <line x1="550" y1="746" x2="550" y2="768" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#arr-y)"/>
+      <rect x="270" y="771" width="560" height="40" rx="10" fill="rgba(245,158,11,.06)" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="550" y="789" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="700" font-family="system-ui">⛩ GATE S1 — Pre-Code Security Check</text>
+      <text x="550" y="805" text-anchor="middle" fill="#475569" font-size="9" font-family="system-ui">STRIDE complete · Auth approved · Secrets plan · OWASP reviewed · ADR signed</text>
 
-      <!-- scrum_master SM-PLAN -->
-      <line x1="550" y1="813" x2="550" y2="833" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
-      <rect x="290" y="836" width="520" height="40" rx="10" fill="#0f172a" stroke="rgba(99,102,241,0.4)" stroke-width="1"/>
-      <text x="550" y="854" text-anchor="middle" fill="#a5b4fc" font-size="10" font-weight="700" font-family="system-ui">scrum_master — SM-PLAN</text>
-      <text x="550" y="869" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">Sprint plan · Story labels · Ponytail dependency check · Sprint budget</text>
-      <line x1="550" y1="876" x2="550" y2="896" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
+      <line x1="550" y1="811" x2="550" y2="831" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
+      <rect x="285" y="834" width="530" height="40" rx="10" fill="rgba(124,58,237,.07)" stroke="rgba(124,58,237,.35)" stroke-width="1"/>
+      <text x="550" y="852" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="700" font-family="system-ui">scrum_master — SM-PLAN</text>
+      <text x="550" y="867" text-anchor="middle" fill="#475569" font-size="9" font-family="system-ui">Sprint plan · Story labels · Ponytail check · Budget warning</text>
+      <line x1="550" y1="874" x2="550" y2="896" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
 
-      <!-- ─────────────── DEVELOP PHASE ─────────────── -->
-      <rect x="20" y="899" width="1060" height="28" rx="6" fill="rgba(6,182,212,0.08)" stroke="rgba(6,182,212,0.2)" stroke-width="1"/>
-      <text x="550" y="918" text-anchor="middle" fill="#67e8f9" font-size="11" font-weight="700" letter-spacing="3" font-family="system-ui">DEVELOP PHASE</text>
+      <!-- DEVELOP BAND -->
+      <rect x="20" y="899" width="1060" height="28" rx="6" fill="rgba(6,182,212,.05)" stroke="rgba(6,182,212,.2)" stroke-width="1"/>
+      <text x="550" y="918" text-anchor="middle" fill="#67e8f9" font-size="11" font-weight="700" letter-spacing="4" font-family="system-ui">DEVELOP PHASE</text>
 
-      <!-- Develop agents -->
-      <rect x="40" y="938" width="155" height="76" rx="10" fill="#0f172a" stroke="rgba(6,182,212,0.4)" stroke-width="1"/>
+      <rect x="40" y="938" width="155" height="74" rx="10" fill="rgba(6,182,212,.06)" stroke="rgba(6,182,212,.3)" stroke-width="1"/>
       <text x="56" y="956" fill="#67e8f9" font-size="10" font-weight="700" font-family="system-ui">backend_lead</text>
-      <text x="56" y="972" fill="#64748b" font-size="9" font-family="system-ui">API impl plan</text>
-      <text x="56" y="987" fill="#64748b" font-size="9" font-family="system-ui">Caching · Saga/Outbox</text>
+      <text x="56" y="972" fill="#475569" font-size="9" font-family="system-ui">API impl plan</text>
+      <text x="56" y="987" fill="#475569" font-size="9" font-family="system-ui">Caching · Saga/Outbox</text>
 
-      <rect x="208" y="938" width="155" height="76" rx="10" fill="#0f172a" stroke="rgba(6,182,212,0.4)" stroke-width="1"/>
+      <rect x="208" y="938" width="155" height="74" rx="10" fill="rgba(6,182,212,.06)" stroke="rgba(6,182,212,.3)" stroke-width="1"/>
       <text x="224" y="956" fill="#67e8f9" font-size="10" font-weight="700" font-family="system-ui">frontend_lead</text>
-      <text x="224" y="972" fill="#64748b" font-size="9" font-family="system-ui">Component arch</text>
-      <text x="224" y="987" fill="#64748b" font-size="9" font-family="system-ui">Design tokens · a11y</text>
+      <text x="224" y="972" fill="#475569" font-size="9" font-family="system-ui">Component arch</text>
+      <text x="224" y="987" fill="#475569" font-size="9" font-family="system-ui">Design tokens · a11y</text>
 
-      <rect x="376" y="938" width="155" height="76" rx="10" fill="#0f172a" stroke="rgba(6,182,212,0.4)" stroke-width="1"/>
+      <rect x="376" y="938" width="165" height="74" rx="10" fill="rgba(6,182,212,.06)" stroke="rgba(6,182,212,.3)" stroke-width="1"/>
       <text x="392" y="956" fill="#67e8f9" font-size="10" font-weight="700" font-family="system-ui">senior_engineer_be</text>
-      <text x="392" y="972" fill="#64748b" font-size="9" font-family="system-ui">Implementation code</text>
-      <text x="392" y="987" fill="#64748b" font-size="9" font-family="system-ui">Error handling · Edge cases</text>
+      <text x="392" y="972" fill="#475569" font-size="9" font-family="system-ui">Implementation code</text>
+      <text x="392" y="987" fill="#475569" font-size="9" font-family="system-ui">Error handling · Edge cases</text>
 
-      <rect x="544" y="938" width="155" height="76" rx="10" fill="#0f172a" stroke="rgba(6,182,212,0.4)" stroke-width="1"/>
-      <text x="560" y="956" fill="#67e8f9" font-size="10" font-weight="700" font-family="system-ui">senior_engineer_fe</text>
-      <text x="560" y="972" fill="#64748b" font-size="9" font-family="system-ui">UI code · State mgmt</text>
-      <text x="560" y="987" fill="#64748b" font-size="9" font-family="system-ui">Responsive · Accessibility</text>
+      <rect x="554" y="938" width="160" height="74" rx="10" fill="rgba(6,182,212,.06)" stroke="rgba(6,182,212,.3)" stroke-width="1"/>
+      <text x="570" y="956" fill="#67e8f9" font-size="10" font-weight="700" font-family="system-ui">senior_engineer_fe</text>
+      <text x="570" y="972" fill="#475569" font-size="9" font-family="system-ui">UI code · State mgmt</text>
+      <text x="570" y="987" fill="#475569" font-size="9" font-family="system-ui">Responsive · Accessible</text>
 
-      <rect x="712" y="938" width="150" height="76" rx="10" fill="#0f172a" stroke="rgba(6,182,212,0.4)" stroke-width="1"/>
-      <text x="728" y="956" fill="#67e8f9" font-size="10" font-weight="700" font-family="system-ui">qa_engineer</text>
-      <text x="728" y="972" fill="#64748b" font-size="9" font-family="system-ui">Unit + Integration</text>
-      <text x="728" y="987" fill="#64748b" font-size="9" font-family="system-ui">Contract · Load tests</text>
+      <rect x="727" y="938" width="150" height="74" rx="10" fill="rgba(6,182,212,.06)" stroke="rgba(6,182,212,.3)" stroke-width="1"/>
+      <text x="743" y="956" fill="#67e8f9" font-size="10" font-weight="700" font-family="system-ui">qa_engineer</text>
+      <text x="743" y="972" fill="#475569" font-size="9" font-family="system-ui">Unit + Integration</text>
+      <text x="743" y="987" fill="#475569" font-size="9" font-family="system-ui">Contract · Load tests</text>
 
-      <rect x="876" y="938" width="155" height="76" rx="10" fill="#0f172a" stroke="rgba(6,182,212,0.4)" stroke-width="1"/>
-      <text x="892" y="956" fill="#67e8f9" font-size="10" font-weight="700" font-family="system-ui">devops_engineer</text>
-      <text x="892" y="972" fill="#64748b" font-size="9" font-family="system-ui">CI/CD · IaC Terraform</text>
-      <text x="892" y="987" fill="#64748b" font-size="9" font-family="system-ui">GitOps · Deploy strategy</text>
+      <rect x="890" y="938" width="155" height="74" rx="10" fill="rgba(6,182,212,.06)" stroke="rgba(6,182,212,.3)" stroke-width="1"/>
+      <text x="906" y="956" fill="#67e8f9" font-size="10" font-weight="700" font-family="system-ui">devops_engineer</text>
+      <text x="906" y="972" fill="#475569" font-size="9" font-family="system-ui">CI/CD · IaC Terraform</text>
+      <text x="906" y="987" fill="#475569" font-size="9" font-family="system-ui">GitOps · Deploy strategy</text>
 
       <!-- GATE S2 -->
-      <line x1="550" y1="1014" x2="550" y2="1034" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#arr)"/>
-      <rect x="200" y="1037" width="700" height="52" rx="10" fill="rgba(239,68,68,0.07)" stroke="#ef4444" stroke-width="1.5"/>
-      <text x="550" y="1058" text-anchor="middle" fill="#f87171" font-size="11" font-weight="700" font-family="system-ui">⛩ GATE S2 — Post-Code Quality + Security Gate</text>
-      <text x="550" y="1074" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">SAST clean · OWASP Top-10 · No secrets in code · Ponytail PASS · Cross-tenant access-denial test ✓</text>
+      <line x1="550" y1="1012" x2="550" y2="1032" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#arr)"/>
+      <rect x="195" y="1035" width="710" height="52" rx="10" fill="rgba(244,63,94,.05)" stroke="#f43f5e" stroke-width="1.5"/>
+      <text x="550" y="1056" text-anchor="middle" fill="#fb7185" font-size="11" font-weight="700" font-family="system-ui">⛩ GATE S2 — Post-Code Quality + Security Gate</text>
+      <text x="550" y="1072" text-anchor="middle" fill="#475569" font-size="9" font-family="system-ui">SAST clean · OWASP Top-10 · No secrets committed · Ponytail PASS · Cross-tenant access-denial test ✓</text>
 
-      <!-- SRE + Technical writer -->
-      <line x1="550" y1="1089" x2="550" y2="1107" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
-      <rect x="180" y="1110" width="230" height="52" rx="10" fill="#0f172a" stroke="rgba(6,182,212,0.4)" stroke-width="1"/>
+      <line x1="550" y1="1087" x2="550" y2="1107" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
+
+      <rect x="178" y="1110" width="235" height="50" rx="10" fill="rgba(6,182,212,.06)" stroke="rgba(6,182,212,.3)" stroke-width="1"/>
       <text x="295" y="1131" text-anchor="middle" fill="#67e8f9" font-size="10" font-weight="700" font-family="system-ui">sre_engineer</text>
-      <text x="295" y="1148" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">SLIs/SLOs · Alerts · Runbooks</text>
+      <text x="295" y="1147" text-anchor="middle" fill="#475569" font-size="9" font-family="system-ui">SLIs/SLOs · Alerts · Runbooks</text>
 
-      <rect x="690" y="1110" width="230" height="52" rx="10" fill="#0f172a" stroke="rgba(6,182,212,0.4)" stroke-width="1"/>
+      <rect x="688" y="1110" width="235" height="50" rx="10" fill="rgba(6,182,212,.06)" stroke="rgba(6,182,212,.3)" stroke-width="1"/>
       <text x="805" y="1131" text-anchor="middle" fill="#67e8f9" font-size="10" font-weight="700" font-family="system-ui">technical_writer</text>
-      <text x="805" y="1148" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">API docs · Runbook · Changelogs</text>
+      <text x="805" y="1147" text-anchor="middle" fill="#475569" font-size="9" font-family="system-ui">API docs · Runbook · Changelogs</text>
 
-      <!-- SM-RETRO -->
-      <line x1="550" y1="1162" x2="550" y2="1182" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
-      <rect x="310" y="1185" width="480" height="52" rx="10" fill="rgba(99,102,241,0.06)" stroke="rgba(99,102,241,0.35)" stroke-width="1.5"/>
-      <text x="550" y="1207" text-anchor="middle" fill="#a5b4fc" font-size="11" font-weight="700" font-family="system-ui">scrum_master — SM-RETRO</text>
-      <text x="550" y="1223" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">Comprehension debt check · Lesson Age Clock · Write lessons.md · Sprint Discipline Card</text>
+      <line x1="550" y1="1160" x2="550" y2="1180" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr)"/>
+      <rect x="300" y="1183" width="500" height="50" rx="10" fill="rgba(124,58,237,.06)" stroke="rgba(124,58,237,.3)" stroke-width="1.5"/>
+      <text x="550" y="1204" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="700" font-family="system-ui">scrum_master — SM-RETRO</text>
+      <text x="550" y="1220" text-anchor="middle" fill="#475569" font-size="9" font-family="system-ui">Comprehension debt check · gate_fired_at · Write lessons.md · Sprint Discipline Card</text>
 
-      <!-- SHIPPED -->
-      <line x1="550" y1="1237" x2="550" y2="1260" stroke="#10b981" stroke-width="2" marker-end="url(#arr-g)"/>
-      <rect x="360" y="1263" width="380" height="48" rx="12" fill="rgba(16,185,129,0.1)" stroke="#10b981" stroke-width="2"/>
-      <text x="550" y="1284" text-anchor="middle" fill="#10b981" font-size="13" font-weight="800" font-family="system-ui">🚀 SHIPPED</text>
-      <text x="550" y="1302" text-anchor="middle" fill="#64748b" font-size="9" font-family="system-ui">All gates passed · Lessons written · Memory updated</text>
+      <line x1="550" y1="1233" x2="550" y2="1258" stroke="#10b981" stroke-width="2" marker-end="url(#arr-g)"/>
+      <rect x="355" y="1261" width="390" height="48" rx="12" fill="rgba(16,185,129,.08)" stroke="#10b981" stroke-width="2"/>
+      <text x="550" y="1283" text-anchor="middle" fill="#10b981" font-size="14" font-weight="800" font-family="system-ui">🚀 SHIPPED</text>
+      <text x="550" y="1300" text-anchor="middle" fill="#475569" font-size="9" font-family="system-ui">All gates passed · Lessons written · Memory updated</text>
     </svg>
   </div>
 </div>
 
-<div class="divider" style="max-width:1200px;margin:0 auto;"></div>
+<div class="divider"></div>
 
 <!-- MODES -->
-<section id="modes">
+<div id="modes" class="section-wrap">
   <div class="section-label">Execution Modes</div>
   <h2>5 Modes for Every Build</h2>
-  <p class="section-sub">The orchestrator picks the right mode automatically. Use the <code>[LOOP]</code> prefix to force full routing on any prompt.</p>
+  <p class="section-sub">The orchestrator picks the right mode automatically based on confidence scoring. Use <code>[LOOP]</code> to force full routing on any prompt.</p>
   <div class="modes-grid">
-    <div class="mode-card m1">
+    <div class="glass mode-card m1">
       <div class="mode-num">01</div>
       <div class="mode-label">Full Army</div>
       <h3>Complete Pipeline</h3>
-      <p>All 22 agents. Full THINK → DESIGN → DEVELOP. Every gate. For complete product builds.</p>
-      <div><span class="mode-badge" style="background:rgba(99,102,241,.15);color:#a5b4fc;">22 Agents · All Gates</span></div>
-      <p class="mode-agents">Trigger: ≥3 confidence signals</p>
+      <p>All 22 agents. Full THINK → DESIGN → DEVELOP. Every gate enforced. For complete product builds.</p>
+      <div><span class="mode-badge" style="background:rgba(124,58,237,.15);color:#c4b5fd;border:1px solid rgba(124,58,237,.25)">22 Agents · All Gates</span></div>
+      <p class="mode-trigger">Trigger: ≥3 confidence signals</p>
     </div>
-    <div class="mode-card m2">
+    <div class="glass mode-card m2">
       <div class="mode-num">02</div>
       <div class="mode-label">Single Role</div>
       <h3>Targeted Execution</h3>
       <p>One specialist role. No pipeline overhead. For "write the PRD" or "design the database schema."</p>
-      <div><span class="mode-badge" style="background:rgba(139,92,246,.15);color:#c4b5fd;">1 Agent · Skill-Loaded</span></div>
-      <p class="mode-agents">Trigger: single-domain request</p>
+      <div><span class="mode-badge" style="background:rgba(168,85,247,.15);color:#d8b4fe;border:1px solid rgba(168,85,247,.25)">1 Agent · Skill-Loaded</span></div>
+      <p class="mode-trigger">Trigger: single-domain request</p>
     </div>
-    <div class="mode-card m3">
+    <div class="glass mode-card m3">
       <div class="mode-num">03</div>
       <div class="mode-label">Direct</div>
       <h3>Instant Response</h3>
-      <p>No routing. No phase overhead. For bug fixes, quick questions, trivial tasks.</p>
-      <div><span class="mode-badge" style="background:rgba(16,185,129,.15);color:#6ee7b7;">0 Overhead · Instant</span></div>
-      <p class="mode-agents">Trigger: TRIVIAL classification</p>
+      <p>No routing overhead. For bug fixes, quick questions, trivial tasks. Zero ceremony.</p>
+      <div><span class="mode-badge" style="background:rgba(16,185,129,.12);color:#6ee7b7;border:1px solid rgba(16,185,129,.2)">0 Overhead · Instant</span></div>
+      <p class="mode-trigger">Trigger: TRIVIAL classification</p>
     </div>
-    <div class="mode-card m4">
+    <div class="glass mode-card m4">
       <div class="mode-num">04</div>
       <div class="mode-label">Hybrid</div>
       <h3>Existing Spec</h3>
-      <p>Uses pre-existing <code>.kiro/specs/</code> files as DESIGN inputs. Skips THINK. Goes straight to DEVELOP.</p>
-      <div><span class="mode-badge" style="background:rgba(245,158,11,.15);color:#fcd34d;">Spec-Aware · Skip THINK</span></div>
-      <p class="mode-agents">Trigger: existing spec detected</p>
+      <p>Uses pre-existing <code>.kiro/specs/</code> as DESIGN inputs. Skips THINK. Jumps straight to DEVELOP.</p>
+      <div><span class="mode-badge" style="background:rgba(245,158,11,.12);color:#fcd34d;border:1px solid rgba(245,158,11,.2)">Spec-Aware · Skip THINK</span></div>
+      <p class="mode-trigger">Trigger: existing spec detected</p>
     </div>
-    <div class="mode-card m5">
+    <div class="glass mode-card m5">
       <div class="mode-num">05</div>
       <div class="mode-label">Lean</div>
       <h3>Small Team</h3>
-      <p>3 lite roles, 4-iteration cap. For 2-person startups, MVPs, fast prototypes. Skips heavy infra roles.</p>
-      <div><span class="mode-badge" style="background:rgba(6,182,212,.15);color:#67e8f9;">3 Roles · 4-Iter Cap</span></div>
-      <p class="mode-agents">Trigger: Discovery score ≤7 (Lean)</p>
+      <p>3 lite roles, 4-iteration cap. For 2-person startups, MVPs, fast prototypes.</p>
+      <div><span class="mode-badge" style="background:rgba(6,182,212,.1);color:#67e8f9;border:1px solid rgba(6,182,212,.2)">3 Roles · 4-Iter Cap</span></div>
+      <p class="mode-trigger">Trigger: Discovery score ≤7</p>
     </div>
   </div>
-</section>
+</div>
 
-<div class="divider" style="max-width:1200px;margin:0 auto;"></div>
+<div class="divider"></div>
 
 <!-- AGENTS -->
-<section id="agents">
+<div id="agents" class="section-wrap">
   <div class="section-label">The Team</div>
   <h2>22 Specialist Agents</h2>
-  <p class="section-sub">Each agent has a dedicated skills path, primary artifact, and upstream dependency chain. Skills load on-demand — only the 2–4 relevant files for each story.</p>
+  <p class="section-sub">Each agent has a dedicated skills path, a primary artifact, and an upstream dependency chain. Skills load on-demand — only the 2–4 files relevant to the current story.</p>
 
   <div class="agents-phase">
     <div class="phase-header"><span class="phase-pill pill-think">Think Phase</span><div class="phase-line"></div></div>
     <div class="agents-grid">
-      <div class="agent-card">
-        <div class="agent-icon">🔍</div>
-        <div class="agent-role">market_researcher</div>
-        <h4>Market Researcher</h4>
-        <div class="agent-artifact">Segments · TAM/SAM/SOM · Competitive gaps · Positioning strategy</div>
-        <span class="skill-count">5 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">🧠</div>
-        <div class="agent-role">cto</div>
-        <h4>CTO</h4>
-        <div class="agent-artifact">Tech strategy · Build-vs-buy · Vendor approvals · Risk register</div>
-        <span class="skill-count">6 skill files</span>
-      </div>
+      <div class="glass agent-card"><span class="agent-icon">🔍</span><div class="agent-role">market_researcher</div><h4>Market Researcher</h4><div class="agent-artifact">Segments · TAM/SAM/SOM · Competitive gaps · Positioning</div><span class="skill-count">5 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">🧠</span><div class="agent-role">cto</div><h4>CTO</h4><div class="agent-artifact">Tech strategy · Build-vs-buy · Vendor approvals · Risk register</div><span class="skill-count">6 skill files</span></div>
     </div>
   </div>
 
   <div class="agents-phase">
     <div class="phase-header"><span class="phase-pill pill-design">Design Phase</span><div class="phase-line"></div></div>
     <div class="agents-grid">
-      <div class="agent-card">
-        <div class="agent-icon">📋</div>
-        <div class="agent-role">product_manager</div>
-        <h4>Product Manager</h4>
-        <div class="agent-artifact">PRD · User stories · Acceptance criteria · Gantt v0</div>
-        <span class="skill-count">5 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">🏗️</div>
-        <div class="agent-role">architect</div>
-        <h4>Architect</h4>
-        <div class="agent-artifact">ADRs · API contracts · Data model · Capacity plan · STRIDE</div>
-        <span class="skill-count">10 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">🗄️</div>
-        <div class="agent-role">database_architect</div>
-        <h4>Database Architect</h4>
-        <div class="agent-artifact">Schema DDL · ER diagram · Migration plan · GDPR retention</div>
-        <span class="skill-count">7 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">☁️</div>
-        <div class="agent-role">cloud_architect</div>
-        <h4>Cloud Architect</h4>
-        <div class="agent-artifact">VPC · Landing zone · Multi-region · IAM · FinOps baseline</div>
-        <span class="skill-count">6 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">💰</div>
-        <div class="agent-role">finops_architect</div>
-        <h4>FinOps Architect</h4>
-        <div class="agent-artifact">Unit economics · 12-month cost projection · Budget guardrails</div>
-        <span class="skill-count">4 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">🔐</div>
-        <div class="agent-role">security_engineer</div>
-        <h4>Security Engineer</h4>
-        <div class="agent-artifact">STRIDE model · Auth design · OWASP · Secrets · Compliance ADRs</div>
-        <span class="skill-count">8 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">📌</div>
-        <div class="agent-role">scrum_master</div>
-        <h4>Scrum Master</h4>
-        <div class="agent-artifact">SM-PLAN: Sprint plan · SM-RETRO: Lessons · Comprehension debt</div>
-        <span class="skill-count">5 skill files</span>
-      </div>
+      <div class="glass agent-card"><span class="agent-icon">📋</span><div class="agent-role">product_manager</div><h4>Product Manager</h4><div class="agent-artifact">PRD · User stories · Acceptance criteria · Gantt v0</div><span class="skill-count">5 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">🏗️</span><div class="agent-role">architect</div><h4>Architect</h4><div class="agent-artifact">ADRs · API contracts · Data model · Capacity · STRIDE</div><span class="skill-count">10 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">🗄️</span><div class="agent-role">database_architect</div><h4>Database Architect</h4><div class="agent-artifact">Schema DDL · ER diagram · Migration plan · GDPR retention</div><span class="skill-count">7 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">☁️</span><div class="agent-role">cloud_architect</div><h4>Cloud Architect</h4><div class="agent-artifact">VPC · Landing zone · Multi-region · IAM · FinOps baseline</div><span class="skill-count">6 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">💰</span><div class="agent-role">finops_architect</div><h4>FinOps Architect</h4><div class="agent-artifact">Unit economics · 12-month cost projection · Budget guardrails</div><span class="skill-count">4 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">🔐</span><div class="agent-role">security_engineer</div><h4>Security Engineer</h4><div class="agent-artifact">STRIDE model · Auth design · OWASP · Secrets · Compliance ADRs</div><span class="skill-count">8 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">📌</span><div class="agent-role">scrum_master</div><h4>Scrum Master</h4><div class="agent-artifact">SM-PLAN: Sprint plan · SM-RETRO: Lessons + Comprehension debt</div><span class="skill-count">5 skill files</span></div>
     </div>
   </div>
 
   <div class="agents-phase">
     <div class="phase-header"><span class="phase-pill pill-develop">Develop Phase</span><div class="phase-line"></div></div>
     <div class="agents-grid">
-      <div class="agent-card">
-        <div class="agent-icon">⚙️</div>
-        <div class="agent-role">backend_lead</div>
-        <h4>Backend Lead</h4>
-        <div class="agent-artifact">API impl plan · Caching · Idempotency · Saga/Outbox · Rate limiting</div>
-        <span class="skill-count">8 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">🎨</div>
-        <div class="agent-role">frontend_lead</div>
-        <h4>Frontend Lead</h4>
-        <div class="agent-artifact">Component arch · Design tokens · a11y (WCAG 2.1 AA) · State mgmt</div>
-        <span class="skill-count">7 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">💻</div>
-        <div class="agent-role">senior_engineer_be</div>
-        <h4>Senior Engineer (BE)</h4>
-        <div class="agent-artifact">Implementation code · Error handling · Edge cases · TDD</div>
-        <span class="skill-count">8 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">🖥️</div>
-        <div class="agent-role">senior_engineer_fe</div>
-        <h4>Senior Engineer (FE)</h4>
-        <div class="agent-artifact">UI code · State management · Responsive · Accessibility</div>
-        <span class="skill-count">7 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">🤖</div>
-        <div class="agent-role">ml_engineer</div>
-        <h4>ML Engineer</h4>
-        <div class="agent-artifact">Model selection · Training pipeline · Inference API · Drift monitoring</div>
-        <span class="skill-count">6 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">📊</div>
-        <div class="agent-role">data_engineer</div>
-        <h4>Data Engineer</h4>
-        <div class="agent-artifact">Data pipelines · ETL/ELT · Warehouse design · Streaming</div>
-        <span class="skill-count">7 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">🔬</div>
-        <div class="agent-role">data_scientist</div>
-        <h4>Data Scientist</h4>
-        <div class="agent-artifact">EDA · Feature engineering · Model evaluation · A/B test design</div>
-        <span class="skill-count">6 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">📱</div>
-        <div class="agent-role">mobile_engineer</div>
-        <h4>Mobile Engineer</h4>
-        <div class="agent-artifact">iOS/Android · Offline sync · Push notifications · App store</div>
-        <span class="skill-count">7 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">✅</div>
-        <div class="agent-role">qa_engineer</div>
-        <h4>QA Engineer</h4>
-        <div class="agent-artifact">Unit · Integration · Contract · Load tests · Mutation coverage</div>
-        <span class="skill-count">7 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">🚀</div>
-        <div class="agent-role">devops_engineer</div>
-        <h4>DevOps Engineer</h4>
-        <div class="agent-artifact">CI/CD pipeline · IaC (Terraform) · GitOps · Deployment strategy</div>
-        <span class="skill-count">8 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">📡</div>
-        <div class="agent-role">sre_engineer</div>
-        <h4>SRE Engineer</h4>
-        <div class="agent-artifact">SLIs/SLOs · Observability · Alert rules · Incident runbooks</div>
-        <span class="skill-count">6 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">📝</div>
-        <div class="agent-role">technical_writer</div>
-        <h4>Technical Writer</h4>
-        <div class="agent-artifact">API docs · Architecture docs · Runbooks · Changelogs</div>
-        <span class="skill-count">5 skill files</span>
-      </div>
-      <div class="agent-card">
-        <div class="agent-icon">🌐</div>
-        <div class="agent-role">website_creator</div>
-        <h4>Website Creator</h4>
-        <div class="agent-artifact">Landing pages · SEO · Conversion · Performance · Accessibility</div>
-        <span class="skill-count">4 subdomains</span>
-      </div>
+      <div class="glass agent-card"><span class="agent-icon">⚙️</span><div class="agent-role">backend_lead</div><h4>Backend Lead</h4><div class="agent-artifact">API impl plan · Caching · Idempotency · Saga/Outbox · Rate limiting</div><span class="skill-count">8 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">🎨</span><div class="agent-role">frontend_lead</div><h4>Frontend Lead</h4><div class="agent-artifact">Component arch · Design tokens · a11y (WCAG 2.1 AA) · State mgmt</div><span class="skill-count">7 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">💻</span><div class="agent-role">senior_engineer_be</div><h4>Senior Engineer (BE)</h4><div class="agent-artifact">Implementation code · Error handling · Edge cases · TDD</div><span class="skill-count">8 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">🖥️</span><div class="agent-role">senior_engineer_fe</div><h4>Senior Engineer (FE)</h4><div class="agent-artifact">UI code · State management · Responsive · Accessibility</div><span class="skill-count">7 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">🤖</span><div class="agent-role">ml_engineer</div><h4>ML Engineer</h4><div class="agent-artifact">Model selection · Training pipeline · Inference API · Drift monitoring</div><span class="skill-count">6 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">📊</span><div class="agent-role">data_engineer</div><h4>Data Engineer</h4><div class="agent-artifact">Pipelines · ETL/ELT · Warehouse design · Streaming</div><span class="skill-count">7 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">🔬</span><div class="agent-role">data_scientist</div><h4>Data Scientist</h4><div class="agent-artifact">EDA · Feature engineering · Model evaluation · A/B test design</div><span class="skill-count">6 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">📱</span><div class="agent-role">mobile_engineer</div><h4>Mobile Engineer</h4><div class="agent-artifact">iOS/Android · Offline sync · Push notifications · App store</div><span class="skill-count">7 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">✅</span><div class="agent-role">qa_engineer</div><h4>QA Engineer</h4><div class="agent-artifact">Unit · Integration · Contract · Load tests · Mutation coverage</div><span class="skill-count">7 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">🚀</span><div class="agent-role">devops_engineer</div><h4>DevOps Engineer</h4><div class="agent-artifact">CI/CD · IaC (Terraform) · GitOps · Deployment strategy</div><span class="skill-count">8 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">📡</span><div class="agent-role">sre_engineer</div><h4>SRE Engineer</h4><div class="agent-artifact">SLIs/SLOs · Observability · Alert rules · Incident runbooks</div><span class="skill-count">6 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">📝</span><div class="agent-role">technical_writer</div><h4>Technical Writer</h4><div class="agent-artifact">API docs · Architecture docs · Runbooks · Changelogs</div><span class="skill-count">5 skill files</span></div>
+      <div class="glass agent-card"><span class="agent-icon">🌐</span><div class="agent-role">website_creator</div><h4>Website Creator</h4><div class="agent-artifact">Landing pages · SEO · Conversion · Performance · Accessibility</div><span class="skill-count">4 subdomains</span></div>
     </div>
   </div>
-</section>
+</div>
 
-<div class="divider" style="max-width:1200px;margin:0 auto;"></div>
+<div class="divider"></div>
 
 <!-- DISCOVERY ENGINE -->
-<section id="discovery">
+<div id="discovery" class="section-wrap">
   <div class="section-label">Discovery Engine</div>
   <h2>7 Questions → Right Mode</h2>
-  <p class="section-sub">When confidence is LOW, the system runs 7 structured scoping questions to score the build (0–21) and map to the right execution mode.</p>
+  <p class="section-sub">When confidence is LOW, the system asks 7 structured scoping questions to score the build (0–21) and map to the right execution mode.</p>
   <div class="discovery-row">
-    <div>
-      <ol class="discovery-questions">
-        <li><span>What type of product or system are you building? (platform, service, tool, feature)</span></li>
-        <li><span>What is the target scale? (users, requests/sec, data volume)</span></li>
-        <li><span>What is the team size and experience level?</span></li>
-        <li><span>What existing codebase or infrastructure does this integrate with?</span></li>
-        <li><span>What are the compliance or regulatory requirements?</span></li>
-        <li><span>What is the expected timeline and delivery pressure?</span></li>
-        <li><span>Are there security, privacy, or multi-tenancy requirements?</span></li>
-      </ol>
-    </div>
+    <ol class="discovery-questions">
+      <li><span>What type of product or system are you building? (platform, service, tool, feature)</span></li>
+      <li><span>What is the target scale? (users, requests/sec, data volume)</span></li>
+      <li><span>What is the team size and experience level?</span></li>
+      <li><span>What existing codebase or infrastructure does this integrate with?</span></li>
+      <li><span>What are the compliance or regulatory requirements?</span></li>
+      <li><span>What is the expected timeline and delivery pressure?</span></li>
+      <li><span>Are there security, privacy, or multi-tenancy requirements?</span></li>
+    </ol>
     <div class="score-table">
-      <div class="score-row">
-        <span class="score-range">15–21</span>
-        <div class="score-bar-wrap"><div class="score-bar" style="width:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6);"></div></div>
-        <span class="score-label" style="color:#a5b4fc;">Mode 1 — Full Army</span>
-      </div>
-      <div class="score-row">
-        <span class="score-range">11–14</span>
-        <div class="score-bar-wrap"><div class="score-bar" style="width:76%;background:linear-gradient(90deg,#8b5cf6,#ec4899);"></div></div>
-        <span class="score-label" style="color:#c4b5fd;">Mode 2 — Targeted</span>
-      </div>
-      <div class="score-row">
-        <span class="score-range">8–10</span>
-        <div class="score-bar-wrap"><div class="score-bar" style="width:55%;background:linear-gradient(90deg,#06b6d4,#10b981);"></div></div>
-        <span class="score-label" style="color:#67e8f9;">Mode 5 — Lean</span>
-      </div>
-      <div class="score-row">
-        <span class="score-range">4–7</span>
-        <div class="score-bar-wrap"><div class="score-bar" style="width:35%;background:linear-gradient(90deg,#10b981,#f59e0b);"></div></div>
-        <span class="score-label" style="color:#6ee7b7;">Mode 3 — Direct</span>
-      </div>
-      <div class="score-row">
-        <span class="score-range">0–3</span>
-        <div class="score-bar-wrap"><div class="score-bar" style="width:15%;background:#64748b;"></div></div>
-        <span class="score-label" style="color:#94a3b8;">Clarify Scope</span>
-      </div>
+      <div class="score-row"><span class="score-range">15–21</span><div class="score-bar-wrap"><div class="score-bar" style="width:100%;background:linear-gradient(90deg,#7c3aed,#6366f1)"></div></div><span class="score-mode" style="color:#a78bfa">Mode 1 — Full Army</span></div>
+      <div class="score-row"><span class="score-range">11–14</span><div class="score-bar-wrap"><div class="score-bar" style="width:76%;background:linear-gradient(90deg,#a855f7,#ec4899)"></div></div><span class="score-mode" style="color:#d8b4fe">Mode 2 — Targeted</span></div>
+      <div class="score-row"><span class="score-range">8–10</span><div class="score-bar-wrap"><div class="score-bar" style="width:55%;background:linear-gradient(90deg,#06b6d4,#10b981)"></div></div><span class="score-mode" style="color:#67e8f9">Mode 5 — Lean</span></div>
+      <div class="score-row"><span class="score-range">4–7</span><div class="score-bar-wrap"><div class="score-bar" style="width:34%;background:linear-gradient(90deg,#10b981,#f59e0b)"></div></div><span class="score-mode" style="color:#6ee7b7">Mode 3 — Direct</span></div>
+      <div class="score-row"><span class="score-range">0–3</span><div class="score-bar-wrap"><div class="score-bar" style="width:14%;background:#334155"></div></div><span class="score-mode" style="color:#475569">Clarify Scope</span></div>
     </div>
   </div>
-</section>
+</div>
 
-<div class="divider" style="max-width:1200px;margin:0 auto;"></div>
+<div class="divider"></div>
 
 <!-- PONYTAIL -->
-<section id="ponytail">
+<div id="ponytail" class="section-wrap">
   <div class="section-label">Ponytail Protocol</div>
   <h2>7-Rung Dependency Ladder</h2>
-  <p class="section-sub">The "lazy senior dev" principle. Every dependency climbs the ladder from bottom before using a higher rung. Rung disqualification triggers an ADR and a same-rung alternative check.</p>
+  <p class="section-sub">The "lazy senior dev" principle — climb from the cheapest rung before reaching for a heavier one. Rung disqualification triggers an ADR and a same-rung alternative check.</p>
   <div class="rungs">
-    <div class="rung"><div class="rung-n">Rung 1 — Cheapest</div><h4>Standard Library</h4><p>Language built-ins and stdlib first. No external dependencies if stdlib covers it.</p></div>
-    <div class="rung"><div class="rung-n">Rung 2</div><h4>Well-Known Dependency</h4><p>Battle-tested package with &gt;1M weekly downloads, active maintenance, low CVE history.</p></div>
-    <div class="rung"><div class="rung-n">Rung 3</div><h4>Configuration / Flag</h4><p>A config flag or env var achieves the goal without adding code or a new package.</p></div>
-    <div class="rung"><div class="rung-n">Rung 4</div><h4>Existing Internal Tool</h4><p>Something already in the codebase or org toolchain that does this or close to it.</p></div>
-    <div class="rung"><div class="rung-n">Rung 5</div><h4>Compose Existing Tools</h4><p>Combine two existing tools rather than adding a new dependency.</p></div>
-    <div class="rung"><div class="rung-n">Rung 6</div><h4>Fork + Patch</h4><p>Fork the dependency, apply the minimal patch, own the diff. Only if Rung 1–5 fail.</p></div>
-    <div class="rung"><div class="rung-n">Rung 7 — Most Expensive</div><h4>Write Custom</h4><p>Build from scratch. Requires explicit ADR, security sign-off, and maintenance plan.</p></div>
+    <div class="glass rung"><div class="rung-n">Rung 1 — Cheapest</div><h4>Standard Library</h4><p>Language built-ins and stdlib first. No external deps if stdlib covers it.</p></div>
+    <div class="glass rung"><div class="rung-n">Rung 2</div><h4>Well-Known Dependency</h4><p>Battle-tested package: &gt;1M weekly downloads, active maintenance, low CVE history.</p></div>
+    <div class="glass rung"><div class="rung-n">Rung 3</div><h4>Configuration / Flag</h4><p>A config flag or env var achieves the goal without adding code or a new package.</p></div>
+    <div class="glass rung"><div class="rung-n">Rung 4</div><h4>Existing Internal Tool</h4><p>Something already in the codebase or org toolchain that does this or close to it.</p></div>
+    <div class="glass rung"><div class="rung-n">Rung 5</div><h4>Compose Existing Tools</h4><p>Combine two existing tools rather than adding a new dependency.</p></div>
+    <div class="glass rung"><div class="rung-n">Rung 6</div><h4>Fork + Patch</h4><p>Fork the dependency, apply the minimal patch, own the diff. Only if Rungs 1–5 fail.</p></div>
+    <div class="glass rung"><div class="rung-n">Rung 7 — Most Expensive</div><h4>Write Custom</h4><p>Build from scratch. Requires explicit ADR, security sign-off, and maintenance plan.</p></div>
   </div>
-</section>
+</div>
 
-<div class="divider" style="max-width:1200px;margin:0 auto;"></div>
+<div class="divider"></div>
 
 <!-- GATES -->
-<section id="gates">
-  <div class="section-label">Security & Quality Gates</div>
-  <h2>Gates & Guards</h2>
-  <p class="section-sub">Non-negotiable checkpoints. A failed gate blocks the pipeline completely. No exceptions, no "ship and fix later."</p>
+<div id="gates" class="section-wrap">
+  <div class="section-label">Security & Quality</div>
+  <h2>Gates &amp; Guards</h2>
+  <p class="section-sub">Non-negotiable checkpoints. A failed gate blocks the pipeline completely — no exceptions, no "ship and fix later."</p>
   <div class="gates-grid">
-    <div class="gate-card g-s1">
+    <div class="gate-card gate-s1">
       <div class="gate-label">GATE S1 — Pre-Code</div>
       <h3>Security Check</h3>
       <ul class="gate-items">
         <li>STRIDE threat model complete</li>
-        <li>Auth + authz model reviewed</li>
-        <li>Secrets management plan approved</li>
+        <li>Auth + authz model reviewed &amp; approved</li>
+        <li>Secrets management plan in place</li>
         <li>OWASP Top-10 reviewed</li>
         <li>Compliance ADRs signed</li>
         <li>No code written until this PASSES</li>
       </ul>
     </div>
-    <div class="gate-card g-s2">
+    <div class="gate-card gate-s2">
       <div class="gate-label">GATE S2 — Post-Code</div>
       <h3>Quality + Security</h3>
       <ul class="gate-items">
         <li>SAST scan clean</li>
-        <li>OWASP re-verified on code</li>
+        <li>OWASP re-verified on shipped code</li>
         <li>No secrets committed</li>
         <li>Ponytail audit PASS</li>
         <li>Cross-tenant access-denial test ✓ (Fix 43C)</li>
         <li>Jira comment with gate summary</li>
       </ul>
     </div>
-    <div class="gate-card g-guard1">
+    <div class="gate-card gate-g1">
       <div class="gate-label">GUARD 1 — Always Active</div>
       <h3>Constraint Drift Guard</h3>
       <ul class="gate-items">
         <li>Reads decisions.md at EVERY session start</li>
-        <li>Reads lessons.md — HIGH-confidence apply immediately</li>
+        <li>HIGH-confidence lessons apply immediately</li>
         <li>Checks gate_fired_at timestamp (Fix 43A)</li>
-        <li>Stale lesson (no gate_fired_at) → Sprint 0 treatment</li>
+        <li>Absent gate_fired_at → Sprint 0 treatment</li>
         <li>Architecture decisions bind ALL roles</li>
       </ul>
     </div>
-    <div class="gate-card g-guard2">
+    <div class="gate-card gate-g2">
       <div class="gate-label">GUARD 2 — Always Active</div>
       <h3>Bad Loop Guard</h3>
       <ul class="gate-items">
         <li>Requires BOTH: domain keyword + high-risk verb</li>
-        <li>Self-triggering: deploy/release/production alone</li>
+        <li>Self-triggering: deploy / release / production</li>
         <li>Blocked domains: auth, payments, user-data, secrets</li>
         <li>Blocked verbs: delete, wipe, drop, overwrite, bypass</li>
         <li>Fires before any code execution</li>
       </ul>
     </div>
   </div>
-</section>
+</div>
 
-<div class="divider" style="max-width:1200px;margin:0 auto;"></div>
+<div class="divider"></div>
 
 <!-- OUTPUTS -->
-<section id="outputs">
+<div id="outputs" class="section-wrap">
   <div class="section-label">Deliverables</div>
   <h2>What Gets Produced</h2>
   <p class="section-sub">Every phase produces structured, versioned documents. All outputs link forward to the next phase's inputs — nothing gets re-derived.</p>
   <div class="outputs-grid">
-    <div class="output-card"><div class="output-phase op-think">Think</div><h4>Market Research</h4><p>Segments, TAM/SAM/SOM, competitive gaps, positioning</p></div>
-    <div class="output-card"><div class="output-phase op-think">Think</div><h4>Tech Strategy</h4><p>Build-vs-buy decisions, vendor approvals, risk register</p></div>
-    <div class="output-card"><div class="output-phase op-design">Design</div><h4>PRD</h4><p>Product requirements doc with Label Map and acceptance criteria</p></div>
-    <div class="output-card"><div class="output-phase op-design">Design</div><h4>TRD</h4><p>Technical requirements with skill hints and HOW decisions</p></div>
-    <div class="output-card"><div class="output-phase op-design">Design</div><h4>ADRs</h4><p>Architecture Decision Records — immutable, all roles bound</p></div>
-    <div class="output-card"><div class="output-phase op-design">Design</div><h4>Schema DDL</h4><p>Database schema with ER diagram, migrations, GDPR retention</p></div>
-    <div class="output-card"><div class="output-phase op-design">Design</div><h4>Security Posture</h4><p>STRIDE model, auth design, secrets plan, compliance status</p></div>
-    <div class="output-card"><div class="output-phase op-design">Design</div><h4>Sprint Plan</h4><p>Story breakdown, Ponytail-checked dependencies, budget</p></div>
-    <div class="output-card"><div class="output-phase op-design">Design</div><h4>Cloud Architecture</h4><p>VPC, IAM, landing zone, multi-region plan, FinOps baseline</p></div>
-    <div class="output-card"><div class="output-phase op-develop">Develop</div><h4>Implementation Code</h4><p>BE + FE code, error handling, edge cases, TDD</p></div>
-    <div class="output-card"><div class="output-phase op-develop">Develop</div><h4>Test Suite</h4><p>Unit, integration, contract, load tests, mutation coverage</p></div>
-    <div class="output-card"><div class="output-phase op-develop">Develop</div><h4>CI/CD Pipeline</h4><p>GitHub Actions / Terraform IaC, GitOps, deploy strategy</p></div>
-    <div class="output-card"><div class="output-phase op-develop">Develop</div><h4>Runbooks</h4><p>On-call runbooks, incident response, escalation paths</p></div>
-    <div class="output-card"><div class="output-phase op-develop">Develop</div><h4>SLO Definitions</h4><p>SLIs, SLOs, error budgets, alert rules, observability stack</p></div>
-    <div class="output-card"><div class="output-phase op-develop">Develop</div><h4>API Documentation</h4><p>OpenAPI spec, usage guide, changelog, migration notes</p></div>
-    <div class="output-card"><div class="output-phase op-develop">Develop</div><h4>Lessons + Memory</h4><p>lessons.md with gate_fired_at, decisions.md, checkpoint</p></div>
+    <div class="glass output-card"><div class="output-phase op-think">Think</div><h4>Market Research</h4><p>Segments, TAM/SAM/SOM, competitive gaps, positioning</p></div>
+    <div class="glass output-card"><div class="output-phase op-think">Think</div><h4>Tech Strategy</h4><p>Build-vs-buy, vendor approvals, risk register</p></div>
+    <div class="glass output-card"><div class="output-phase op-design">Design</div><h4>PRD</h4><p>Requirements, Label Map, acceptance criteria</p></div>
+    <div class="glass output-card"><div class="output-phase op-design">Design</div><h4>TRD</h4><p>Technical requirements with skill hints and HOW decisions</p></div>
+    <div class="glass output-card"><div class="output-phase op-design">Design</div><h4>ADRs</h4><p>Architecture Decision Records — immutable, all roles bound</p></div>
+    <div class="glass output-card"><div class="output-phase op-design">Design</div><h4>Schema DDL</h4><p>Database schema, ER diagram, migrations, GDPR retention</p></div>
+    <div class="glass output-card"><div class="output-phase op-design">Design</div><h4>Security Posture</h4><p>STRIDE model, auth design, secrets plan, compliance</p></div>
+    <div class="glass output-card"><div class="output-phase op-design">Design</div><h4>Sprint Plan</h4><p>Story breakdown, Ponytail-checked dependencies, budget</p></div>
+    <div class="glass output-card"><div class="output-phase op-design">Design</div><h4>Cloud Architecture</h4><p>VPC, IAM, landing zone, multi-region, FinOps baseline</p></div>
+    <div class="glass output-card"><div class="output-phase op-develop">Develop</div><h4>Implementation Code</h4><p>BE + FE code, error handling, edge cases, TDD</p></div>
+    <div class="glass output-card"><div class="output-phase op-develop">Develop</div><h4>Test Suite</h4><p>Unit, integration, contract, load, mutation coverage</p></div>
+    <div class="glass output-card"><div class="output-phase op-develop">Develop</div><h4>CI/CD Pipeline</h4><p>GitHub Actions, Terraform IaC, GitOps, deploy strategy</p></div>
+    <div class="glass output-card"><div class="output-phase op-develop">Develop</div><h4>Runbooks</h4><p>On-call runbooks, incident response, escalation paths</p></div>
+    <div class="glass output-card"><div class="output-phase op-develop">Develop</div><h4>SLO Definitions</h4><p>SLIs, SLOs, error budgets, alert rules, observability</p></div>
+    <div class="glass output-card"><div class="output-phase op-develop">Develop</div><h4>API Documentation</h4><p>OpenAPI spec, usage guide, changelog, migration notes</p></div>
+    <div class="glass output-card"><div class="output-phase op-develop">Develop</div><h4>Lessons + Memory</h4><p>lessons.md with gate_fired_at, decisions.md, checkpoint</p></div>
   </div>
-</section>
+</div>
 
-<div class="divider" style="max-width:1200px;margin:0 auto;"></div>
+<div class="divider"></div>
 
 <!-- SKILLS -->
-<section id="skills" style="padding-bottom:2rem;">
+<div id="skills" class="section-wrap" style="padding-bottom:2rem">
   <div class="section-label">Skills System</div>
   <h2>130+ Targeted Skill Files</h2>
   <p class="section-sub">Each agent loads only the 2–4 skill files relevant to the current story. Never all files. Skills define depth, format, and quality bar.</p>
-</section>
-<div style="max-width:1200px;margin:0 auto;padding:0 2rem 5rem;">
-  <div class="skills-section">
+</div>
+<div style="max-width:1240px;margin:0 auto;padding:0 2rem 5rem">
+  <div class="skills-wrap">
     <div class="skills-grid">
-      <div class="skill-group">
-        <h4>🏗️ Architect</h4>
-        <ul class="skill-list">
-          <li>ADR Authoring</li><li>API Gateway Patterns</li><li>Capacity Planning</li>
-          <li>Domain-Driven Design</li><li>Event Sourcing / CQRS</li><li>Hexagonal Architecture</li>
-          <li>Microservices Decomp.</li><li>Monorepo Strategy</li>
-        </ul>
-      </div>
-      <div class="skill-group">
-        <h4>⚙️ Backend Lead</h4>
-        <ul class="skill-list">
-          <li>API Design Patterns</li><li>Caching Strategies</li><li>Idempotency</li>
-          <li>Message Queue Design</li><li>Rate Limiting</li><li>Saga / Outbox Pattern</li>
-          <li>Service Mesh</li><li>gRPC Patterns</li>
-        </ul>
-      </div>
-      <div class="skill-group">
-        <h4>🔐 Security Engineer</h4>
-        <ul class="skill-list">
-          <li>Auth Design (OAuth/OIDC)</li><li>STRIDE Methodology</li><li>OWASP Top-10</li>
-          <li>Secrets Management</li><li>Zero Trust Architecture</li><li>RBAC / ABAC Patterns</li>
-          <li>Penetration Test Guide</li>
-        </ul>
-      </div>
-      <div class="skill-group">
-        <h4>🗄️ DB Architect</h4>
-        <ul class="skill-list">
-          <li>Schema Design</li><li>Indexing Strategy</li><li>Migration Safety</li>
-          <li>Query Optimization</li><li>GDPR / Retention</li><li>Replication Patterns</li>
-          <li>Time-series Design</li>
-        </ul>
-      </div>
-      <div class="skill-group">
-        <h4>🚀 DevOps</h4>
-        <ul class="skill-list">
-          <li>CI/CD Pipeline Design</li><li>IaC (Terraform)</li><li>GitOps Workflow</li>
-          <li>Container Orchestration</li><li>Blue/Green Deploy</li><li>Feature Flags</li>
-          <li>Rollback Strategy</li>
-        </ul>
-      </div>
-      <div class="skill-group">
-        <h4>✅ QA Engineer</h4>
-        <ul class="skill-list">
-          <li>TDD Red/Green/Refactor</li><li>Contract Testing</li><li>Load Testing</li>
-          <li>Mutation Testing</li><li>E2E Test Strategy</li><li>Testing Strategy Template</li>
-        </ul>
-      </div>
-      <div class="skill-group">
-        <h4>📊 Data / ML</h4>
-        <ul class="skill-list">
-          <li>EDA Patterns</li><li>Feature Engineering</li><li>Model Evaluation</li>
-          <li>A/B Test Design</li><li>Pipeline Architecture</li><li>ML Serving / Embeddings</li>
-          <li>Statistical Analysis</li>
-        </ul>
-      </div>
-      <div class="skill-group">
-        <h4>🔧 Shared Skills</h4>
-        <ul class="skill-list">
-          <li>Code Review Excellence</li><li>Debugging Methodology</li><li>Error Handling</li>
-          <li>Concurrency Safety</li><li>Performance Profiling</li><li>Refactoring Safely</li>
-          <li>Design System Gate</li><li>Infrastructure as Code</li>
-        </ul>
-      </div>
+      <div class="skill-group"><h4>🏗️ Architect</h4><ul class="skill-list"><li>ADR Authoring</li><li>API Gateway Patterns</li><li>Capacity Planning</li><li>Domain-Driven Design</li><li>Event Sourcing / CQRS</li><li>Hexagonal Architecture</li><li>Microservices Decomp.</li><li>Monorepo Strategy</li></ul></div>
+      <div class="skill-group"><h4>⚙️ Backend Lead</h4><ul class="skill-list"><li>API Design Patterns</li><li>Caching Strategies</li><li>Idempotency</li><li>Message Queue Design</li><li>Rate Limiting</li><li>Saga / Outbox Pattern</li><li>Service Mesh</li><li>gRPC Patterns</li></ul></div>
+      <div class="skill-group"><h4>🔐 Security Engineer</h4><ul class="skill-list"><li>Auth Design (OAuth/OIDC)</li><li>STRIDE Methodology</li><li>OWASP Top-10</li><li>Secrets Management</li><li>Zero Trust Architecture</li><li>RBAC / ABAC Patterns</li><li>Pentest Guide</li></ul></div>
+      <div class="skill-group"><h4>🗄️ DB Architect</h4><ul class="skill-list"><li>Schema Design</li><li>Indexing Strategy</li><li>Migration Safety</li><li>Query Optimization</li><li>GDPR / Retention</li><li>Replication Patterns</li><li>Time-series Design</li></ul></div>
+      <div class="skill-group"><h4>🚀 DevOps</h4><ul class="skill-list"><li>CI/CD Pipeline Design</li><li>IaC (Terraform)</li><li>GitOps Workflow</li><li>Container Orchestration</li><li>Blue/Green Deploy</li><li>Feature Flags Safely</li><li>Rollback Strategy</li></ul></div>
+      <div class="skill-group"><h4>✅ QA Engineer</h4><ul class="skill-list"><li>TDD Red/Green/Refactor</li><li>Contract Testing</li><li>Load Testing</li><li>Mutation Testing</li><li>E2E Test Strategy</li><li>Testing Strategy Template</li></ul></div>
+      <div class="skill-group"><h4>📊 Data / ML</h4><ul class="skill-list"><li>EDA Patterns</li><li>Feature Engineering</li><li>Model Evaluation</li><li>A/B Test Design</li><li>Pipeline Architecture</li><li>ML Serving / Embeddings</li><li>Statistical Analysis</li></ul></div>
+      <div class="skill-group"><h4>🔧 Shared Skills</h4><ul class="skill-list"><li>Code Review Excellence</li><li>Debugging Methodology</li><li>Error Handling</li><li>Concurrency Safety</li><li>Performance Profiling</li><li>Refactoring Safely</li><li>Design System Gate</li><li>Infrastructure as Code</li></ul></div>
     </div>
   </div>
 </div>
 
+<div class="divider"></div>
+
 <!-- FEATURES TABLE -->
-<div class="divider" style="max-width:1200px;margin:0 auto;"></div>
-<section id="features">
+<div id="features" class="section-wrap">
   <div class="section-label">51 Improvements</div>
   <h2>Feature / Fix Division Table</h2>
   <p class="section-sub">Every change categorised by type. 51 implemented across 11 dry runs — from infrastructure rewrites to runtime security guards.</p>
 
-  <!-- Summary pills -->
-  <div style="display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:2.5rem;">
-    <div style="display:flex;align-items:center;gap:.5rem;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:999px;padding:.35rem 1rem;">
-      <span style="font-size:1rem;">🚀</span>
-      <span style="font-size:.78rem;font-weight:700;color:#a5b4fc;">20 Features</span>
-      <span style="font-size:.72rem;color:var(--muted);">39%</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:.5rem;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);border-radius:999px;padding:.35rem 1rem;">
-      <span style="font-size:1rem;">🔧</span>
-      <span style="font-size:.78rem;font-weight:700;color:#67e8f9;">18 Fixes</span>
-      <span style="font-size:.72rem;color:var(--muted);">35%</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:.5rem;background:rgba(236,72,153,.08);border:1px solid rgba(236,72,153,.2);border-radius:999px;padding:.35rem 1rem;">
-      <span style="font-size:1rem;">🛡️</span>
-      <span style="font-size:.78rem;font-weight:700;color:#f9a8d4;">7 Guards</span>
-      <span style="font-size:.72rem;color:var(--muted);">14%</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:.5rem;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:999px;padding:.35rem 1rem;">
-      <span style="font-size:1rem;">🚪</span>
-      <span style="font-size:.78rem;font-weight:700;color:#fca5a5;">7 Gates</span>
-      <span style="font-size:.72rem;color:var(--muted);">14%</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:.5rem;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:999px;padding:.35rem 1rem;">
-      <span style="font-size:1rem;">🏗️</span>
-      <span style="font-size:.78rem;font-weight:700;color:#fcd34d;">5 Architecture</span>
-      <span style="font-size:.72rem;color:var(--muted);">10%</span>
-    </div>
+  <div class="sum-pills">
+    <div class="sum-pill sp-feat"><span>🚀</span><span>20 Features</span><span class="sp-count">39%</span></div>
+    <div class="sum-pill sp-fix"><span>🔧</span><span>18 Fixes</span><span class="sp-count">35%</span></div>
+    <div class="sum-pill sp-guard"><span>🛡️</span><span>7 Guards</span><span class="sp-count">14%</span></div>
+    <div class="sum-pill sp-gate"><span>🚪</span><span>7 Gates</span><span class="sp-count">14%</span></div>
+    <div class="sum-pill sp-arch"><span>🏗️</span><span>5 Architecture</span><span class="sp-count">10%</span></div>
   </div>
 
-  <!-- Filter bar -->
-  <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem;" id="fix-filters">
-    <button class="fix-filter active" data-cat="all" onclick="filterFixes('all',this)">All 51</button>
-    <button class="fix-filter" data-cat="Feature" onclick="filterFixes('Feature',this)">🚀 Features</button>
-    <button class="fix-filter" data-cat="Fix" onclick="filterFixes('Fix',this)">🔧 Fixes</button>
-    <button class="fix-filter" data-cat="Guard" onclick="filterFixes('Guard',this)">🛡️ Guards</button>
-    <button class="fix-filter" data-cat="Gate" onclick="filterFixes('Gate',this)">🚪 Gates</button>
-    <button class="fix-filter" data-cat="Architecture" onclick="filterFixes('Architecture',this)">🏗️ Architecture</button>
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem">
+    <button class="fix-filter active" onclick="filterFixes('all',this)">All 51</button>
+    <button class="fix-filter" onclick="filterFixes('Feature',this)">🚀 Features</button>
+    <button class="fix-filter" onclick="filterFixes('Fix',this)">🔧 Fixes</button>
+    <button class="fix-filter" onclick="filterFixes('Guard',this)">🛡️ Guards</button>
+    <button class="fix-filter" onclick="filterFixes('Gate',this)">🚪 Gates</button>
+    <button class="fix-filter" onclick="filterFixes('Architecture',this)">🏗️ Architecture</button>
   </div>
 
-  <div id="fix-table-wrap" style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
-    <table id="fix-table" style="width:100%;border-collapse:collapse;">
+  <div id="fix-table-wrap">
+    <table id="fix-table" style="width:100%;border-collapse:collapse">
       <thead>
-        <tr style="border-bottom:1px solid var(--border);">
-          <th style="padding:.7rem 1rem;text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);">Type</th>
-          <th style="padding:.7rem 1rem;text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);">Fix</th>
-          <th style="padding:.7rem 1rem;text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);">Capability / What Was Added</th>
-          <th style="padding:.7rem 1rem;text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);">Category</th>
+        <tr style="border-bottom:1px solid rgba(124,58,237,.2)">
+          <th style="padding:.7rem 1.1rem;text-align:left;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569">Type</th>
+          <th style="padding:.7rem 1.1rem;text-align:left;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569">Fix</th>
+          <th style="padding:.7rem 1.1rem;text-align:left;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569">Capability / What Was Added</th>
+          <th style="padding:.7rem 1.1rem;text-align:left;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#475569">Category</th>
         </tr>
       </thead>
-      <tbody id="fix-tbody">
-      </tbody>
+      <tbody id="fix-tbody"></tbody>
     </table>
   </div>
-</section>
+</div>
 
-<style>
-  .fix-filter {
-    background:var(--card); border:1px solid var(--border); border-radius:8px;
-    padding:.35rem .9rem; font-size:.75rem; font-weight:600; color:var(--muted);
-    cursor:pointer; transition:.2s;
-  }
-  .fix-filter:hover { border-color:var(--accent); color:var(--text); }
-  .fix-filter.active { background:rgba(99,102,241,.15); border-color:var(--accent); color:#a5b4fc; }
-  #fix-tbody tr { border-bottom:1px solid rgba(255,255,255,.04); transition:.15s; }
-  #fix-tbody tr:last-child { border:none; }
-  #fix-tbody tr:hover { background:rgba(99,102,241,.05); }
-  #fix-tbody td { padding:.65rem 1rem; font-size:.8rem; vertical-align:top; }
-  .type-pill { display:inline-flex;align-items:center;gap:.3rem;padding:.18rem .55rem;border-radius:6px;font-size:.68rem;font-weight:700;white-space:nowrap; }
-  .tp-Feature  { background:rgba(99,102,241,.12); color:#a5b4fc; }
-  .tp-Fix      { background:rgba(6,182,212,.1);   color:#67e8f9; }
-  .tp-Guard    { background:rgba(236,72,153,.1);  color:#f9a8d4; }
-  .tp-Gate     { background:rgba(239,68,68,.1);   color:#fca5a5; }
-  .tp-Architecture { background:rgba(245,158,11,.1); color:#fcd34d; }
-  .cat-pill { display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.65rem;font-weight:600;background:rgba(255,255,255,.04);color:var(--muted); }
-  .fix-id { font-size:.72rem; font-weight:700; color:var(--accent); white-space:nowrap; }
-  .fix-desc { color:var(--text); line-height:1.4; }
-  .fix-candidate { color:var(--yellow) !important; }
-</style>
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">LOOP · ENGINEERING</div>
+  <p style="position:relative">Built by <strong style="color:#94a3b8">GURPREET</strong> · 51 implemented fixes · Dry Run v11 · 9.5/10 ship confidence</p>
+  <p style="margin-top:.5rem;position:relative"><a href="https://github.com/supersaiyane/loopEngineering" target="_blank">github.com/supersaiyane/loopEngineering</a></p>
+  <p style="margin-top:.8rem;font-size:.68rem;color:#1e293b;position:relative">Kiro IDE · Claude Projects · ChatGPT Custom GPT</p>
+</footer>
 
 <script>
 const FIXES = [
@@ -1259,71 +973,31 @@ const FIXES = [
   {type:'Gate',         fix:'Fix 43C',desc:'Cross-Tenant Isolation Test at GATE S2 — absence = GATE FAIL on rbac/multi-tenant stories', cat:'Security'},
   {type:'Guard',        fix:'Fix 44A',desc:'Mode 5 Security/RBAC Advisory — warn when security/rbac story ships in Lean mode without GATE S2', cat:'Security', candidate:true},
 ];
-
-const typeEmoji = {Feature:'🚀',Fix:'🔧',Guard:'🛡️',Gate:'🚪',Architecture:'🏗️'};
-
-function renderFixes(cat) {
-  const tbody = document.getElementById('fix-tbody');
-  const rows = cat === 'all' ? FIXES : FIXES.filter(f => f.type === cat);
-  tbody.innerHTML = rows.map(f => `
-    <tr data-type="${f.type}">
-      <td><span class="type-pill tp-${f.type}">${typeEmoji[f.type]} ${f.type}</span></td>
-      <td><span class="fix-id">${f.fix}</span>${f.candidate ? ' <span style="font-size:.62rem;color:var(--yellow);font-weight:700;">🔲 CANDIDATE</span>' : ''}</td>
-      <td><span class="fix-desc${f.candidate?' fix-candidate':''}">${f.desc}</span></td>
-      <td><span class="cat-pill">${f.cat}</span></td>
-    </tr>
-  `).join('');
+const E = {Feature:'🚀',Fix:'🔧',Guard:'🛡️',Gate:'🚪',Architecture:'🏗️'};
+function renderFixes(cat){
+  const rows = cat==='all' ? FIXES : FIXES.filter(f=>f.type===cat);
+  document.getElementById('fix-tbody').innerHTML = rows.map(f=>`
+    <tr><td><span class="type-pill tp-${f.type}">${E[f.type]} ${f.type}</span></td>
+    <td><span class="fix-id">${f.fix}</span>${f.candidate?' <span style="font-size:.6rem;color:#fbbf24;font-weight:700">🔲 CANDIDATE</span>':''}</td>
+    <td><span class="fix-desc${f.candidate?' fix-candidate':''}">${f.desc}</span></td>
+    <td><span class="cat-pill">${f.cat}</span></td></tr>`).join('');
 }
-
-function filterFixes(cat, btn) {
-  document.querySelectorAll('.fix-filter').forEach(b => b.classList.remove('active'));
+function filterFixes(cat,btn){
+  document.querySelectorAll('.fix-filter').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderFixes(cat);
 }
-
 renderFixes('all');
-</script>
 
-<!-- FOOTER -->
-<footer>
-  <div class="foot-logo">LOOP<span>.</span>ENGINEERING</div>
-  <p>Built by <strong>GURPREET</strong> · 51 implemented fixes · Dry Run v11 · 9.5/10 ship confidence</p>
-  <p style="margin-top:.4rem;">
-    <a href="https://github.com/supersaiyane/loopEngineering" target="_blank">github.com/supersaiyane/loopEngineering</a>
-  </p>
-  <p style="margin-top:.8rem;font-size:.72rem;color:#334155;">Kiro IDE · Claude Projects · ChatGPT Custom GPT</p>
-</footer>
-
-<script>
-  // smooth active nav highlight
-  const sections = document.querySelectorAll('section[id], div[id]');
-  const navLinks = document.querySelectorAll('.nav-links a');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        navLinks.forEach(a => {
-          a.style.color = a.getAttribute('href') === '#' + e.target.id ? '#a5b4fc' : '';
-        });
-      }
-    });
-  }, { threshold: 0.3 });
-  sections.forEach(s => observer.observe(s));
-
-  // agent card hover glow based on phase
-  document.querySelectorAll('.agents-phase').forEach((phase, i) => {
-    const colors = ['rgba(99,102,241,.12)', 'rgba(139,92,246,.12)', 'rgba(6,182,212,.1)'];
-    const borders = ['rgba(99,102,241,.5)', 'rgba(139,92,246,.5)', 'rgba(6,182,212,.5)'];
-    phase.querySelectorAll('.agent-card').forEach(card => {
-      card.addEventListener('mouseenter', () => {
-        card.style.borderColor = borders[i] || borders[2];
-        card.style.boxShadow = `0 4px 24px ${colors[i] || colors[2]}`;
-      });
-      card.addEventListener('mouseleave', () => {
-        card.style.borderColor = '';
-        card.style.boxShadow = '';
-      });
+// Nav scroll highlight
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) document.querySelectorAll('.nav-links a').forEach(a=>{
+      a.style.color = a.getAttribute('href')==='#'+e.target.id ? '#c4b5fd' : '';
     });
   });
+},{threshold:0.3});
+document.querySelectorAll('[id]').forEach(s=>obs.observe(s));
 </script>
 </body>
 </html>
