@@ -2,6 +2,7 @@
 
 <div align="center">
 
+[![GitHub](https://img.shields.io/badge/GitHub-supersaiyane%2FloopEngineering-181717?style=for-the-badge&logo=github)](https://github.com/supersaiyane/loopEngineering)
 ![Status](https://img.shields.io/badge/status-production--ready-brightgreen?style=for-the-badge)
 ![Dry Runs](https://img.shields.io/badge/dry%20runs-v11-blue?style=for-the-badge)
 ![Ship Confidence](https://img.shields.io/badge/ship%20confidence-9.5%2F10-success?style=for-the-badge)
@@ -518,5 +519,8 @@ All pipeline verification runs are documented in `docs/`. Each dry run tests the
 ![Memory](https://img.shields.io/badge/memory-cross--session%20compounding-blue?style=flat-square)
 
 *Loop Engineering — because AI agents shouldn't need to relearn what they already know.*
+
+**Repository:** [github.com/supersaiyane/loopEngineering](https://github.com/supersaiyane/loopEngineering)
+**Author:** GURPREET · [@supersaiyane](https://github.com/supersaiyane)
 
 </div>
