@@ -284,6 +284,7 @@
     <a href="#flow">Flowchart</a>
     <a href="#gates">Gates</a>
     <a href="#outputs">Outputs</a>
+    <a href="#features">Features</a>
   </div>
 </nav>
 
@@ -1111,6 +1112,177 @@
     </div>
   </div>
 </div>
+
+<!-- FEATURES TABLE -->
+<div class="divider" style="max-width:1200px;margin:0 auto;"></div>
+<section id="features">
+  <div class="section-label">51 Improvements</div>
+  <h2>Feature / Fix Division Table</h2>
+  <p class="section-sub">Every change categorised by type. 51 implemented across 11 dry runs — from infrastructure rewrites to runtime security guards.</p>
+
+  <!-- Summary pills -->
+  <div style="display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:2.5rem;">
+    <div style="display:flex;align-items:center;gap:.5rem;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:999px;padding:.35rem 1rem;">
+      <span style="font-size:1rem;">🚀</span>
+      <span style="font-size:.78rem;font-weight:700;color:#a5b4fc;">20 Features</span>
+      <span style="font-size:.72rem;color:var(--muted);">39%</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:.5rem;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);border-radius:999px;padding:.35rem 1rem;">
+      <span style="font-size:1rem;">🔧</span>
+      <span style="font-size:.78rem;font-weight:700;color:#67e8f9;">18 Fixes</span>
+      <span style="font-size:.72rem;color:var(--muted);">35%</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:.5rem;background:rgba(236,72,153,.08);border:1px solid rgba(236,72,153,.2);border-radius:999px;padding:.35rem 1rem;">
+      <span style="font-size:1rem;">🛡️</span>
+      <span style="font-size:.78rem;font-weight:700;color:#f9a8d4;">7 Guards</span>
+      <span style="font-size:.72rem;color:var(--muted);">14%</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:.5rem;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:999px;padding:.35rem 1rem;">
+      <span style="font-size:1rem;">🚪</span>
+      <span style="font-size:.78rem;font-weight:700;color:#fca5a5;">7 Gates</span>
+      <span style="font-size:.72rem;color:var(--muted);">14%</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:.5rem;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:999px;padding:.35rem 1rem;">
+      <span style="font-size:1rem;">🏗️</span>
+      <span style="font-size:.78rem;font-weight:700;color:#fcd34d;">5 Architecture</span>
+      <span style="font-size:.72rem;color:var(--muted);">10%</span>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem;" id="fix-filters">
+    <button class="fix-filter active" data-cat="all" onclick="filterFixes('all',this)">All 51</button>
+    <button class="fix-filter" data-cat="Feature" onclick="filterFixes('Feature',this)">🚀 Features</button>
+    <button class="fix-filter" data-cat="Fix" onclick="filterFixes('Fix',this)">🔧 Fixes</button>
+    <button class="fix-filter" data-cat="Guard" onclick="filterFixes('Guard',this)">🛡️ Guards</button>
+    <button class="fix-filter" data-cat="Gate" onclick="filterFixes('Gate',this)">🚪 Gates</button>
+    <button class="fix-filter" data-cat="Architecture" onclick="filterFixes('Architecture',this)">🏗️ Architecture</button>
+  </div>
+
+  <div id="fix-table-wrap" style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+    <table id="fix-table" style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--border);">
+          <th style="padding:.7rem 1rem;text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);">Type</th>
+          <th style="padding:.7rem 1rem;text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);">Fix</th>
+          <th style="padding:.7rem 1rem;text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);">Capability / What Was Added</th>
+          <th style="padding:.7rem 1rem;text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);">Category</th>
+        </tr>
+      </thead>
+      <tbody id="fix-tbody">
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<style>
+  .fix-filter {
+    background:var(--card); border:1px solid var(--border); border-radius:8px;
+    padding:.35rem .9rem; font-size:.75rem; font-weight:600; color:var(--muted);
+    cursor:pointer; transition:.2s;
+  }
+  .fix-filter:hover { border-color:var(--accent); color:var(--text); }
+  .fix-filter.active { background:rgba(99,102,241,.15); border-color:var(--accent); color:#a5b4fc; }
+  #fix-tbody tr { border-bottom:1px solid rgba(255,255,255,.04); transition:.15s; }
+  #fix-tbody tr:last-child { border:none; }
+  #fix-tbody tr:hover { background:rgba(99,102,241,.05); }
+  #fix-tbody td { padding:.65rem 1rem; font-size:.8rem; vertical-align:top; }
+  .type-pill { display:inline-flex;align-items:center;gap:.3rem;padding:.18rem .55rem;border-radius:6px;font-size:.68rem;font-weight:700;white-space:nowrap; }
+  .tp-Feature  { background:rgba(99,102,241,.12); color:#a5b4fc; }
+  .tp-Fix      { background:rgba(6,182,212,.1);   color:#67e8f9; }
+  .tp-Guard    { background:rgba(236,72,153,.1);  color:#f9a8d4; }
+  .tp-Gate     { background:rgba(239,68,68,.1);   color:#fca5a5; }
+  .tp-Architecture { background:rgba(245,158,11,.1); color:#fcd34d; }
+  .cat-pill { display:inline-block;padding:.15rem .5rem;border-radius:4px;font-size:.65rem;font-weight:600;background:rgba(255,255,255,.04);color:var(--muted); }
+  .fix-id { font-size:.72rem; font-weight:700; color:var(--accent); white-space:nowrap; }
+  .fix-desc { color:var(--text); line-height:1.4; }
+  .fix-candidate { color:var(--yellow) !important; }
+</style>
+
+<script>
+const FIXES = [
+  {type:'Architecture', fix:'Fix 1',  desc:'$TRACKER abstraction — pipeline works without Jira', cat:'Infrastructure'},
+  {type:'Fix',          fix:'Fix 2',  desc:'SM role split — SM no longer gates itself', cat:'Sprint Execution'},
+  {type:'Feature',      fix:'Fix 3',  desc:'FE/BE skill differentiation — separate skill libraries per lane', cat:'Agent Roles'},
+  {type:'Fix',          fix:'Fix 4',  desc:'Steering file inclusion — files load before agents activate', cat:'Infrastructure'},
+  {type:'Feature',      fix:'Fix 5',  desc:'Conflict resolution protocol — CTO/Architect/Security arbitration chain', cat:'Governance'},
+  {type:'Feature',      fix:'Fix 6',  desc:'Lean Team Mode (Mode 5) — 3-role lightweight path for MVPs', cat:'Routing'},
+  {type:'Feature',      fix:'Fix 7',  desc:'Loop Engine — PLAN→DO→VERIFY→DECIDE story loop with retry cap', cat:'Sprint Execution'},
+  {type:'Feature',      fix:'Fix 8',  desc:'Token / memory / context discipline — budgets, rot detection, per-role limits', cat:'Performance'},
+  {type:'Feature',      fix:'Fix 9',  desc:'Skill Activation Pipeline — label → matrix → compress-all protocol', cat:'Agent Roles'},
+  {type:'Fix',          fix:'Fix 10', desc:'Code persistence + loop spec + sprint parallelism defined', cat:'Sprint Execution'},
+  {type:'Fix',          fix:'Fix 11', desc:'Routing precision — conflicts resolved, matrix "ALL files" entries removed', cat:'Routing'},
+  {type:'Architecture', fix:'Fix 12', desc:'Hook rewrite as thin router — constitution moved to steering files', cat:'Infrastructure'},
+  {type:'Fix',          fix:'Fix 13', desc:'Cleanup — 7 dead hooks deleted, shared skills consolidated', cat:'Infrastructure'},
+  {type:'Gate',         fix:'Fix 14', desc:'Design System Gate — blocks agents from bypassing design system', cat:'Code Quality'},
+  {type:'Fix',          fix:'Fix 15', desc:'Report templates + Sprint Discipline Card added', cat:'Documentation'},
+  {type:'Fix',          fix:'Fix 16', desc:'Critical bugs — duplicate sections, mode routing errors, skill load failures', cat:'Infrastructure'},
+  {type:'Fix',          fix:'Fix 17', desc:'Medium improvements — discipline gaps compounding silently', cat:'Sprint Execution'},
+  {type:'Fix',          fix:'Fix 18', desc:'Low priority polish — health-check signals, minor correctness', cat:'Infrastructure'},
+  {type:'Architecture', fix:'Fix 19', desc:'Team-orchestrator split — 1,264-line file → core + sprint + rules', cat:'Infrastructure'},
+  {type:'Feature',      fix:'Fix 20', desc:'Step 0 keyword expansion + Role Handoff template (200-token structured format)', cat:'Routing'},
+  {type:'Fix',          fix:'Fix 21', desc:'Shared skill file verification at session start — missing files warned not silenced', cat:'Infrastructure'},
+  {type:'Fix',          fix:'Fix 22', desc:'Dry Run v1 gaps — STEP 6 / ROLE HANDOFF conflict resolved', cat:'Routing'},
+  {type:'Feature',      fix:'Fix 23', desc:'Dynamic Skill × Agent Selection — label-to-matrix-to-compress replaces filename guessing', cat:'Agent Roles'},
+  {type:'Fix',          fix:'Fix 24', desc:'JWT gap closure — Mode auto-inference stalling on single-shot prompts fixed', cat:'Routing'},
+  {type:'Fix',          fix:'Fix 25', desc:'26 filename mismatches + 19 gaps across dry runs patched', cat:'Infrastructure'},
+  {type:'Fix',          fix:'Fix 27', desc:'P0 calibration — degradation thresholds, mode false positives, VERIFIER theater', cat:'Performance'},
+  {type:'Feature',      fix:'Fix 28', desc:'Quick Reference cards + lessons scan made active (not decorative)', cat:'Memory'},
+  {type:'Fix',          fix:'Fix 29', desc:'Design system owner + creation protocol defined', cat:'Documentation'},
+  {type:'Fix',          fix:'Fix 30', desc:'Dry Run v3 — 7 gaps (Healthcare/FinTech/B2B SaaS/IoT scenarios)', cat:'Sprint Execution'},
+  {type:'Fix',          fix:'Fix 31', desc:'Dry Run v4 — 8 gaps (data lake/edtech/marketplace/IoT adversarial)', cat:'Sprint Execution'},
+  {type:'Feature',      fix:'Fix 32', desc:'Doc Knowledge Architecture — 6-doc source-of-truth framework, 8 templates', cat:'Documentation'},
+  {type:'Feature',      fix:'Fix 33A',desc:'IAM Budget Pre-Warning — auth scope estimate before sprint planning', cat:'Sprint Execution'},
+  {type:'Feature',      fix:'Fix 33B',desc:'OQ Auto-Prompt — SM-PLAN blocked until open questions resolved with resume phrase', cat:'Sprint Execution'},
+  {type:'Feature',      fix:'Fix 34', desc:'Strix Security Integration — pentesting skill files for security_engineer', cat:'Agent Roles'},
+  {type:'Fix',          fix:'Fix 35', desc:'Dual-routing conflict — two competing hooks causing undefined behavior removed', cat:'Infrastructure'},
+  {type:'Fix',          fix:'Fix 36', desc:'Hook SYSTEM AUTHORITY — Kiro native "Build a Feature" dialog suppressed', cat:'Infrastructure'},
+  {type:'Feature',      fix:'Fix 37', desc:'Ponytail Lazy Senior Dev — 7-rung ladder enforced before any code is written', cat:'Code Quality'},
+  {type:'Feature',      fix:'Fix 38A',desc:'25-signal confidence list — enterprise prompts no longer score LOW incorrectly', cat:'Routing'},
+  {type:'Feature',      fix:'Fix 38B',desc:'Mobile-first Mode 5 — mobile_engineer auto-activated for mobile platform prompts', cat:'Routing'},
+  {type:'Gate',         fix:'Fix 38C',desc:'Ponytail GATE S2 commit block — rung violations caught at PR, not post-merge', cat:'Code Quality'},
+  {type:'Gate',         fix:'Fix 39A',desc:'GATE S2 Jira Ponytail verdict — PASS/FAIL line in every Jira comment for audit trail', cat:'Code Quality'},
+  {type:'Fix',          fix:'Fix 39B',desc:'IAM scan PRD coverage — confirmed in place', cat:'Security'},
+  {type:'Feature',      fix:'Fix 40A',desc:'5-Stage Memory Progression — lessons compound (Fail→Investigate→Verify→Distill→Consult)', cat:'Memory'},
+  {type:'Gate',         fix:'Fix 40B',desc:'Comprehension Debt Gate — SM-RETRO blocks sprint if agents approved without reading diffs', cat:'Sprint Execution'},
+  {type:'Guard',        fix:'Fix 40C',desc:'Constraint Drift Guard (GUARD 1) — binding constraints re-read every session start', cat:'Memory'},
+  {type:'Guard',        fix:'Fix 40D',desc:'Ralph Wiggum NON-NEG #10 — "mostly passing" / "looks good" are not close conditions', cat:'Code Quality'},
+  {type:'Guard',        fix:'Fix 40E',desc:'Bad Loop Domain Blocklist (GUARD 2) — auth/payments/prod/arch rewrites need human gate', cat:'Security'},
+  {type:'Architecture', fix:'Fix 41A',desc:'session-guards.md created — hook bloat extracted, always-loaded guard file', cat:'Infrastructure'},
+  {type:'Gate',         fix:'Fix 41B',desc:'Comprehension Debt scoring rubric — 4-item binary (0=critical, replaces subjective SM call)', cat:'Sprint Execution'},
+  {type:'Fix',          fix:'Fix 41C',desc:'Bad-loop verb scoping — keyword-only gate caused false positives; domain + verb now required', cat:'Security'},
+  {type:'Guard',        fix:'Fix 42A',desc:'Post-Discovery Bad-Loop Gate (STEP 4B) — discovered scope re-checked after discovery', cat:'Security'},
+  {type:'Gate',         fix:'Fix 42B',desc:'Stage-1 Lesson Age Enforcement — stale blockers block Sprint N+1', cat:'Memory'},
+  {type:'Guard',        fix:'Fix 42C',desc:'Deploy Self-Triggering Gate — "deploy/release/production" fire gate without needing a verb', cat:'Security'},
+  {type:'Fix',          fix:'Fix 43A',desc:'Lesson Age Clock Accuracy — gate_fired_at field; delayed retros no longer inflate age', cat:'Memory'},
+  {type:'Feature',      fix:'Fix 43B',desc:'Ponytail Rung Disqualification Protocol — RDR + escalation + ADR + artifact', cat:'Code Quality'},
+  {type:'Gate',         fix:'Fix 43C',desc:'Cross-Tenant Isolation Test at GATE S2 — absence = GATE FAIL on rbac/multi-tenant stories', cat:'Security'},
+  {type:'Guard',        fix:'Fix 44A',desc:'Mode 5 Security/RBAC Advisory — warn when security/rbac story ships in Lean mode without GATE S2', cat:'Security', candidate:true},
+];
+
+const typeEmoji = {Feature:'🚀',Fix:'🔧',Guard:'🛡️',Gate:'🚪',Architecture:'🏗️'};
+
+function renderFixes(cat) {
+  const tbody = document.getElementById('fix-tbody');
+  const rows = cat === 'all' ? FIXES : FIXES.filter(f => f.type === cat);
+  tbody.innerHTML = rows.map(f => `
+    <tr data-type="${f.type}">
+      <td><span class="type-pill tp-${f.type}">${typeEmoji[f.type]} ${f.type}</span></td>
+      <td><span class="fix-id">${f.fix}</span>${f.candidate ? ' <span style="font-size:.62rem;color:var(--yellow);font-weight:700;">🔲 CANDIDATE</span>' : ''}</td>
+      <td><span class="fix-desc${f.candidate?' fix-candidate':''}">${f.desc}</span></td>
+      <td><span class="cat-pill">${f.cat}</span></td>
+    </tr>
+  `).join('');
+}
+
+function filterFixes(cat, btn) {
+  document.querySelectorAll('.fix-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFixes(cat);
+}
+
+renderFixes('all');
+</script>
 
 <!-- FOOTER -->
 <footer>
