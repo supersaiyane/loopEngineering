@@ -31,9 +31,10 @@
 8. [File Structure](#-file-structure)
 9. [Steering Files — What Each One Does](#-steering-files--what-each-one-does)
 10. [Quality Gates & Guards](#-quality-gates--guards)
-11. [The Fix Register — What Was Built](#-the-fix-register--what-was-built)
-12. [Dry Run History](#-dry-run-history)
-13. [Glossary](#-glossary)
+11. [⚡ Setup & Usage — Kiro, Claude, ChatGPT](#-setup--usage--kiro-claude-chatgpt)
+12. [The Fix Register — What Was Built](#-the-fix-register--what-was-built)
+13. [Dry Run History](#-dry-run-history)
+14. [Glossary](#-glossary)
 
 ---
 
@@ -408,6 +409,267 @@ Re-reads all binding constraints at **every session start**. Prevents the model 
 ### GUARD 2 — Bad Loop Detection
 
 Blocks agents from self-escalating scope without human approval. Fires on high-risk domain + verb combinations. See [Key Concepts](#-key-concepts-explained) above.
+
+---
+
+## ⚡ Setup & Usage — Kiro, Claude, ChatGPT
+
+This system runs on **three platforms**. Pick the one you use.
+
+---
+
+### 🟣 PLATFORM 1 — Kiro IDE (Native)
+
+> **This is the primary platform.** The `.kiro/` folder and hook were built specifically for Kiro.
+
+#### Why Kiro sometimes reverts to its native behavior
+
+Kiro has a built-in "Build a Feature" dialog and spec-driven workflow (`.kiro/specs/`). Without explicit suppression, Kiro ignores the orchestration hook and falls back to its own defaults — asking "Is this a new feature or a bug fix?" and creating files you didn't ask for.
+
+**The fix is already baked into the hook** — it starts with a `SYSTEM AUTHORITY` block that explicitly disables all Kiro native behaviors. But the symlink must exist for the hook to load correctly.
+
+#### Step 1 — Clone the repo into your project
+
+```bash
+# Inside your project root (where you open Kiro):
+git clone https://github.com/supersaiyane/loopEngineering.git
+cd loopEngineering
+```
+
+#### Step 2 — Create the `.kiro` symlink (CRITICAL)
+
+Kiro reads from `.kiro/` at the project root. This repo stores everything in `kiro/`. The symlink bridges them:
+
+```bash
+# Run this from the loopEngineering directory:
+ln -s kiro .kiro
+```
+
+Verify it worked:
+```bash
+ls -la .kiro          # should show → kiro
+ls .kiro/hooks/       # should show elite-team-orchestrator.kiro.hook
+ls .kiro/steering/    # should show all 14 steering files
+```
+
+> ⚠️ **If `.kiro` already exists** in your project, remove it first: `rm -rf .kiro` then re-create the symlink.
+
+#### Step 3 — Open the project in Kiro
+
+Open the `loopEngineering/` folder in Kiro. The hook loads automatically on every prompt via `promptSubmit` event — no manual activation needed.
+
+#### Step 4 — Verify the hook is active
+
+Type any prompt and look for this log line at the start of the response:
+```
+[ENV] TRACKER_MODE=markdown | GIT_MODE=LOCAL
+```
+If you see this → the hook is active. ✅
+
+If you **don't** see it → the symlink is broken. Re-run Step 2.
+
+#### Step 5 — Start your first build
+
+```
+Build me a SaaS billing platform with Stripe integration
+```
+
+The system will:
+1. Score signals → HIGH confidence → Mode 1 selected
+2. Log `[MODE: 1 auto-inferred | confidence=HIGH]`
+3. Activate the full 22-agent pipeline
+4. Start with Think phase (Market Researcher + CTO)
+
+#### 🚨 Troubleshooting — Kiro Reverting to Native Behavior
+
+| Symptom | Root cause | Fix |
+|---------|-----------|-----|
+| Kiro asks "New feature or bug fix?" | Hook not loading — symlink missing | Run `ln -s kiro .kiro` from project root |
+| Kiro creates `.kiro/specs/` folder | Hook loaded but SYSTEM AUTHORITY ignored | Check hook file exists at `.kiro/hooks/elite-team-orchestrator.kiro.hook` |
+| Steering files "not found" errors | Kiro can't resolve `kiro/steering/` paths | Verify symlink: `ls -la .kiro` → should say `kiro` |
+| Hook fires but uses wrong mode | Signal count below threshold | Prefix prompt with `[LOOP]` to force full routing |
+| Kiro ignores orchestration mid-session | Native dialog intercepted a prompt | Prefix prompt with `[LOOP]` to bypass the complexity gate |
+
+#### Force Override — `[LOOP]` prefix
+
+If Kiro ever falls back to native behavior mid-session, prefix your prompt with `[LOOP]`:
+
+```
+[LOOP] Build me a notification service with real-time updates
+```
+
+`[LOOP]` bypasses the Step 0 complexity gate and guarantees the full orchestration pipeline runs regardless of prompt length or signal count.
+
+#### Mode Shortcuts
+
+```
+mode 1: build me a [full platform]        → Full 22-agent army
+mode 2: write the architecture doc for X  → Single role (Architect)
+mode 3: fix the null pointer in auth.go   → Direct execution, no overhead
+mode 5: lean mode — 2-person startup      → 3 lite roles, 4-iteration cap
+run discovery questions                   → Forces 7-question scoping wizard
+```
+
+---
+
+### 🔵 PLATFORM 2 — Claude (claude.ai Projects)
+
+> Best for: ongoing builds without Kiro, or using Claude as the AI engine alongside the system.
+
+#### Step 1 — Create a Claude Project
+
+1. Go to **[claude.ai](https://claude.ai)** → left sidebar → **"New Project"**
+2. Name it: `Loop Engineering` or your product name
+3. Click **Create Project**
+
+#### Step 2 — Paste the system prompt
+
+1. Inside the project → **"Project Instructions"** (gear icon or top right)
+2. Open `kiro/adapters/claude-system-prompt.md` in any text editor
+3. Copy everything **below** the `# ─────` comment line
+4. Paste into Project Instructions → **Save**
+
+#### Step 3 — Upload Knowledge files
+
+Click **"Add Content" → "Upload files"** and upload these from `kiro/steering/`:
+
+| File | Purpose |
+|------|---------|
+| `team-orchestrator-core.md` | Core execution rules + role handoffs |
+| `team-orchestrator-rules.md` | NON-NEGOTIABLES + GATE S1 + GATE S2 |
+| `team-orchestrator-sprint.md` | Sprint lifecycle + SM-RETRO |
+| `skill-selection-matrix.md` | Story label → skill file mapping |
+| `loop-engine.md` | PLAN→DO→VERIFY→DECIDE loop |
+| `discovery-engine.md` | 7 scoping questions + scoring |
+| `ponytail.md` | 7-rung lazy load ladder |
+| `session-guards.md` | GUARD 1 + GUARD 2 |
+
+**Optional (recommended for existing projects):**
+- `docs/lessons.md` — past lessons (HIGH-confidence rules apply immediately)
+- `docs/decisions.md` — ADR constraints (bind all roles)
+
+#### Step 4 — Start your first session
+
+Open a new conversation in the project and type:
+```
+[NEW SESSION]
+Product: <what you're building>
+Phase: THINK (or DESIGN / DEVELOP if resuming)
+Last action: <what was done last, or "starting fresh">
+```
+
+#### Step 5 — Resuming a build
+
+Paste your latest checkpoint entry at the start of each new conversation:
+```
+Resuming from checkpoint:
+Sprint 2 / Phase 1. Last: backend auth complete. Next: FE integration story AUTH-003.
+Files: docs/phase-1/sprint-plan.md (Sprint 2 section)
+```
+
+Claude Projects remember Knowledge files but not conversation history — the checkpoint paste is your resume mechanism.
+
+#### Mode shortcuts (same as Kiro)
+```
+mode 1: build me a [platform]
+mode 2: write the PRD for [feature]
+mode 5: lean mode — small team
+run discovery questions
+```
+
+---
+
+### 🟢 PLATFORM 3 — ChatGPT (Custom GPT or Project)
+
+> Best for: teams who prefer GPT-4o, or for sharing the system with others via a Custom GPT link.
+
+#### Option A — Custom GPT (shareable, persistent) — Recommended
+
+**Requires:** ChatGPT Plus, Team, or Enterprise.
+
+1. Go to **[chat.openai.com](https://chat.openai.com)** → **"Explore GPTs"** → **"Create"**
+2. Click the **"Configure"** tab
+3. Set **Name:** `Loop Engineering Elite Team`
+4. Set **Description:** `Senior engineering orchestrator — 22 specialist roles, 5 execution modes, structured sprint pipeline with security gates`
+5. In the **Instructions** field: open `kiro/adapters/chatgpt-system-prompt.md`, copy everything below the `# ─────` line, paste it in
+6. **Knowledge → Upload files:** same 8 steering files as Claude setup above
+7. **Capabilities:** enable ✅ Web Search + ✅ Code Interpreter
+8. **Conversation starters** (paste these in):
+   ```
+   [NEW SESSION] Product: [name] | Starting: THINK phase
+   mode 1: build me a [describe your app]
+   mode 5: lean mode — 2-person team, build [describe]
+   run discovery questions
+   ```
+9. Click **Save** → **"Anyone with a link"** (for sharing) or **"Only me"**
+
+#### Option B — ChatGPT Project (personal, no sharing)
+
+1. Left sidebar → **"New Project"** → name it `Loop Engineering`
+2. Inside project → **"Customize ChatGPT"**
+3. Paste the `chatgpt-system-prompt.md` content into Instructions
+4. **Add files** → same 8 steering files
+
+#### Verify setup works
+
+Start with:
+```
+[NEW SESSION] Product: test | Starting: THINK phase
+```
+You should see:
+```
+[ENV] TRACKER_MODE=markdown | GIT_MODE=LOCAL
+```
+
+#### Important: ChatGPT pair-programming model
+
+ChatGPT produces commands — **you run them in your terminal.** When the system outputs:
+```bash
+git checkout -b feature/AUTH-001-user-login
+```
+Copy that and run it yourself. Think of ChatGPT as the brain, your terminal as the hands.
+
+#### Model recommendations
+
+| Task | Recommended model |
+|------|--------------------|
+| Full Mode 1 build (all phases) | GPT-4o |
+| Architecture + ADR reasoning | o3 or o1 |
+| Code generation (senior_engineer roles) | GPT-4o |
+| Market research + THINK phase | GPT-4o with web search |
+| Mode 3 quick fixes | GPT-4o mini (cost-efficient) |
+| Mode 5 lean / fast builds | GPT-4o mini |
+
+---
+
+### 📊 Platform Comparison
+
+| | Kiro IDE | Claude Projects | ChatGPT Custom GPT |
+|---|---|---|---|
+| Hook auto-loads | ✅ (every prompt) | ✅ (Project Instructions) | ✅ (Instructions field) |
+| Steering files auto-loaded | ✅ (symlink) | ✅ (Knowledge upload) | ✅ (Knowledge upload) |
+| Runs code directly | ✅ | ❌ (describes code) | ✅ (Code Interpreter) |
+| File system access | ✅ | ❌ | ❌ |
+| Shareable with team | ✅ (git repo) | ❌ (personal project) | ✅ (GPT link) |
+| Best for | Primary dev work | Long-form builds | Teams / GPT preference |
+| Setup time | ~5 min | ~10 min | ~15 min |
+| Adapter file needed | ❌ (hook handles it) | ✅ `claude-system-prompt.md` | ✅ `chatgpt-system-prompt.md` |
+
+---
+
+### 📁 Adapter Files Location
+
+All adapter files are in `kiro/adapters/`:
+
+```
+kiro/adapters/
+├── claude-system-prompt.md    ← Paste into Claude Project Instructions
+├── claude-setup-guide.md      ← Detailed Claude setup walkthrough
+├── chatgpt-system-prompt.md   ← Paste into ChatGPT Instructions
+└── chatgpt-setup-guide.md     ← Detailed ChatGPT setup walkthrough
+```
+
+> Both system prompts are synced to **Fix 43C · Dry Run v11 · 9.5/10 ship confidence.**
 
 ---
 
