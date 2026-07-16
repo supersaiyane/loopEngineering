@@ -74,3 +74,36 @@ I will proceed once you confirm all three.
 `Log: [BAD-LOOP-GATE: domain=[auth] verb=[redesign] → human approval required]`
 
 An agent that proceeds in these domains without explicit user approval = NON-NEGOTIABLE #10 violation.
+
+---
+
+## GUARD 3 — PXPIPE IMAGE CONTEXT GUARD (Fix 44G)
+
+**When:** pxpipe proxy is active (`ANTHROPIC_BASE_URL=http://127.0.0.1:47821`).
+**Why:** Old history turns are stored as PNG images, not text. The model reads them at
+gist-level accuracy (decisions, values, paths, names = 98/98 lossless) but NOT at
+byte-exact level. Silent misreads — plausible wrong values, no error signal — occur on
+exact strings at ~13% rate on Fable 5, ~100% on Opus 4.8.
+
+**NEVER recall from imaged context (re-fetch from source instead):**
+- Git commit SHAs / hashes → run `git log` or `git show` fresh
+- File:line references → re-check `project_map.md` or grep
+- Exact error codes, IDs, ticket numbers → re-read the relevant file or tool result
+- camelCase function/variable names → re-read the source file
+- API keys, secrets, credentials → never in images (verbatim-risk guard)
+- Checkpoint timestamps / gate_fired_at values → re-read `docs/checkpoint.md`
+
+**What IS safe to use from imaged context:**
+- Decisions made ("we chose Postgres over MySQL")
+- File names and directory paths (not line numbers)
+- Architecture intent ("auth service handles session tokens")
+- Status summaries ("Sprint 3 complete, fix 44B merged")
+- Counts and relative values ("3 files changed", "~15% improvement")
+
+**Protocol:**
+Any agent that needs an exact string from session history older than the live text
+tail MUST re-fetch it from the canonical source before using it. This is the
+re-read-before-edit protocol already in debugging_methodology.md — now with an
+explicit reason: the old context may be an image, not text.
+
+`Log: [GUARD-3: exact-string needed → re-fetching from source, not image memory]`

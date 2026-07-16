@@ -9,6 +9,8 @@
 ![Fixes](https://img.shields.io/badge/fixes%20implemented-50%2F51-orange?style=for-the-badge)
 ![Roles](https://img.shields.io/badge/agent%20roles-22-purple?style=for-the-badge)
 ![Skill Files](https://img.shields.io/badge/skill%20files-254-informational?style=for-the-badge)
+![pxpipe](https://img.shields.io/badge/pxpipe-token%20compression%20%E2%88%9260%25-ff6b35?style=for-the-badge)
+![White Paper](https://img.shields.io/badge/white%20paper-v5%20published-blueviolet?style=for-the-badge)
 
 </div>
 
@@ -32,13 +34,18 @@
 9. [Steering Files — What Each One Does](#-steering-files--what-each-one-does)
 10. [Quality Gates & Guards](#-quality-gates--guards)
 11. [⚡ Setup & Usage — Kiro, Claude, ChatGPT](#-setup--usage--kiro-claude-chatgpt)
-12. [The Fix Register — What Was Built](#-the-fix-register--what-was-built)
-13. [Dry Run History](#-dry-run-history)
-14. [Glossary](#-glossary)
+12. [🗜️ Token Compression — pxpipe](#️-token-compression--pxpipe)
+13. [The Fix Register — What Was Built](#-the-fix-register--what-was-built)
+14. [Dry Run History](#-dry-run-history)
+15. [R&D Research Files](#-rd-research-files)
+16. [Roadmap](#-roadmap)
+17. [Glossary](#-glossary)
 
 ---
 
 ## 🤔 What Is This Project?
+
+> **The context:** By mid-2026, frontier AI coding agents score ~88% on SWE-bench benchmarks but fail in **70–95% of production deployments**. Only 14% of enterprise AI pilots ever reach org-wide scale. The gap is not model capability — it's process architecture. No production-validated framework for sustained, multi-session LLM coding agents existed in the literature. Loop Engineering is the first.
 
 **Loop Engineering** is a system of rules, files, and protocols that tells the **Kiro AI IDE** how to behave like a structured engineering team — instead of just answering prompts one at a time.
 
@@ -54,6 +61,8 @@ Without this system, Kiro answers each prompt independently — like a contracto
 ---
 
 ## 🎯 The Problem It Solves
+
+The production reliability crisis in agentic AI systems is real and documented. Frontier models are capable. The process architectures are not. Loop Engineering is the process layer that closes the gap.
 
 | Problem Without This System | How This System Fixes It |
 |-----------------------------|--------------------------|
@@ -319,7 +328,7 @@ loopEngineering/
 │   │   ├── team-orchestrator-rules.md   ← NON-NEGOTIABLES + GATE S1/S2
 │   │   ├── discovery-engine.md          ← 7-question discovery + scoring
 │   │   ├── ponytail.md                  ← 7-rung ladder enforcement
-│   │   ├── session-guards.md            ← GUARD 1 (constraints) + GUARD 2 (bad loop)
+│   │   ├── session-guards.md            ← GUARD 1 + GUARD 2 + GUARD 3 (pxpipe)
 │   │   ├── skill-selection-matrix.md    ← Story label → skill file mapping
 │   │   ├── skill-label-index.md         ← All skill filenames indexed
 │   │   ├── loop-engine.md               ← PLAN→DO→VERIFY→DECIDE loop spec
@@ -336,8 +345,15 @@ loopEngineering/
 │   │   ├── ... (18 more roles)
 │   │   └── shared/                 ← Cross-role shared skills
 │   │
-│   ├── 📄 CLAUDE.md               ← Active fix register + session instructions
+│   ├── 📄 CLAUDE.md               ← Active fix register + pxpipe note
 │   └── 📄 CLAUDE-implemented.md   ← Full history of all 50 implemented fixes
+│
+├── 📂 scripts/                     ← Utility scripts
+│   └── start-kiro-pxpipe.sh        ← Launch Kiro through pxpipe proxy (run this)
+│
+├── 📄 gstack-research.md           ← R&D: gstack vs Loop Engineering analysis
+├── 📄 pxpipe-research.md           ← R&D: pxpipe token compression assessment
+├── 📄 oneagent-search.md           ← R&D: 67TB logs/metrics/traces search architecture
 │
 └── 📂 docs/                        ← Evidence, decisions, memory
     ├── checkpoint.md               ← Session continuity (resume from here)
@@ -360,7 +376,7 @@ loopEngineering/
 | `team-orchestrator-rules.md` | On demand | GATE S1 (security) + GATE S2 (PR review) checklists |
 | `discovery-engine.md` | On demand | 7 discovery questions → score → mode recommendation |
 | `ponytail.md` | **Always** | 7-rung ladder — loaded before any agent fires |
-| `session-guards.md` | **Always** | Constraint drift guard + bad loop guard |
+| `session-guards.md` | **Always** | GUARD 1 (constraint drift) + GUARD 2 (bad loop) + GUARD 3 (pxpipe image context) |
 | `skill-selection-matrix.md` | On demand | Maps story labels → exact skill files to load |
 | `skill-label-index.md` | On demand | Filename index for all 254 skill files |
 | `loop-engine.md` | On demand | PLAN→DO→VERIFY→DECIDE loop specification |
@@ -409,6 +425,22 @@ Re-reads all binding constraints at **every session start**. Prevents the model 
 ### GUARD 2 — Bad Loop Detection
 
 Blocks agents from self-escalating scope without human approval. Fires on high-risk domain + verb combinations. See [Key Concepts](#-key-concepts-explained) above.
+
+### GUARD 3 — pxpipe Image Context (Fix 44G)
+
+When the pxpipe token-compression proxy is active, old history turns are stored as PNG images. The model reads them at gist-level accuracy (decisions, paths, values = **98/98 lossless**) but NOT at byte-exact level — ~13% silent misread rate on exact strings.
+
+GUARD 3 tells every agent: never recall exact strings from image context — always re-fetch from the canonical source.
+
+```
+BLOCKED from image recall:  git SHAs · file:line refs · camelCase identifiers
+                             exact error codes · checkpoint timestamps
+
+SAFE from image recall:     decisions made · file names · architecture intent
+                             status summaries · counts and relative values
+```
+
+See [Token Compression — pxpipe](#️-token-compression--pxpipe) for full setup.
 
 ---
 
@@ -673,6 +705,61 @@ kiro/adapters/
 
 ---
 
+## 🗜️ Token Compression — pxpipe
+
+> **What it is:** A local proxy that intercepts every API call from Kiro/Claude and converts bulky old context (system prompt, tool results, history) into PNG images before they leave your machine. Image tokens are billed by pixel area — not by content. Dense code/JSON runs at ~1 char/token as text, but ~3.1 chars/image-token, so you pay ~3x less per character of context.
+
+**Measured results on our workload:**
+- ~59–70% lower end-to-end token bill on dense coding sessions
+- Gist recall: **98/98** — decisions, values, paths, names survive perfectly
+- Verbatim recall: **13/15** — ~13% silent misread on exact hex strings (addressed by GUARD 3)
+- Effective context window: **~3x larger** — same 1M window, old turns take ⅓ the tokens
+
+**Why this matters for Loop Engineering specifically:**
+Our hook fires on every prompt, sending the full orchestrator + 22 agent descriptions every time. That's ~15-25k tokens per prompt before any task begins. With pxpipe, that static slab compresses to ~5-8k image tokens — the biggest single saving in our setup.
+
+### Quick Start (30 seconds)
+
+**Step 1 — Install once:**
+```bash
+npm install -g pxpipe-proxy
+```
+
+**Step 2 — Launch every session:**
+```bash
+cd loopEngineering
+./scripts/start-kiro-pxpipe.sh
+```
+
+The script starts the proxy, waits for it to be ready, then launches Kiro or Claude automatically. Dashboard at `http://127.0.0.1:47821` — shows live token savings per request with a kill switch.
+
+**Step 3 — Validate (first sprint only):**
+Check `~/.pxpipe/events.jsonl` after one sprint to see your actual compression ratio.
+
+### What Gets Compressed
+
+| Content | Compressed? | Why |
+|---|---|---|
+| System prompt + tool docs | ✅ Yes | Static slab — biggest single saving |
+| Old history turns (beyond live tail) | ✅ Yes | Dense code/JSON — ~3x compression |
+| Recent turns (active working window) | ❌ No | Stays text — agents need byte-exact access |
+| Sparse prose | ❌ No | Profitability gate: images only win on dense content |
+| git log / SHA output | ❌ No | GUARD 3 keepSharp — exact string protection |
+
+### GUARD 3 Integration
+
+GUARD 3 (in `session-guards.md`) makes agents aware of image context. When pxpipe is active, any exact-string lookup — git SHA, file:line, camelCase identifier — must come from a fresh tool call, not from memory. This aligns with our existing re-read-before-edit protocol.
+
+### Research & Benchmarks
+
+Full analysis in [`pxpipe-research.md`](pxpipe-research.md), including:
+- Benchmark table (gist recall 98/98, verbatim recall 13/15, SWE-bench 10/10 at -65% cost)
+- Why our workload is ideal (dense code/JSON, re-reads before edits)
+- Comparison with `/compact` (pxpipe keeps content as images vs. `/compact` discards it as prose)
+- keepSharp configuration for protecting exact strings
+
+---
+
 ## 🔧 The Fix Register — What Was Built
 
 This system was built across **51 incremental fixes** over multiple sessions.
@@ -700,6 +787,7 @@ This system was built across **51 incremental fixes** over multiple sessions.
 | Fix 33–38 | Enforcement: ponytail ladder, confidence signals, mobile routing |
 | Fix 39–42 | Protection: memory progression, comprehension debt, bad loop scoping |
 | Fix 43 | Verification: lesson age clock, dep disqualification, cross-tenant gate |
+| Fix 44G | ✅ Infra: pxpipe integration — GUARD 3, launch script, CLAUDE.md note |
 | Fix 44A | 🔲 Pending: Mode 5 advisory for security/rbac stories without GATE S2 |
 
 > Full history: [`kiro/CLAUDE-implemented.md`](kiro/CLAUDE-implemented.md) · Active register: [`kiro/CLAUDE.md`](kiro/CLAUDE.md)
@@ -726,7 +814,98 @@ All pipeline verification runs are documented in `docs/`. Each dry run tests the
 
 ---
 
-## 📚 Glossary
+## 🔬 R&D Research Files
+
+Three research documents park findings from experiments and third-party tool analysis. These are reference material — not active system files.
+
+| File | What It Contains |
+|------|-----------------|
+| [`loop-engineering-white-paper-v5.pdf`](loop-engineering-white-paper-v5.pdf) | **Publication draft white paper (34 pages).** Problem-first framing: the 2026 production reliability crisis → why existing approaches fail → the Loop Engineering Framework as the response. Includes 12-pattern failure taxonomy, gist/exact-string recall bifurcation finding, compression data, guard effectiveness analysis. |
+| [`GOAT.md`](GOAT.md) | **Honest gap analysis.** Where this framework is genuinely first in field (failure mode taxonomy, degradation tiers, compression-fidelity bifurcation, session continuity architecture) vs. what is missing for full academic validation (external reproducibility, controlled methodology, competitor comparison). |
+| [`pxpipe-research.md`](pxpipe-research.md) | Full pxpipe assessment: benchmarks, compression math, Loop Engineering fit analysis, gist vs verbatim recall boundary, GUARD 3 rationale |
+| [`gstack-research.md`](gstack-research.md) | gstack vs Loop Engineering: 30+ slash command inventory, 5 additive capabilities, architectural conflict analysis, decision log (Debugging Iron Law, Edit Scope Lock, QA Executor concept) |
+| [`oneagent-search.md`](oneagent-search.md) | 67TB logs/metrics/traces search: AI agent as query layer on ClickHouse + VictoriaMetrics + Tempo, MCP server spec, cross-signal correlation architecture |
+
+---
+
+## 🗺️ Roadmap
+
+> Based on the [GOAT analysis](GOAT.md) — where the framework is already first in field, and what it needs to become the definitive reference.
+
+The roadmap is organized into four horizons. Each is grounded in a specific gap identified during the white paper research and GOAT analysis.
+
+---
+
+### ✅ Phase 0 — Foundation (Complete)
+*What exists today, July 2026*
+
+| Item | Status |
+|------|--------|
+| 12-pattern production failure taxonomy | ✅ Documented + cataloged |
+| Four-layer process architecture | ✅ Production-validated (44 fix cycles) |
+| Degradation tier system (PEAK → CRITICAL) | ✅ Implemented in CLAUDE.md + session-guards.md |
+| Session continuity (resume vector + checkpoint) | ✅ Active across all sessions |
+| Gist/exact-string recall bifurcation finding | ✅ Measured, documented, mitigated via GUARD 3 |
+| Compression data (59–70% on code-heavy sessions) | ✅ Measured across 44 sessions |
+| Three-tier guard architecture | ✅ In session-guards.md |
+| White paper v5 (problem-first, 34 pages) | ✅ DOCX + PDF published |
+| GOAT analysis | ✅ Honest gap + strength inventory |
+
+---
+
+### 🔜 Phase 1 — Reproducibility (Next 30 days)
+*Transform the practitioner contribution into a replicable one*
+
+| Item | What + Why |
+|------|------------|
+| **Open-source the core artifacts** | Publish the CLAUDE.md behavioral spec template, checkpoint schema, degradation tier definition, and guard system spec as standalone reusable components. Right now only we can run the framework — others need installable artifacts to replicate. |
+| **Methodology doc for compression-fidelity finding** | Write up the exact test conditions: how many sessions, what content types, what compression parameters, how misreads were detected. Without this, the 11–17% misread rate is an observation, not a finding. |
+| **Fix 44A** | Mode 5 advisory for security/RBAC stories — the one remaining open candidate from Dry Run v11. Small but completes the gate coverage. |
+| **Competitor comparison section** | Document MemGPT, LangMem, LangGraph memory modules, Cognition Devin architecture. Show where the Loop Engineering approach is complementary, where it diverges, and why. The white paper currently doesn't acknowledge these exist. |
+
+---
+
+### 📅 Phase 2 — Validation (Next 90 days)
+*Turn single-team evidence into reproducible findings*
+
+| Item | What + Why |
+|------|------------|
+| **External validator study** | Recruit one other developer to apply the framework to their own codebase and document what happens. Even one external replication transforms this from case study to evidence. This is the single highest-leverage action for academic credibility. |
+| **Before/after baseline measurement** | Run the same development workflow with the framework disabled for one sprint, then enabled — measure failure mode recurrence, session continuity score, tool call counts. Without a control group, the evaluation claims are assertions. |
+| **Formal evaluation protocol** | Define measurable KPIs: session continuity score, failure mode recurrence rate, constraint drift incidents per 10 sessions, guard activation rate. Metrics enable others to benchmark against the framework, not just use it. |
+| **MOMENTO evaluation scenarios** | Build evaluation scenarios from the checkpoint/resume vector patterns and test against the MOMENTO framework. This connects the framework to the only published multi-session benchmark, providing an academic anchor point. |
+
+---
+
+### 🔭 Phase 3 — Publication (3–6 months)
+*Place the work in the academic record*
+
+| Item | What + Why |
+|------|------------|
+| **arXiv preprint** | Submit the white paper v5 (with Phase 1 additions: methodology, competitor comparison) as an arXiv preprint. This establishes a timestamp on the failure taxonomy and bifurcation finding before others document them. |
+| **Practitioner venue submission** | Target MLSys, EMNLP Systems track, or the ACL Workshop on Natural Language Processing for Programming — venues that accept practitioner research with production-validated findings. The MOMENTO paper creates a natural citation bridge. |
+| **Case study publication** | Write the 44-fix development history as a structured case study. The progression from patch-level to framework-level resolution across 44 iterations is itself a publishable finding about how production AI frameworks emerge iteratively. |
+| **Open standard proposal** | Propose the CLAUDE.md behavioral spec format and checkpoint schema as a community standard for process-layer LLM agent configuration. Similar to how `.editorconfig` standardized editor behavior — a `process.md` format could standardize agent process-layer contracts. |
+
+---
+
+### 🌐 Phase 4 — Field Impact (6–12 months)
+*From framework to ecosystem*
+
+| Item | What + Why |
+|------|------------|
+| **Multi-team validation study** | Coordinate 3–5 development teams running the framework across different codebases, tech stacks, and team sizes. Report aggregate failure mode rates and framework adoption patterns. This is what moves the work from "strong practitioner contribution" to "field-defining paper." |
+| **Generalization research** | Test whether the failure mode taxonomy generalizes beyond software development. The twelve failure modes were derived from coding agents — how many apply to agents in other stateful domains (legal document review, financial analysis, scientific research automation)? |
+| **Benchmark contribution** | Contribute production-derived test cases to MOMENTO or a successor benchmark. The resume vector + checkpoint patterns are directly translatable to multi-session evaluation scenarios with ground-truth correctness criteria. |
+| **Tooling** | Build a lightweight framework validation tool — something that audits an existing agent configuration against the twelve failure modes and reports which ones are mitigated vs. exposed. Makes the framework accessible to teams without the 44-fix development journey. |
+
+---
+
+### 🎯 The One That Matters Most
+
+> **External reproducibility is the critical path item.** Everything in Phase 1–4 is achievable, but external reproducibility is what separates a well-documented practitioner system from a contribution that reshapes the field. One other developer. One other codebase. One published report. That's the unlock.
+
+---
 
 | Term | What It Means |
 |------|---------------|
@@ -738,6 +917,7 @@ All pipeline verification runs are documented in `docs/`. Each dry run tests the
 | **GATE S2** | PR review gate that runs BEFORE any code merges. |
 | **GUARD 1** | Constraint drift protection — re-reads binding constraints every session. |
 | **GUARD 2** | Bad loop protection — blocks agents from self-escalating dangerous scope changes. |
+| **GUARD 3** | pxpipe image context protection — prevents agents from recalling exact strings (SHAs, line numbers, identifiers) from compressed image history. |
 | **Ponytail** | The 7-rung lazy-load ladder. Forces agents to use what already exists before building from scratch. |
 | **RDR** | Rung Disqualification Record — written when a dep on a rung is disqualified (CVE, license, etc.). |
 | **ADR** | Architecture Decision Record — permanent doc explaining WHY an architectural choice was made. |
@@ -752,6 +932,8 @@ All pipeline verification runs are documented in `docs/`. Each dry run tests the
 | **Cross-Tenant Test** | A test that proves user A from company A cannot access user B's data from company B. Required at GATE S2 for RBAC stories. |
 | **NON-NEG** | Non-Negotiable — a rule that cannot be overridden by any agent, prompt, or circumstance. |
 | **Dry Run** | A simulated full pipeline run used to find gaps before real-world use. |
+| **pxpipe** | A local proxy that compresses dense context (system prompt, tool results, old history) to PNG images — saves ~59-70% on token cost for code-heavy sessions. |
+| **Silent confabulation** | When an agent confidently returns a wrong value from imaged history with no error signal. GUARD 3 prevents this by requiring re-fetch from source for exact strings. |
 
 ---
 
@@ -763,10 +945,16 @@ All pipeline verification runs are documented in `docs/`. Each dry run tests the
 ├─────────────────────────────────────────────────────────┤
 │  Dry Run v11 complete          ✅ 9.5/10                │
 │  Fixes 1–43C implemented       ✅ 50/51                 │
+│  Fix 44G pxpipe integration    ✅ GUARD 3 + script      │
 │  Fix 44A (Mode 5 advisory)     🔲 Candidate             │
+│  pxpipe token compression      ✅ ~59-70% savings       │
+│  White paper v5                ✅ 34pp · DOCX + PDF     │
+│  GOAT analysis                 ✅ Strengths + gaps doc  │
 │  Git repo status               ✅ Clean (committed)     │
 │  Adapters                      ⏸️ Intentionally skipped │
-│  Next action                   → Implement Fix 44A       │
+│  Next action                   → npm install -g pxpipe-proxy │
+│                                → ./scripts/start-kiro-pxpipe.sh │
+│                                → Implement Fix 44A       │
 │                                → git push                │
 └─────────────────────────────────────────────────────────┘
 ```

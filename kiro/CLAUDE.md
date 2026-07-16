@@ -2,10 +2,28 @@
 # Fixes 1–15 are APPLIED and documented in CLAUDE-implemented.md (reference only, never auto-loads).
 # This file = pending work only. Read this every session. Skip CLAUDE-implemented.md unless debugging.
 
-Last updated: 2026-07-10
+Last updated: 2026-07-15
 # All fixes through Fix 43C implemented. Dry Run v11 complete (9.5/10). See CLAUDE-implemented.md for full history.
 # Gap found in v11: Fix 44A (LOW) — Mode 5 emits no advisory when security/rbac story ships without GATE S2.
+# pxpipe integration complete (2026-07-15): GUARD 3 added to session-guards.md, launch script at scripts/start-kiro-pxpipe.sh
+# Research parked: gstack-research.md, pxpipe-research.md, oneagent-search.md
 # Next: Implement Fix 44A, then push.
+
+# ── PXPIPE TOKEN COMPRESSION ────────────────────────────────────
+# pxpipe proxy reduces input token cost ~59-70% on dense code/JSON sessions
+# by rendering old history + system prompt + tool docs as PNG images.
+#
+# LAUNCH:  cd loopEngineering && ./scripts/start-kiro-pxpipe.sh
+#
+# TOKEN DISCIPLINE NOTE (from global CAVEMAN ULTRA):
+# The degradation tier thresholds (PEAK/GOOD/DEGRADING/CRITICAL) measure
+# BEHAVIOR discipline, not just cost. Tiers remain the same.
+# But with pxpipe active: financial pressure per tier is ~3x lower.
+# A DEGRADING session without pxpipe ≈ a GOOD session with pxpipe, dollar-for-dollar.
+# Check ~/.pxpipe/events.jsonl after a sprint to see actual compression on our workload.
+#
+# GUARD 3 applies when pxpipe is active — see kiro/steering/session-guards.md
+# ────────────────────────────────────────────────────────────────
 
 ---
 
