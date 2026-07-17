@@ -1773,10 +1773,10 @@ Mode 4 Standard: project > 5 user stories OR multi-sprint plan
 **Fix:** Create the three files and add session-end write instructions:
 
 Files to create:
-- `loopEngineering/docs/lessons.md` — use confidence-scored format defined in OPERATING RULES above
-- `loopEngineering/docs/decisions.md` — ADR index with temporal validity:
+- `loopEngineering/kiro/memory/lessons.md` — use confidence-scored format defined in OPERATING RULES above
+- `loopEngineering/kiro/memory/decisions.md` — ADR index with temporal validity:
   `| ADR-NNN | title | date | Accepted/Superseded | valid_from → valid_to | one-line decision |`
-- `loopEngineering/docs/project_map.md` — module-level map of kiro/ system (dirs, responsibilities, key files)
+- `loopEngineering/kiro/memory/project_map.md` — module-level map of kiro/ system (dirs, responsibilities, key files)
 
 Session-end write protocol (replaces disabled hooks 03/05):
 1. Write checkpoint entry (checkpoint.md)
@@ -1850,7 +1850,7 @@ The original objective must be captured at session start (first user message) an
 | 12C | Hook prompt length | Hook file < 100 lines; team-orchestrator.md unchanged |
 | 12D | Mode 4 Lite/Standard determined at project start | Log line: `[MODE 4: Lite/Standard — N stories]` |
 | 12E | Linear/GitHub/Asana tracker calls use correct API | TRACKER_MODE=linear → `linear.createCycle()` not `jira.createSprint()` |
-| 12F | Memory files exist | `docs/lessons.md`, `docs/decisions.md`, `docs/project_map.md` present |
+| 12F | Memory files exist | `kiro/memory/lessons.md`, `kiro/memory/decisions.md`, `kiro/memory/project_map.md` present |
 | 12G | Split complete | CLAUDE-implemented.md has Fixes 1–11; this file has Fix 12+ only |
 | 12H | Prompt caching active | API logs show cache_read_input_tokens > 0 on second+ turns |
 | 12I | Hard spend limit set | Anthropic console shows daily cap configured |
@@ -2522,7 +2522,7 @@ Step 0 path resolution: `kiro/skills/shared/<filename>` (not role-relative).
 **Fix:** Add to hook Step 4 (ALL MODES block):
 ```
 ALL MODES — session start:
-  IF docs/lessons.md OR docs/decisions.md exist in the workspace:
+  IF kiro/memory/lessons.md OR kiro/memory/decisions.md exist in the workspace:
     LOAD: kiro/steering/memory-management.md
     Execute memory retrieval protocol BEFORE first role activates.
     Log: [MEMORY: lessons.md loaded (N entries), decisions.md loaded (N ADRs)]
@@ -2559,10 +2559,10 @@ ALSO at this checkpoint: Check context level.
 **Fix:** Add to SM-RETRO definition in `team-orchestrator.md`:
 ```
 SM-RETRO — MEMORY WRITE STEP (run before producing retro doc):
-1. Read docs/lessons.md — note the last entry date and confidence levels.
+1. Read kiro/memory/lessons.md — note the last entry date and confidence levels.
 2. If any pattern from THIS sprint isn't captured → append entry with confidence: low.
 3. If any low/medium entry from a prior sprint was confirmed this sprint → upgrade confidence.
-4. Read docs/decisions.md — if any architectural decision was made or superseded this sprint → update ADR.
+4. Read kiro/memory/decisions.md — if any architectural decision was made or superseded this sprint → update ADR.
 5. Log: [MEMORY WRITE: N entries updated/added to lessons.md, N ADRs updated]
 This step is not optional. It runs before the retro 3-working/3-improve/3-actions sections.
 ```
@@ -2599,7 +2599,7 @@ This step is not optional. It runs before the retro 3-working/3-improve/3-action
 
 Fixes 14 and 15 introduced architectural decisions not yet recorded as ADRs.
 
-Add to `docs/decisions.md`:
+Add to `kiro/memory/decisions.md`:
 - ADR-009: UI prerequisite gate approach — design_system_gate.md as blocking prerequisite vs inline linting rules
 - ADR-010: Sprint Discipline Card as SM-RETRO blocker vs optional appendix
 - ADR-011: impl-decisions.md as per-sprint ephemeral doc vs permanent ADR index entry
@@ -2716,7 +2716,7 @@ Priority: Medium. Items from system-review-2026-06-30-v3-ai-pro.md.
   `## [date] [confidence] [domain: backend | frontend | mobile | data | security | all]`
   MEMORY WRITE (GATE 4) must tag each new entry with the sprint's primary lane.
   MEMORY LOAD (session start) filters: load entries where domain matches current build + all domain:all entries.
-**Files:** docs/lessons.md (schema); kiro/steering/memory-management.md (load + write rules)
+**Files:** kiro/memory/lessons.md (schema); kiro/steering/memory-management.md (load + write rules)
 
 ### 20E — Goal Anchor → Tie to 85% Threshold Instead of Count
 **Problem:** "Every 10 tool calls" requires self-counting — unreliable in long sessions.
@@ -2872,7 +2872,7 @@ In a multi-sprint build, if the user starts a NEW session for Sprint 2, the mode
 but doesn't know: which sprint is active, what was shipped in Sprint 1, what stories are in progress.
 Sprint 2 starts blind — no velocity baseline, no sprint context, wrong assumptions about project state.
 **Fix:** Add to hook STEP 4 memory check block:
-  "IF docs/checkpoint.md exists:
+  "IF kiro/memory/checkpoint.md exists:
      Read LAST ROW only (latest state — not full file).
      If last row contains 'Sprint N complete' → Sprint N+1 is next. Load sprint N+1 context.
      If last row contains 'Sprint N in progress' → resume Sprint N. Load active stories from $TRACKER.
@@ -3412,7 +3412,7 @@ Additional gaps discovered in future dry runs will be appended here as 25E, 25F,
   Session start detection: scan last row WHERE TYPE=SPRINT only.
   Alternative (simpler): Add horizontal separator "---" between sprint entries and non-sprint entries.
   Recommended: TYPE column approach (more reliable for programmatic parsing).
-**Files:** docs/checkpoint.md (add TYPE column header + backfill existing entries)
+**Files:** kiro/memory/checkpoint.md (add TYPE column header + backfill existing entries)
            kiro/steering/team-orchestrator-core.md (checkpoint read instruction: filter TYPE=SPRINT)
 
 ---
@@ -3527,7 +3527,7 @@ Status: PENDING IMPLEMENTATION
    - If ambiguous → treat as TYPE=SESSION, log warning, ask user to confirm sprint state."
   Backfill existing checkpoint.md rows by adding TYPE column value based on Task column content.
 **Files:** kiro/hooks/elite-team-orchestrator.kiro.hook (STEP 4 sprint state detection block)
-           docs/checkpoint.md (manual backfill of TYPE values)
+           kiro/memory/checkpoint.md (manual backfill of TYPE values)
 
 ### 26B — data/eda Maker Role Ambiguity (🟡 Medium)
 **Problem:** data/eda stories need BOTH data_scientist (experiment design + statistical analysis) AND senior_engineer_be (assignment service implementation). Current trigger: data_scientist = maker. But A/B framework requires backend implementation that data_scientist may not own.
@@ -3804,7 +3804,7 @@ Status: PENDING IMPLEMENTATION
 **Files:** kiro/steering/loop-engine.md (VERIFIER tool-type classification section)
 **Problem:** When a deferred story is resumed in a new session, the proactive announcement emits the story ID but does NOT re-trigger the lessons scan for that story's labels. Lessons from prior sprints that are relevant to the deferred story's domain are silently skipped.
 **Fix:** Proactive RESUMING announcement for deferred stories must include:
-  "Run LESSONS SCAN for story labels [X, Y, Z] from docs/lessons.md before resuming DO phase."
+  "Run LESSONS SCAN for story labels [X, Y, Z] from kiro/memory/lessons.md before resuming DO phase."
   Log: `[DEFERRED-RESUME: story=<ID> | labels=[X,Y,Z] | lessons scan: required before DO phase]`
 **Files:** kiro/hooks/elite-team-orchestrator.kiro.hook (SPRINT STATE block — deferred story resume path)
 
@@ -3920,7 +3920,7 @@ Before modifying ANY skill file in `kiro/skills/`:
 4. Only merge if the delta is positive. No intuition-based edits. Evidence required.
 
 ### LESSONS.MD CONFIDENCE SCORING
-Every entry in `docs/lessons.md`:
+Every entry in `kiro/memory/lessons.md`:
 ```
 ## [YYYY-MM-DD] — [pattern title]
 **Type:** Mistake | Correction | Rule | Anti-pattern
@@ -4610,7 +4610,7 @@ LESSON AGE CHECK (Fix 42B) — before Sprint N+1:
 If retro is delayed (runs 2 days into Sprint N+1), the age check in Sprint N+2 reads
 "1 sprint old" when the issue is actually "2 sprints unresolved."
 **Fix:** Add `gate_fired_at: Sprint N` metadata to lessons at gate-fire time. LESSON AGE CHECK uses `gate_fired_at`, not `written_at`.
-**Files:** `docs/lessons.md` (template), `kiro/steering/team-orchestrator-sprint.md` (LESSON AGE CHECK block)
+**Files:** `kiro/memory/lessons.md` (template), `kiro/steering/team-orchestrator-sprint.md` (LESSON AGE CHECK block)
 
 ---
 
@@ -4636,3 +4636,259 @@ at least ONE explicit cross-tenant access-denial test REQUIRED. Absence = GATE S
 **Files:** `kiro/steering/team-orchestrator-rules.md` (GATE S2 checklist, new conditional item)
 
 ---
+---
+
+# ── PHASE 1 COMPLETE ✅ (2026-07-17) — Moved from CLAUDE-working.md ──
+
+# ── PHASE 1 — COMPLETE ✅ ─────────────────────────────────────────
+
+## Fix 44A — Mode 5 Security/RBAC Advisory  ✅ DONE 2026-07-17
+# Wired into kiro/steering/orchestrator-routing.md (Mode 5 section)
+# Blocking advisory with Option A (cross-tenant test enforced) or Option B (escalate to Mode 1/2)
+
+## Fix 45A — Open-Source Artifacts  ✅ DONE 2026-07-17
+# LICENSE (MIT) created · CONTRIBUTING.md created · README.md "How to Reproduce" section added
+
+## Fix 45B — Compression-Fidelity Bifurcation Methodology Doc  ✅ DONE 2026-07-17
+# docs/compression-fidelity-methodology.md created
+# Test setup, protocol, results (11–17% misread, 97–98% semantic), GUARD 3, limitations
+
+## Fix 45C — Competitor Comparison Section  ✅ DONE 2026-07-17
+# docs/competitor-comparison.md created
+# MemGPT, Reflexion, longer context, Loop Engineering — structured comparison + research landscape
+
+## Research Task R1 — External Validator Outreach  ✅ DONE 2026-07-17
+# docs/external-validator-outreach.md created
+# HN, Reddit, LinkedIn, Discord posts ready to publish
+
+## Fix 46A — Product Knowledge Graph + Living Visualization  [PRIORITY: MEDIUM · Phase 2 Roadmap]
+# What: A living knowledge graph of the PRODUCT being built by Kiro — not Loop Engineering's lessons.
+#   Tracks the evolving architecture from service level down to function/class level.
+#   Kiro WRITES the code AND emits graph patches — no human manually maintains function-level entries.
+#   ARCHITECT reviews patches + adds decision nodes at GATE 5. Viz regenerated each sprint.
+#
+# Two-agent update flow:
+#   SENIOR_ENGINEER (per story, during DEVELOP phase):
+#     1. Writes code as normal
+#     2. Emits docs/graph-patch-{sprint}-{story}.yaml alongside the PR
+#        → lists every new/modified class + function created in that story
+#     ARCHITECT (at GATE 5, before SM-RETRO):
+#     1. Collects all graph-patch-*.yaml files from this sprint
+#     2. Merges patches into docs/product-graph.yaml
+#     3. Adds/updates decision nodes (only humans can infer architectural intent from code)
+#     4. Regenerates docs/product-graph.html
+#     5. Commits, deletes sprint patch files
+#
+# Node type ladder (deep → architectural):
+#   service    → top-level deployable unit (e.g. auth-service)
+#   module     → logical grouping within a service (e.g. token-manager)
+#   component  → class-level unit (e.g. JwtValidator)
+#   function   → function/method within a class (e.g. validateExpiry:line45)
+#   api        → external-facing endpoint
+#   database   → data store
+#   decision   → architectural choice (ARCHITECT-authored only; Kiro cannot infer these from code)
+#
+# YAML schema (docs/product-graph.yaml):
+#   nodes:
+#     - id: unique identifier
+#       type: service | module | component | function | api | database | decision
+#       label: human-readable name
+#       file: src/auth/service.ts
+#       line: 45                          # for function nodes
+#       sprint: which sprint created this
+#       description: what it does (1-2 sentences)
+#       calls: [other-node-id, ...]       # optional, for function nodes
+#   edges:
+#     - from: node_id
+#       to: node_id
+#       type: depends_on | implements | guards_against | decided_by | calls | owns
+#   decisions:
+#     - id: decision node id
+#       choice: what was decided
+#       reason: why (reference TRD section or failure mode)
+#       alternatives_rejected: [option-a, option-b]
+#       sprint: when
+#
+# Patch file schema (docs/graph-patch-{sprint}-{story}.yaml):
+#   story: PROJ-123
+#   sprint: 3
+#   nodes_added:
+#     - id: jwt-validator
+#       type: component
+#       file: src/auth/jwt.ts
+#       line: 12
+#       description: Validates JWT signature and expiry
+#   nodes_modified:
+#     - id: auth-service
+#       changes: added dependency on jwt-validator
+#   edges_added:
+#     - from: auth-service
+#       to: jwt-validator
+#       type: owns
+#
+# Visualization (docs/product-graph.html):
+#   - D3 force-directed graph, self-contained HTML (open in browser, no server needed)
+#   - Node depth: service > module > component > function (nested clusters)
+#   - Click node → expand: file path, line, description, sprint, decision rationale
+#   - Filter by sprint (dropdown) — see product evolution over time
+#   - Filter by type (services only / decisions only / functions only)
+#   - decision nodes rendered distinctly (diamond shape, orange color)
+#
+# Files:
+#   - docs/product-graph.yaml          (new — created sprint 1, appended every sprint)
+#   - docs/product-graph.html          (new — regenerated by ARCHITECT at every GATE 5)
+#   - docs/graph-patch-{S}-{story}.yaml (new — emitted by SENIOR_ENGINEER per story, deleted at GATE 5)
+#   - kiro/steering/orchestrator-routing.md (add GATE 5 product-graph merge step)
+#   - kiro/skills/architect/product_graph_update.md  (new skill: ARCHITECT merge + decision annotation)
+#   - kiro/skills/senior_engineer/graph_patch_emit.md (new skill: how SE emits patch files)
+#
+# Note: TECHNICAL_WRITER references product-graph.html when writing sprint summaries.
+#   decision nodes are the only part requiring human judgment — everything else Kiro auto-generates.
+# Status: ✅ DONE 2026-07-17 — Wiring: L1✅ L2✅ L3✅ L4✅ L5⬜ L6⬜ L7⬜
+
+---
+
+# ── FIX 47 GROUP ✅ DONE 2026-07-17 — Moved from CLAUDE-working.md ──
+
+# ── FIX 47 — SKILL ACTIVATION AUDIT (pick next session) ─────────
+# Found: 2026-07-17 audit. 173/254 skills (68%) have zero label triggers — dead files.
+# 6 entire agent directories fully unwired: cto, scrum_master, technical_writer,
+#   cloud_architect, finops_architect, product_manager.
+# Full gap list: docs/Agentaudit.md
+# Three sub-fixes in order:
+
+## Fix 47A — New Labels + Extend Existing Rows  [PRIORITY: HIGH · biggest coverage gain]
+# What: 173 skills unreachable because skill-label-index.md has no row for them.
+#   Add ~70 new label rows + extend existing rows to wire ~115 skills.
+# New labels to add (grouped):
+#   be/:        be/graphql, be/realtime, be/refactor, be/perf
+#   fe/:        fe/ssr, fe/pwa, fe/design-system
+#   arch/:      arch/ddd, arch/microservices, arch/monorepo, arch/api-gateway,
+#               arch/capacity, arch/microfrontend, arch/zero-trust
+#   ml/:        ml/agent, ml/rag, ml/evals, ml/fine-tuning, ml/mlops, ml/prompt, ml/cost
+#   data/:      data/quality, data/analytics, data/lake
+#   db/:        db/graph, db/timeseries, db/reliability
+#   cloud/:     cloud/landing-zone, cloud/network, cloud/multi-region, cloud/review,
+#               cloud/compliance, cloud/cost, cloud/capacity, cloud/multi-cloud
+#   finops/:    finops/cost, finops/alerts, finops/chargeback, finops/savings, finops/optimize
+#   security/:  security/compliance, security/incident, security/supply-chain
+#   sre/:       sre/capacity, sre/chaos, sre/incident, sre/oncall, sre/runbook, sre/toil
+#   devops/:    devops/platform, devops/feature-flags
+#   mobile/:    mobile/release, mobile/push
+#   product/:   product/prd, product/stories, product/mvp, product/prioritize,
+#               product/metrics, product/okrs, product/experiment, product/discovery
+#   research/:  research/competitive, research/user, research/market,
+#               research/positioning, research/pricing
+#   web/:       web/content, web/email, web/conversion, web/growth, web/seo, web/technical
+#   docs/:      docs/sdk, docs/onboarding, docs/troubleshooting, docs/leadership, docs/sales
+#   testing/:   testing/load
+# Also extend existing rows: be/resilience += consistency_models_cap + microservices_communication;
+#   be/api += integration_contract_spec + rate_limiting_algorithms; be/caching += semantic_caching;
+#   be/ml += production_rag_at_scale + ai_ml_security_prompt_injection;
+#   be/database += database_performance_tuning + migration_strategies + nosql + read_replica;
+#   be/auth += identity_access_management_rbac_abac + multi_tenancy_patterns;
+#   be/pii += privacy_engineering_gdpr_ccpa; be/queue += event_sourcing_cqrs;
+#   data/pipeline += cloud_data_pipelines; data/modeling += olap_oltp_boundaries;
+#   data/eda += cohort_retention + data_storytelling + statistical_analysis;
+#   devops/k8s += service_mesh + container_kubernetes_security;
+#   devops/ci += database_migrations_cicd + secure_sdlc_devsecops;
+#   devops/monitor += error_budget_policy; fe/perf += react_performance + frontend_observability;
+#   mobile/* += mobile_performance_profiling + mobile_development_strategy;
+#   security/review += owasp_top10_review + vulnerability_management;
+#   security/pentest += red_blue_purple_team; security/secrets += secrets_management;
+#   security-critical += threat_modeling_stride_pasta + mutation_testing;
+#   testing/unit += equivalence_partitioning; ml/evals += model_evaluation_benchmarking;
+#   ml/agent += agentic_memory_mem0 + long_term_memory + multi_agent_orchestration;
+#   ml/rag += graph_rag; ml/prompt += prompt_optimization_dspy
+# File: kiro/steering/skill-label-index.md (Section 1 additions)
+# Status: ✅ DONE 2026-07-17
+# Wiring: L1✅ L2✅ L3✅(matrix already had new agents) L4⬜(no phase triggers) L5⬜(no role defaults) L6⬜(no guards) L7⬜(no new failure modes)
+# Wiring gaps found: L2 LABEL-BASED FALLBACK missing keyword patterns for 82 new labels → Fix 47D
+#                    L4 phase triggers for CTO/SM/TW/ARCHITECT still pending → Fix 47B
+#                    L5 role defaults still pending → Fix 47C
+
+## Fix 47B — Phase/Event Triggers  ✅ DONE 2026-07-17
+# Wiring: L1✅(skill files exist) L2⬜(n/a) L3✅(matrix defaults) L4✅(phase triggers) L5✅(role defaults) L6⬜(no guards needed) L7⬜(no new failure modes)
+# What was done:
+#   orchestrator-routing.md → PHASE/EVENT AUTO-TRIGGERS block: CTO@THINK, ARCHITECT@GATE2, SM@SM-PLAN, TW@GATE5
+#   team-orchestrator-sprint.md → SM-PLAN section added (before GATE 4) with scrum_master + architect auto-activation
+#   team-orchestrator-sprint.md → GATE 5 Step 3 added: technical_writer auto-activation + sprint artifacts
+# Original Fix 47B spec:
+# What: CTO, SCRUM_MASTER, TECHNICAL_WRITER, ARCHITECT have skills that should load
+#   when the AGENT ACTIVATES, not on story label. Currently none of their skills load.
+# Actions:
+#   CTO (THINK phase): load all cto/* skills when CTO activates in THINK phase
+#     → orchestrator-routing.md: add CTO skill load list to THINK phase block
+#   SCRUM_MASTER (SM-PLAN): load sprint_planning, estimation_techniques,
+#     velocity_capacity_modeling, dependency_management, living_context_file,
+#     blocker_triage, stakeholder_communication when SM-PLAN starts
+#   SCRUM_MASTER (SM-RETRO): load retrospective_facilitation, blameless_postmortem
+#   GATE 2: load testing_strategy_template, security_posture_template,
+#     prebuild_documentation_gate, app_flow_template, project_index_template
+#   GATE 5 / sprint close: load all technical_writer/ base skills
+#     (diataxis, plain_language, audience_adaptation, changelog, developer_handoff_kit)
+#   ARCHITECT defaults (any activation): load trd_template, hexagonal_architecture,
+#     project_structure_layout
+# Files:
+#   kiro/steering/orchestrator-routing.md (THINK phase block)
+#   kiro/steering/team-orchestrator-core.md (SM-PLAN + SM-RETRO sections)
+#   kiro/steering/team-orchestrator-sprint.md (GATE 2 + GATE 5 sections)
+# Status: 🔲 PENDING — do after Fix 47A
+
+## Fix 47C — Role Defaults  ✅ DONE 2026-07-17
+# Wiring: L1✅ L2⬜(n/a) L3✅(UNIVERSAL ROLE DEFAULTS section added) L4⬜(n/a) L5✅ L6⬜ L7⬜
+# What was done:
+#   skill-selection-matrix.md → UNIVERSAL ROLE DEFAULTS table added at top (before THINK PHASE section)
+#   Covers: code_review_excellence (all agents), debugging+refactoring (Mode 3), twelve_factor_app (devops),
+#           secure_sdlc_devsecops (security), system_design_workshop (architect@GATE2),
+#           technology_radar (cto@THINK), sprint_planning_facilitation (sm@SM-PLAN), documentation_sprint (tw@GATE5)
+# Original Fix 47C spec:
+# What: Some shared skills should load for ALL agents on ALL stories, not label-gated.
+# Actions:
+#   shared/code_review_excellence.md → role default for all agents (Section 2 universal row)
+#   shared/debugging_methodology.md → Mode 3 / bugfix default
+#   shared/refactoring_safely.md → Mode 3 / bugfix default
+#   devops_engineer/twelve_factor_app.md → devops_engineer role default
+#   security_engineer/secure_sdlc_devsecops.md → security_engineer role default
+# File: kiro/steering/skill-selection-matrix.md (role defaults section)
+# Status: 🔲 PENDING — do after Fix 47B
+
+## Fix 47D — LABEL-BASED FALLBACK Keyword Expansion  ✅ DONE 2026-07-17
+# Wiring: L1⬜(n/a) L2✅(fallback map expanded) L3⬜(n/a) L4⬜(n/a) L5⬜(n/a) L6⬜(n/a) L7⬜(n/a)
+# What was done:
+#   skill-label-index.md LABEL-BASED FALLBACK → expanded from 9 to ~60 keyword patterns
+#   Covers all new lanes: be extras (GraphQL, realtime, queue, refactor), arch (DDD, microservices, monorepo, event-driven),
+#   ml (RAG, agent, evals, fine-tuning, prompt, serving), cloud (landing-zone, IaC, multi-region, serverless),
+#   finops, sre (SLO, chaos, runbook, capacity), product (PRD, OKR, roadmap, stories),
+#   research (market, user), web (SEO, conversion), docs (SDK, changelog, runbook),
+#   data extras, security extras, devops extras, mobile
+# Original Fix 47D spec:
+# What: LABEL-BASED FALLBACK in skill-label-index.md only has 9 keyword patterns (old labels).
+#   82 new labels added in Fix 47A have no keyword fallback.
+#   If a story arrives with no explicit labels, the system cannot infer ml/agent, product/prd,
+#   cloud/*, finops/*, arch/*, etc.
+# Action: Extend LABEL-BASED FALLBACK keyword map with patterns for all new labels:
+#   'GraphQL' | 'subscription' | 'resolver'           → be/graphql
+#   'WebSocket' | 'SSE' | 'real-time'                → be/realtime
+#   'refactor' | 'clean up' | 'tech debt'             → be/refactor
+#   'DDD' | 'domain' | 'bounded context'              → arch/ddd
+#   'microservices' | 'service mesh' | 'decompose'    → arch/microservices
+#   'monorepo' | 'Nx' | 'Turborepo'                  → arch/monorepo
+#   'agent' | 'tool use' | 'orchestration'            → ml/agent
+#   'RAG' | 'retrieval' | 'vector search'             → ml/rag
+#   'evals' | 'benchmark' | 'evaluation'              → ml/evals
+#   'fine-tun' | 'LoRA' | 'PEFT'                     → ml/fine-tuning
+#   'PRD' | 'product requirements'                    → product/prd
+#   'OKR' | 'north star'                              → product/okrs
+#   'landing zone' | 'VPC' | 'cloud setup'            → cloud/landing-zone
+#   'FinOps' | 'cost model' | 'chargeback'            → finops/cost
+#   'SLO' | 'error budget' | 'SLI'                   → sre/oncall
+#   'chaos' | 'game day' | 'fault injection'          → sre/chaos
+#   'runbook' | 'on-call' | 'playbook'               → sre/runbook
+#   'SEO' | 'structured data' | 'hreflang'            → web/seo
+#   'conversion' | 'CRO' | 'landing page'             → web/conversion
+#   'SDK docs' | 'API reference' | 'developer docs'   → docs/sdk
+#   (+ ~40 more patterns for remaining new labels)
+# File: kiro/steering/skill-label-index.md (LABEL-BASED FALLBACK section)
+# Wiring: L2 only (fallback is part of skill-label-index.md)
+# Status: 🔲 PENDING — do after Fix 47C (lower urgency; explicit labels preferred)

@@ -96,7 +96,7 @@ Dead hooks (01-05, context-rot-detection, enforce-orchestrator-pipeline) — del
 
 ---
 
-## Pending Fixes (summary — full detail in CLAUDE.md)
+## Pending Fixes (summary — full detail in kiro/claude-working.md)
 
 | Fix | Status | Description |
 |-----|--------|-------------|

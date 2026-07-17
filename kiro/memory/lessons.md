@@ -30,7 +30,7 @@ Stage 5 — CONSULT   On the next task, READ this entry before starting. Don't r
 
 **Compounding contract (Fix 40A):**
 - When a lesson reaches `confidence: high` → promote it to a Skill file AND to CLAUDE.md NON-NEGOTIABLES.
-- `docs/lessons.md` is project-scoped. Skills in `kiro/skills/` travel across projects.
+- `kiro/memory/lessons.md` is project-scoped. Skills in `kiro/skills/` travel across projects.
 - Do NOT leave lessons only in checkpoint.md — that file is session-scoped and does not compound.
 
 ---

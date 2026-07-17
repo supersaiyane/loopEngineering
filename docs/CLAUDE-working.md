@@ -1,13 +1,178 @@
 # KIRO SYSTEM — ONGOING FIXES
-# Fixes 1–15 are APPLIED and documented in CLAUDE-implemented.md (reference only, never auto-loads).
-# This file = pending work only. Read this every session. Skip CLAUDE-implemented.md unless debugging.
+# All implemented fixes (Fix 1 → Fix 47D, Fix 44A, 45A/B/C, 46A, R1-outreach) are in CLAUDE-implemented.md
+# (reference only, never auto-loads). This file = PENDING work only.
+# Read this every session. Skip CLAUDE-implemented.md unless debugging.
 
-Last updated: 2026-07-15
-# All fixes through Fix 43C implemented. Dry Run v11 complete (9.5/10). See CLAUDE-implemented.md for full history.
-# Gap found in v11: Fix 44A (LOW) — Mode 5 emits no advisory when security/rbac story ships without GATE S2.
+Last updated: 2026-07-17
+
+# ══════════════════════════════════════════════════════════════════════
+# POST-FIX WIRING VERIFICATION — MANDATORY AFTER EVERY FIX
+# ══════════════════════════════════════════════════════════════════════
+# After implementing ANY fix, run this 7-point wiring check before marking ✅ DONE.
+# A fix is NOT complete until all applicable layers below are verified.
+# Skip a layer only if the fix provably does not touch that layer — state why when skipping.
+#
+# LAYER 1 — SKILL FILES EXIST
+#   New skill files created? → Verify path is correct: kiro/skills/<role>/<filename>.md
+#   Existing files modified? → Confirm LOAD-TYPE annotation at top is still accurate
+#
+# LAYER 2 — LABEL INDEX (skill-label-index.md)
+#   New skills added? → Do they have a label row in Section 1?
+#   New labels introduced? → Are they documented with all skill file paths?
+#   Keyword fallback: do the new labels have keyword patterns in LABEL-BASED FALLBACK?
+#
+# LAYER 3 — SKILL SELECTION MATRIX (skill-selection-matrix.md)
+#   New agent added? → Does it have activity rows in the matrix?
+#   New activity pattern? → Is there a matrix row for it under the correct agent?
+#   Role overrides (Section 2 of label index): does the role need additional files beyond Section 1?
+#
+# LAYER 4 — PHASE / EVENT TRIGGERS (orchestrator-routing.md + team-orchestrator-*.md)
+#   Fix adds behavior that fires WITHOUT a story label? (e.g., at THINK, GATE 2, SM-PLAN, GATE 5)
+#   → Must be wired as a phase trigger in orchestrator-routing.md or team-orchestrator-sprint.md
+#   Fix adds GATE checklist item? → Confirm it appears in the gate checklist in team-orchestrator-sprint.md
+#
+# LAYER 5 — ROLE DEFAULTS (skill-selection-matrix.md)
+#   Fix adds behavior that should fire for ALL agents or ALL stories in a given mode?
+#   → Must be a role default or mode default in skill-selection-matrix.md
+#
+# LAYER 6 — SESSION GUARDS (session-guards.md)
+#   Fix adds a cross-session constraint, compression guard, or non-bypassable check?
+#   → Must be documented in session-guards.md with its trigger condition
+#
+# LAYER 7 — FAILURE MODE COVERAGE (F01–F12 table)
+#   Fix addresses a new failure mode not in F01–F12? → Add to the table with ID, name, description
+#   Fix addresses an existing failure mode? → Confirm the fix appears in the fix register with correct Fx reference
+#
+# WIRING STATUS FORMAT (add to each fix entry in this file):
+#   Wiring: L1✅ L2✅ L3✅ L4⬜ L5⬜ L6⬜ L7✅  ← ⬜ = not applicable / skipped with reason
+#
+# ══════════════════════════════════════════════════════════════════════
+# PHASE 1 COMPLETE ✅ (2026-07-17)
+# Fix 44A ✅ · Fix 45A ✅ · Fix 45B ✅ · Fix 45C ✅ · R1 ✅
+# All fixes through Fix 43C implemented. Dry Run v11 complete. White paper v5 published (34pp, July 2026).
+# GOAT.md created. README.md + index.html updated with crisis framing, research section, roadmap.
 # pxpipe integration complete (2026-07-15): GUARD 3 added to session-guards.md, launch script at scripts/start-kiro-pxpipe.sh
 # Research parked: gstack-research.md, pxpipe-research.md, oneagent-search.md
-# Next: Implement Fix 44A, then push.
+
+
+# ── PENDING FIXES ──────────────────────────────────────────────
+# Fixes 44A, 45A, 45B, 45C, R1(outreach), 46A, 47A–D moved to CLAUDE-implemented.md
+
+## Fix 46B — White Paper v6: Add External Validation Section  [PRIORITY: LOW · Phase 2 Roadmap]
+# What: When external validator(s) reproduce findings, update white paper with Section 11 results.
+#   Also add: competitor comparison table (Fix 45C), compression methodology (Fix 45B).
+# Action: Update gen_whitepaper_v5.js → gen_whitepaper_v6.js with:
+#   - New subsection 10.4: External Validation Results
+#   - Updated Section 1.3: Competitor comparison table
+#   - Appendix A: Compression-fidelity methodology
+# File: gen_whitepaper_v6.js (new, based on v5)
+# Status: 🔲 PENDING — blocked on external validation data
+
+## Research Task R1 — Recruit First External Validator  [PRIORITY: HIGH · Critical Path]
+# What: The GOAT analysis identifies external reproducibility as the #1 gap.
+#   One independent developer who clones, follows the process, and reports back
+#   is the diff between a practitioner journal and a field contribution.
+# Action:
+#   - Post on relevant communities (HN, r/MachineLearning, AI engineering forums)
+#   - Share the repo + white paper v5 PDF
+#   - Ask: "Does your production setup hit failure modes F01–F12?"
+#   - Collect: before/after data if they adopt the framework
+# Prerequisite: Fix 45A (open-source artifacts) must be done first.
+# Status: 🔲 PENDING — blocked on Fix 45A
+
+# ── PHASE 2 ROADMAP ITEMS (90 days) ─────────────────────────────
+# Prerequisite: Phase 1 (Fix 44A, 45A, 45B, 45C) must be complete first.
+
+## R2 — Before/After Baseline Study
+# What: Without a before/after comparison, all improvement claims are self-reported.
+#   Need a structured baseline: capture failure mode occurrence rates BEFORE framework adoption,
+#   then measure again AFTER, across at least one external team.
+# Action:
+#   - Define baseline measurement protocol: which failure modes (F01–F12), how measured,
+#     session count required, what counts as an "occurrence"
+#   - Write docs/baseline-protocol.md
+#   - Instrument own sessions to capture occurrence rates as ground truth
+# File: docs/baseline-protocol.md (new)
+# Status: 🔲 PENDING — blocked on R1 (external validator)
+
+## R3 — MOMENTO Evaluation Protocol
+# What: MOMENTO (2025) is the first multi-session evaluation benchmark.
+#   Using MOMENTO scenarios to formally evaluate Loop Engineering gives the paper
+#   a credible, reproducible evaluation framework instead of ad-hoc dry runs.
+# Action:
+#   - Read MOMENTO paper and extract scenario types
+#   - Map our 12 failure modes to MOMENTO scenario categories
+#   - Run ≥3 MOMENTO scenarios with and without the framework
+#   - Document delta as Section 10.X in white paper
+# File: docs/momento-evaluation.md (new)
+# Status: 🔲 PENDING — blocked on R1
+
+# ── PHASE 3 ROADMAP ITEMS (3–6 months) ──────────────────────────
+# Prerequisite: Phase 2 complete, external validation data in hand.
+
+## P3A — arXiv Preprint
+# What: Submit the white paper to arXiv (cs.SE or cs.AI) for public record and citation.
+# Action:
+#   - Convert white paper v6 to LaTeX (arXiv standard)
+#   - Add abstract in arXiv format (≤150 words)
+#   - Add author affiliation and contact
+#   - Submit to cs.SE (Software Engineering) category
+# File: docs/arxiv-submission/ (new directory with .tex source)
+# Status: 🔲 PENDING — blocked on Phase 2 data + white paper v6
+
+## P3B — Practitioner Venue Submission
+# What: Submit to a practitioner-friendly venue to reach the audience that would use this.
+# Target venues (in priority order):
+#   1. EMNLP Industry Track — natural language / agent engineering audience
+#   2. ICLR Workshop on LLM Agents — direct audience fit
+#   3. FSE/ICSE Industry Track — software engineering practitioners
+# Action:
+#   - Monitor CFPs for above venues
+#   - Adapt white paper v6 to 8-page conference format
+#   - Prepare camera-ready if accepted
+# File: docs/venue-submission.md (new — track CFP deadlines)
+# Status: 🔲 PENDING — blocked on Phase 2
+
+## P3C — Open Standard Proposal: Session Continuity Architecture
+# What: The session continuity pattern (checkpoint + resume vector + CLAUDE.md process contract)
+#   is general enough to be a field standard, not just a Loop Engineering internal.
+#   Propose it as an open standard for AI agent session management.
+# Action:
+#   - Write docs/session-continuity-standard.md as a draft RFC
+#   - Define: checkpoint schema, resume vector format, process contract spec
+#   - Publish as standalone doc for community feedback
+# File: docs/session-continuity-standard.md (new)
+# Status: 🔲 PENDING — blocked on Phase 2 validation
+
+# ── PHASE 4 ROADMAP ITEMS (6–12 months) ─────────────────────────
+# Long horizon. Don't plan implementation until Phase 3 is underway.
+
+## P4A — Multi-Team Multi-Model Validation
+# What: Validate whether process-layer gains generalize across models (not just Claude)
+#   and across teams (not just solo practitioner Gurpreet).
+# Questions to answer:
+#   - Do failure modes F01–F12 appear with GPT-4o? Gemini? Open-source models?
+#   - Does the framework produce the same reliability lift with a 5-person team?
+#   - Which failure modes are model-specific vs. process-layer universal?
+# Status: 🔲 PENDING — Phase 4
+
+## P4B — Benchmark Contribution
+# What: Contribute a Loop Engineering evaluation suite to an existing benchmark
+#   (SWE-bench, MOMENTO, or a new multi-session reliability benchmark).
+# Action:
+#   - Package our 12 failure mode scenarios as reproducible test cases
+#   - Propose addition to MOMENTO or create LE-Bench as standalone
+# Status: 🔲 PENDING — Phase 4
+
+## P4C — Open-Source Validation Tooling
+# What: Build a lightweight CLI that any team can run to:
+#   - Detect which of F01–F12 failure modes are present in their sessions
+#   - Score their process layer against the Loop Engineering rubric
+#   - Output a gap report with fix recommendations
+# Action: Design the CLI spec first (docs/validation-cli-spec.md), then build
+# Status: 🔲 PENDING — Phase 4
+
+# ── END BACKLOG ───────────────────────────────────────────────────
 
 # ── PXPIPE TOKEN COMPRESSION ────────────────────────────────────
 # pxpipe proxy reduces input token cost ~59-70% on dense code/JSON sessions
@@ -34,7 +199,7 @@ Last updated: 2026-07-15
 ---
 
 ## MASTER FIX REGISTER — All Fixes (Fix 1 → Fix 44A)
-Last synced: 2026-07-10 | Total: 51 sub-fixes across 44 fix groups | 50 implemented ✅ · 1 candidate 🔲
+Last synced: 2026-07-17 | Total: 57 sub-fixes across 46 fix groups | 57 implemented ✅ · 0 pending 🔲 · Phase 2 queued
 
 | Fix | Name | Why It Was Needed | Status | File(s) |
 |-----|------|-------------------|--------|---------|
@@ -81,7 +246,7 @@ Last synced: 2026-07-10 | Total: 51 sub-fixes across 44 fix groups | 50 implemen
 | Fix 38C | Ponytail GATE S2 Commit Block | Ponytail check had no commit-time enforcement; violations reached main | ✅ | team-orchestrator-rules.md (GATE S2 item 5) |
 | Fix 39A | GATE S2 Jira Ponytail Verdict | Jira comment template missing Ponytail: PASS/FAIL — audit trail incomplete | ✅ | team-orchestrator-rules.md (GATE S2 item 6) |
 | Fix 39B | IAM Scan PRD Coverage | IAM scan only read security-posture.md; missed signals in PRD Section 3 | ✅ (already in place) | team-orchestrator-core.md |
-| Fix 40A | 5-Stage Memory Progression | Lessons stuck at Stage 1-Fail forever; knowledge never compounded | ✅ | docs/lessons.md |
+| Fix 40A | 5-Stage Memory Progression | Lessons stuck at Stage 1-Fail forever; knowledge never compounded | ✅ | kiro/memory/lessons.md |
 | Fix 40B | Comprehension Debt Gate | Agents approving code without reading diffs; no sprint-boundary gate | ✅ | team-orchestrator-sprint.md (SM-RETRO) |
 | Fix 40C | Constraint Drift Guard | Binding constraints forgotten by turn 47 via lossy summarization | ✅ | session-guards.md (GUARD 1) |
 | Fix 40D | Ralph Wiggum NON-NEG #10 | Stories closed on "looks good" / "mostly passing" — no objective gate | ✅ | team-orchestrator-rules.md (NON-NEG #10) |
@@ -92,10 +257,22 @@ Last synced: 2026-07-10 | Total: 51 sub-fixes across 44 fix groups | 50 implemen
 | Fix 42A | Post-Discovery Bad-Loop Re-Check | Gate ran on original prompt only; discovery-revealed scope not re-gated | ✅ | discovery-engine.md (STEP 4B) |
 | Fix 42B | Stage-1 Lesson Age Enforcement | Stage-1-Fail lessons persisted indefinitely across sprints with no block | ✅ | team-orchestrator-sprint.md (LESSON AGE CHECK) |
 | Fix 42C | Deploy Self-Triggering Gate | 'deploy' was domain keyword but not high-risk verb; prod deploys escaped gate | ✅ | session-guards.md (self-triggering exception) |
-| Fix 43A | Lesson Age Clock Accuracy | Age check used written_at (retro time); delayed retros made stale lessons appear fresh | ✅ | docs/lessons.md (gate_fired_at field), team-orchestrator-sprint.md (LESSON AGE CHECK) |
+| Fix 43A | Lesson Age Clock Accuracy | Age check used written_at (retro time); delayed retros made stale lessons appear fresh | ✅ | kiro/memory/lessons.md (gate_fired_at field), team-orchestrator-sprint.md (LESSON AGE CHECK) |
 | Fix 43B | Ponytail Rung Disqualification | No escalation path when Rung N dep is disqualified (CVE/abandoned/license) — agents stuck | ✅ | ponytail.md (disqualification section), team-orchestrator-rules.md (GATE S2 item 5+6), skill-selection-matrix.md (S1/S2 rows) · artifact: docs/ponytail-rung-disqualification-guide.md |
 | Fix 43C | Cross-Tenant Gate at S2 | GATE S2 coverage % check missed cross-tenant isolation tests; bugs surfaced at retro not PR | ✅ | team-orchestrator-rules.md (GATE S2 item 5b) |
-| Fix 44A | Mode 5 Security/RBAC Advisory | Mode 5 (Lean) skips security_engineer — no warning emitted when security/rbac story ships without GATE S2; cross-tenant test enforcement silently absent | 🔲 CANDIDATE | team-orchestrator-rules.md (Mode 5 advisory condition) |
+| Fix 44A | Mode 5 Security/RBAC Advisory | Mode 5 (Lean) skips security_engineer — no warning emitted when security/rbac story ships without GATE S2; cross-tenant test enforcement silently absent | ✅ | orchestrator-routing.md (Mode 5 advisory block) |
+| Fix 45A | Open-Source Artifacts | Framework not reproducible externally — no LICENSE, no CONTRIBUTING.md, no "how to reproduce" guide | ✅ | LICENSE, CONTRIBUTING.md, README.md |
+| Fix 45B | Compression-Fidelity Methodology Doc | 11–17% exact-string misread finding has no methodology — it's an anecdote without documented test protocol, sample size, and limitations | ✅ | docs/research/compression-fidelity-methodology.md |
+| Fix 45C | Competitor Comparison | White paper mentions MemGPT/Reflexion as prior work but has no structured side-by-side table; reviewers will require it | ✅ | docs/research/competitor-comparison.md |
+| Fix 46A | Product Knowledge Graph | No living architecture map of the product Kiro builds — structural drift invisible across sprints | ✅ | docs/product-graph.yaml, docs/product-graph.html, skills/architect/product_graph_update.md, skills/shared/graph_patch_emit.md · Wiring: L1✅ L2✅ L3✅ L4✅ L5⬜ L6⬜ L7⬜ |
+| Fix 46B | White Paper v6 | Update white paper when external validation data arrives | 🔲 PENDING (blocked on R1) | docs/white-paper/loop-engineering-white-paper-v6.* |
+| Fix 47A | Skill Label Coverage (119 rows) | 173 skill files unreachable — only 37 label rows, 82 new lanes had zero coverage | ✅ | skill-label-index.md (37 → 119 rows; 82 new labels across ml/*, arch/*, cloud/*, finops/*, sre/*, product/*, web/*, docs/*) |
+| Fix 47B | Phase/Event Triggers | CTO/SM/TW/ARCHITECT only fired on story labels — never at their natural system phases | ✅ | orchestrator-routing.md (PHASE/EVENT AUTO-TRIGGERS block), team-orchestrator-sprint.md (SM-PLAN section + GATE 5 TW trigger) |
+| Fix 47C | Universal Role Defaults | code_review_excellence / debugging / refactoring / devops defaults never loaded without labels | ✅ | skill-selection-matrix.md (UNIVERSAL ROLE DEFAULTS table) |
+| Fix 47D | Fallback Keyword Expansion | LABEL-BASED FALLBACK had 9 patterns; 82 new labels had zero fallback coverage for unlabeled stories | ✅ | skill-label-index.md (9 → ~60 keyword patterns covering all new lanes) |
+| Skill: sprint_artifacts | SM Document Generation | SM had no way to produce pptx/pdf/xlsx sprint artifacts at GATE 5 / SM-RETRO / SM-PLAN | ✅ | kiro/skills/scrum_master/sprint_artifacts.md (HYBRID) |
+| Skill: web_app_testing | QA Browser Testing | QA had no browser-based testing capability; Anthropic web-app-tester unpublished | ✅ | kiro/skills/qa_engineer/web_app_testing.md (CHECKLIST) using claude-in-chrome tools |
+| R1 | Recruit External Validator | No independent reproduction — the single biggest gap to academic credibility | 🔲 PENDING | docs/external-validator-outreach.md (posts ready, not yet published) |
 
 ---
 
