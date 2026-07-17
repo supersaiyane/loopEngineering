@@ -100,6 +100,39 @@ IF first request of a new build task (BUILD/CREATE/MAKE/DEVELOP/IMPLEMENT + APP/
 Load order: discovery-engine.md (new builds only) → team-orchestrator-core.md + team-orchestrator-rules.md → skill-selection-matrix.md → loop-engine.md (at DEVELOP) → team-orchestrator-sprint.md (at sprint end).
 All must be in context before their respective phases begin. No exceptions.
 
+# ── PHASE / EVENT AUTO-TRIGGERS (Fix 47B) ───────────────────────────────────
+# These agents activate at SYSTEM PHASES, not story labels.
+# They fire regardless of whether matching labels exist on any story.
+#
+# THINK PHASE (Mode 1, Mode 2, Mode 4 — any phase with discovery/design work):
+#   AUTO-ACTIVATE: cto [THINK-PHASE-TRIGGER]
+#   Skills: kiro/skills/cto/prd_template.md, kiro/skills/cto/technology_radar.md
+#   Why: CTO must frame the product vision and tech strategy BEFORE design begins.
+#        Waiting for a cto/* label means it never fires.
+#
+# GATE 2 (THINK complete → DESIGN begins) OR any story containing arch decision:
+#   AUTO-ACTIVATE: architect [GATE2-TRIGGER]
+#   Skills: kiro/skills/architect/trd_template.md, kiro/skills/architect/system_design_workshop.md
+#   Why: ARCHITECT is the default voice on system structure. Label-gating it means
+#        structural decisions get made by senior_engineer_be without review.
+#
+# SM-PLAN (sprint planning — Sprint N+1 kickoff after "Proceed to Sprint N+1?" YES):
+#   AUTO-ACTIVATE: scrum_master [SM-PLAN-TRIGGER]
+#   Skills: kiro/skills/scrum_master/sprint_planning_facilitation.md,
+#           kiro/skills/scrum_master/sprint_artifacts.md
+#   Why: Sprint planning ALWAYS needs SM. Requiring docs/* label to activate it is wrong.
+#
+# SM-RETRO (GATE 4 — sprint end):
+#   AUTO-ACTIVATE: scrum_master [SM-RETRO-TRIGGER]
+#   Already wired in team-orchestrator-sprint.md GATE 4 step 3. Confirmed ✅
+#
+# GATE 5 (phase end — after all sprints in a phase complete):
+#   AUTO-ACTIVATE: technical_writer [GATE5-TRIGGER]
+#   Skills: kiro/skills/technical_writer/documentation_sprint.md,
+#           kiro/skills/scrum_master/sprint_artifacts.md
+#   Why: Docs must be updated at every phase boundary. docs/* label is not reliable enough.
+# ─────────────────────────────────────────────────────────────────────────────
+
 ---
 
 ## MANDATORY: DISCOVERY-FIRST (before mode selection, before ANY work)
@@ -258,10 +291,35 @@ Checker in lean mode = QUALITY role (fresh context invocation — not the same c
 **Security gates S2 + S3 are NOT optional in lean mode.**
 QUALITY role runs S2 (feature security review) and S3 (secrets scan) regardless of team size.
 
+**⚠️ FIX 44A — MODE 5 SECURITY/RBAC ADVISORY (Guard — always active in Mode 5):**
+Before BUILDER activates, check story labels. If ANY of the following labels are present:
+`security`, `rbac`, `auth`, `authentication`, `authorisation`, `multi-tenant`, `cross-tenant`, `permissions`, `iam`
+
+THEN emit this advisory and BLOCK until user acknowledges:
+```
+⚠️ MODE 5 SECURITY ADVISORY
+This story touches [<matched labels>]. Mode 5 collapses security_engineer into the QUALITY role.
+This means:
+  - No dedicated STRIDE threat model for this story
+  - No OWASP Top-10 review from a security specialist
+  - Cross-tenant isolation test is YOUR responsibility to define
+
+OPTIONS:
+  (A) Continue in Mode 5 — QUALITY role will perform a best-effort security check.
+      Cross-tenant access-denial test MUST be included in VERIFIER or this is a GATE S2 FAIL.
+  (B) Switch to Mode 1 or Mode 2 — activates security_engineer as a dedicated role.
+
+Reply A or B to proceed.
+```
+If user replies A: proceed, but add cross-tenant test to VERIFIER automatically.
+If user replies B: re-route to Mode 1 (full) or Mode 2 (security_engineer only).
+If user does not reply: HOLD. Do not proceed without acknowledgement.
+
 **NEVER in lean mode:**
 - Merge without QUALITY checker approval
 - Skip verifier
 - Read all skill files
+- Skip the Fix 44A advisory when security/rbac labels are present
 
 ---
 

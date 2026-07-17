@@ -17,18 +17,38 @@ inclusion: manual
 # Contains: GATE 4 (memory write + SM-RETRO), GATE 5 (phase-end reports), MODE 1 SELF-CHECK, PHASE PARALLELISM RULES
 # See also: team-orchestrator-core.md (session start), team-orchestrator-rules.md (security, non-negotiables)
 
+### SM-PLAN — SPRINT PLANNING (Fix 47B — per sprint)
+**Trigger:** User confirms "Proceed to Sprint N+1?" (YES) — before any story is assigned or work begins.
+**AUTO-ACTIVATE: scrum_master [SM-PLAN-TRIGGER]** — fires regardless of story labels.
+**Actions in order:**
+1. `scrum_master` [SM-PLAN mode]:
+   - Load kiro/skills/scrum_master/sprint_planning_facilitation.md
+   - Load kiro/skills/scrum_master/sprint_artifacts.md
+   - Review team velocity (from last retro) + available capacity
+   - Pull candidate stories from $TRACKER backlog
+   - Apply label check (Fix 23B): confirm all stories have ≥1 label before sprint is locked
+   - Emit: [LABEL CHECK: N/N stories labeled ✅] OR block and prompt for missing labels
+   - Produce xlsx velocity tracker → `docs/sprint-N/velocity-tracker.xlsx`
+   - Seed sprint-plan.md for Sprint N+1
+2. `architect` [GATE2-TRIGGER — Fix 47B]:
+   - If any story in Sprint N+1 involves NEW services, NEW modules, or crosses component boundaries →
+     load kiro/skills/architect/system_design_workshop.md for those stories
+   - Otherwise: skip (architecture already established)
+
+---
+
 ### GATE 4 — SPRINT END (per sprint)
 **Trigger:** All sprint stories reach Done or explicit carry-over decision made.
 **Actions in order:**
 1. `sre_engineer` — SLI/SLO review, alert rule updates, runbook additions for sprint's features
 2. `technical_writer` — API docs update, ADR index update, new runbooks
 2b. MEMORY WRITE (`scrum_master`, before SM-RETRO):
-    1. Read docs/lessons.md — check last entry date and confidence levels
+    1. Read kiro/memory/lessons.md — check last entry date and confidence levels
     2. If any sprint pattern not captured → append with `confidence: low` and domain tag (Fix 20D)
     3. If any low/medium entry confirmed this sprint → upgrade per objective criteria (Fix 20B):
        low→medium: this is the 2nd+ separate sprint confirming it, zero contradictions
        medium→high: 5+ sprint count + user confirmed at least once. Check checkpoint.md dates.
-    4. Read docs/decisions.md — if any ADR made or superseded this sprint → update
+    4. Read kiro/memory/decisions.md — if any ADR made or superseded this sprint → update
        ADR SCOPE LOAD RULE (Fix 25P): When loading ADRs for a story, filter by:
          domain overlaps story labels AND (scope=global OR scope matches story component).
          Skip ADRs whose domain does not match ANY story label (prevents cross-domain constraint bleed).
@@ -38,13 +58,13 @@ inclusion: manual
         If [PROMOTE] found → promote to ADR (consequential) OR lessons.md (pattern/learning, confidence: low).
         ADR PROMOTION RULES (Fix 25M):
           - Max 2 new ADR promotions per sprint. Queue excess with [ADR-QUEUED] tag for next sprint.
-          - Before promoting: check docs/decisions.md for existing entry on same topic (keyword match on title).
+          - Before promoting: check kiro/memory/decisions.md for existing entry on same topic (keyword match on title).
             Duplicate found → skip, log [ADR-SKIP: duplicate of ADR-N].
         Log: `[IMPL-DECISIONS: N entries reviewed, N promoted to ADR/lessons, N queued, N skipped-dedup]`
         If nothing to promote: log `[IMPL-DECISIONS: N entries reviewed, 0 promoted]`
     5. Log: `[MEMORY WRITE: N entries updated/added, N ADRs updated]`
     6. MEMORY REFRESH — re-inject into active context the 3 most recently written/upgraded entries:
-       Pull last 3 entries by date from docs/lessons.md after step 5 write completes.
+       Pull last 3 entries by date from kiro/memory/lessons.md after step 5 write completes.
        LESSON PROJECT SCOPE (Fix 25Q): Load lessons WHERE:
          (project=global OR project=<current-sprint-project-name>) AND domain matches.
          Current project name = TITLE field of sprint-plan.md (first line after "# Sprint N").
@@ -77,7 +97,7 @@ inclusion: manual
    If debt=high or critical → SM-RETRO BLOCKS Sprint N+1 start. Scrum Master must surface to user.
 
    LESSON AGE CHECK (Fix 42B + Fix 43A) — runs AFTER comprehension debt check, BEFORE Sprint N+1:
-   Scan `docs/lessons.md`. For each entry tagged [Stage 1-Fail]:
+   Scan `kiro/memory/lessons.md`. For each entry tagged [Stage 1-Fail]:
      - Read the `gate_fired_at` field (Fix 43A). If absent → treat as Sprint 0 (worst-case age).
      - Do NOT use the lesson write date or retro date — retros can run late and inflate the age.
      - If `gate_fired_at` sprint is OLDER than current sprint by ≥1 → "stale blocker"
@@ -184,8 +204,24 @@ GATE 5 BLOCKS Phase N+1 until:
 When GATE 5 passes:
 1. Produce all 6 phase-end reports (QA, Security, Mapping, Discipline, Jira, Git)
 2. `scrum_master` marks phase as DONE in roadmap
-3. Announce: `"Phase N CLOSED. QA: GREEN. Security: GREEN. Ready to begin Phase N+1?"`
-4. Wait for explicit YES before starting next phase
+3. `technical_writer` [GATE5-TRIGGER — Fix 47B] — AUTO-ACTIVATES at GATE 5 regardless of docs/* labels:
+   - Load kiro/skills/technical_writer/documentation_sprint.md
+   - Update README, API reference, architecture overview for everything shipped this phase
+   - Load kiro/skills/scrum_master/sprint_artifacts.md → produce:
+     - `docs/sprint-N/review-deck.pptx` — one slide per story shipped this phase
+     - `docs/sprint-N/retro-report.pdf` — SM-RETRO summary for async stakeholders
+   - Log: `[TW-GATE5: docs updated | review-deck.pptx ✅ | retro-report.pdf ✅]`
+4. `architect` [GRAPH-MERGE — Fix 46A] — AUTO-ACTIVATES at GATE 5 after TW docs:
+   - Load kiro/skills/architect/product_graph_update.md
+   - Collect all `docs/graph-patch-sprint{N}-*.yaml` files from this sprint
+   - Merge patches into `docs/product-graph.yaml`
+   - Add decision nodes for any architectural choices made this sprint
+   - Regenerate `docs/product-graph.html`
+   - Delete processed patch files
+   - Log: `[GRAPH-MERGE: +N nodes | +N edges | product-graph.html regenerated]`
+   - If no patch files found → log `[GRAPH: no patches this sprint]` and skip
+5. Announce: `"Phase N CLOSED. QA: GREEN. Security: GREEN. Docs: UPDATED. Graph: MERGED. Ready to begin Phase N+1?"`
+5. Wait for explicit YES before starting next phase
 
 **Non-negotiable:** Code in Phase N+1 CANNOT begin while GATE 5 is RED. No "we'll fix it later" carries.
 

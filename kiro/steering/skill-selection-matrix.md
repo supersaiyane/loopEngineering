@@ -10,6 +10,26 @@ inclusion: manual
 
 ---
 
+## UNIVERSAL ROLE DEFAULTS (Fix 47C)
+# These skills load for ALL agents regardless of story labels or mode.
+# They are NOT activity-gated — they apply every time the named role activates.
+
+| Scope | Always Load | Condition |
+|-------|-------------|-----------|
+| ALL agents — code review activity | shared/code_review_excellence.md | Any role doing review |
+| ALL agents — Mode 3 (bugfix/refactor) | shared/debugging_methodology.md, shared/refactoring_safely.md | Mode 3 only |
+| devops_engineer — any activation | devops_engineer/twelve_factor_app.md | Every devops story |
+| security_engineer — any activation | security_engineer/secure_sdlc_devsecops.md | Every security story |
+| architect — THINK/DESIGN phase | architect/system_design_workshop.md | GATE2-TRIGGER or arch/* label |
+| cto — THINK phase | cto/technology_radar.md | THINK-PHASE-TRIGGER (Fix 47B) |
+| scrum_master — SM-PLAN | scrum_master/sprint_planning_facilitation.md | SM-PLAN-TRIGGER (Fix 47B) |
+| technical_writer — GATE 5 | technical_writer/documentation_sprint.md | GATE5-TRIGGER (Fix 47B) |
+
+**Rule:** Universal defaults load BEFORE label-specific skills. They cannot be skipped by absence of labels.
+Log: `[ROLE-DEFAULTS: <role> | universal=<N files> | label-specific=<N files>]`
+
+---
+
 ## THINK PHASE — Skill Selection
 
 ### market_researcher
@@ -58,6 +78,7 @@ inclusion: manual
 | Service mesh decision | service_mesh_architecture.md | others |
 | Clean architecture | hexagonal_architecture.md | others |
 | Repo structure | monorepo_polyrepo_strategy.md | others |
+| GATE 5 — graph merge (Fix 46A) | shared/graph_patch_emit.md, architect/product_graph_update.md | others |
 
 ### database_architect
 | Activity | Load These Skills | Skip |
@@ -173,6 +194,7 @@ Note: SM activates in ONE mode per call (Fix 2). Mode determines which skills lo
 | Architecture for a service | clean_architecture.md, dependency_injection_patterns.md | others |
 | Adding observability | observability_instrumentation.md | others |
 | Implementing non-trivial story (algorithm choice, library selection, pattern decision) | [no skill file] — write entry in docs/phase-N/impl-decisions.md during DO step. Template in team-orchestrator-core.md Fix 15A (Fix 19 split). Mark entry [PROMOTE] if decision is reusable across projects OR deviates from a standard pattern. SM-RETRO GATE 4 will promote [PROMOTE] entries to ADR or lessons.md (Fix 22E). | all |
+| After writing code for any story (Fix 46A) | shared/graph_patch_emit.md | others — load only when code changes are structural (new class/service/api) |
 
 ### senior_engineer_fe
 | Activity | Load These Skills | Skip |
@@ -184,6 +206,7 @@ Note: SM activates in ONE mode per call (Fix 2). Mode determines which skills lo
 | Refactoring | shared/refactoring_safely.md | others |
 | Feature flags | shared/feature_flags_safely.md | others |
 | React performance | react_performance_patterns.md | others |
+| After writing code for any story (Fix 46A) | shared/graph_patch_emit.md | others — load only when code changes are structural (new component/api/module) |
 | PWA implementation | progressive_web_app.md | others |
 | Frontend monitoring | frontend_observability.md | others |
 
@@ -219,9 +242,9 @@ Note: SM activates in ONE mode per call (Fix 2). Mode determines which skills lo
 | Activity | Load These Skills | Skip |
 |----------|------------------|------|
 | GATE S1 (package approval) | supply_chain_sbom_slsa.md, vulnerability_management_cve_patching.md | others |
-| GATE S1 — CVE flags a dep (Fix 43B) | vulnerability_management_cve_patching.md → write RDR, check same-rung alternatives, sign off on replacement rung before DEVELOP. Full protocol: docs/ponytail-rung-disqualification-guide.md | others |
+| GATE S1 — CVE flags a dep (Fix 43B) | vulnerability_management_cve_patching.md → write RDR, check same-rung alternatives, sign off on replacement rung before DEVELOP. Full protocol: docs/research/ponytail-rung-disqualification-guide.md | others |
 | GATE S2 (feature review) | application_security_testing_sast_dast.md, api_security_owasp_top10.md, owasp_top10_review.md | others |
-| GATE S2 — rung escalation review (Fix 43B) | Verify RDR exists + same-rung alternatives documented + ADR written + security sign-off present. Any missing → GATE S2 FAIL. Ref: docs/ponytail-rung-disqualification-guide.md | others |
+| GATE S2 — rung escalation review (Fix 43B) | Verify RDR exists + same-rung alternatives documented + ADR written + security sign-off present. Any missing → GATE S2 FAIL. Ref: docs/research/ponytail-rung-disqualification-guide.md | others |
 | Secrets management | secrets_management.md | others |
 | Container security | container_kubernetes_security.md | others |
 | AI/ML security | ai_ml_security_prompt_injection.md | others |
