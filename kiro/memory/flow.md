@@ -304,6 +304,15 @@
 ├──────────────────────────────────────────────────────────────────────────────────┤
 │  STORY: Story label → agent assignment + skill file load. Surgical activation.  │
 │  Only the skills relevant to THIS story are loaded. No broad context reads.     │
+│                                                                                  │
+│  Fix 47A-D (Skill Activation Audit — 2026-07-17):                               │
+│    47A: 37 → 119 label rows in skill-label-index.md (all 22 roles covered)     │
+│    47B: Phase/event auto-triggers added to orchestrator-routing.md              │
+│         (THINK-PHASE, GATE 2, SM-PLAN, GATE 5 now auto-activate correct roles) │
+│    47C: Universal Role Defaults table — every role has fallback skill set       │
+│    47D: Keyword fallback expanded from 9 → ~60 patterns in selection matrix     │
+│                                                                                  │
+│  Coverage: 173 skill files now wired (was: ~37 wired, 173 listed)              │
 └──────────────────────────────────────────────────────────────────────────────────┘
 
   Label: be/auth
@@ -707,3 +716,4 @@
 ---
 
 *Full system reference: kiro/steering/ · Loop Engineering White Paper v5 · docs/product-graph.html (updated each sprint)*
+*Phase 1 complete as of 2026-07-17: Fix 44A, 45A/B/C, 46A (product graph), 47A/B/C/D (skill coverage). R1 outreach drafted → docs/Audits/external-validator-outreach.md*

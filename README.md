@@ -4,11 +4,12 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-supersaiyane%2FloopEngineering-181717?style=for-the-badge&logo=github)](https://github.com/supersaiyane/loopEngineering)
 ![Status](https://img.shields.io/badge/status-production--ready-brightgreen?style=for-the-badge)
+![Phase](https://img.shields.io/badge/phase%201-complete%20%E2%9C%85-brightgreen?style=for-the-badge)
 ![Dry Runs](https://img.shields.io/badge/dry%20runs-v11-blue?style=for-the-badge)
 ![Ship Confidence](https://img.shields.io/badge/ship%20confidence-9.5%2F10-success?style=for-the-badge)
-![Fixes](https://img.shields.io/badge/fixes%20implemented-50%2F51-orange?style=for-the-badge)
+![Fixes](https://img.shields.io/badge/fixes%20implemented-Fix%201--47D-orange?style=for-the-badge)
 ![Roles](https://img.shields.io/badge/agent%20roles-22-purple?style=for-the-badge)
-![Skill Files](https://img.shields.io/badge/skill%20files-254-informational?style=for-the-badge)
+![Skill Files](https://img.shields.io/badge/skill%20files-173%20wired-informational?style=for-the-badge)
 ![pxpipe](https://img.shields.io/badge/pxpipe-token%20compression%20%E2%88%9260%25-ff6b35?style=for-the-badge)
 ![White Paper](https://img.shields.io/badge/white%20paper-v5%20published-blueviolet?style=for-the-badge)
 
@@ -130,7 +131,7 @@ Agents do the work → quality gates run → code merges
    ┌──────────┐ ┌──────────┐ ┌──────────┐
    │STEERING  │ │  SKILL   │ │  GUARDS  │
    │  FILES   │ │  FILES   │ │& GATES   │
-   │(14 files)│ │(254 files│ │(GATE S1  │
+   │(14 files)│ │(173 wired│ │(GATE S1  │
    │          │ │ 22 roles)│ │ GATE S2) │
    └──────────┘ └──────────┘ └──────────┘
           │           │           │
@@ -208,7 +209,7 @@ Each role has its own `SKILL.md` and a library of specialist skill files.
 | 21 | 📣 **Market Researcher** | Competitor analysis, market positioning | 4 |
 | 22 | 🌐 **Website Creator** | Landing pages, SEO, web content | 6 |
 
-> **254 total skill files** across all roles — each one is a focused protocol for a specific engineering task.
+> **173 total skill files** across all roles, fully wired (Fix 47A-D) — each one is a focused protocol for a specific engineering task.
 
 ---
 
@@ -322,31 +323,38 @@ loopEngineering/
 │   │   └── elite-team-orchestrator.kiro.hook  ← Entry point (≤60 lines)
 │   │
 │   ├── 📂 steering/                ← The constitution (14 files)
-│   │   ├── orchestrator-routing.md      ← Mode routing logic
+│   │   ├── orchestrator-routing.md      ← Mode routing + phase/event auto-triggers (Fix 47B)
 │   │   ├── team-orchestrator-core.md    ← Core execution rules
-│   │   ├── team-orchestrator-sprint.md  ← Sprint lifecycle (PLAN→RETRO)
+│   │   ├── team-orchestrator-sprint.md  ← Sprint lifecycle + GATE 5 graph merge (Fix 46A)
 │   │   ├── team-orchestrator-rules.md   ← NON-NEGOTIABLES + GATE S1/S2
 │   │   ├── discovery-engine.md          ← 7-question discovery + scoring
 │   │   ├── ponytail.md                  ← 7-rung ladder enforcement
 │   │   ├── session-guards.md            ← GUARD 1 + GUARD 2 + GUARD 3 (pxpipe)
-│   │   ├── skill-selection-matrix.md    ← Story label → skill file mapping
-│   │   ├── skill-label-index.md         ← All skill filenames indexed
+│   │   ├── skill-selection-matrix.md    ← Story label → skill file mapping (119 rows, Fix 47C/D)
+│   │   ├── skill-label-index.md         ← 173 skill files indexed across 22 roles (Fix 47A)
 │   │   ├── loop-engine.md               ← PLAN→DO→VERIFY→DECIDE loop spec
 │   │   ├── context-memory-discipline.md ← Token budgets + degradation tiers
 │   │   ├── memory-management.md         ← Cross-session memory protocols
 │   │   ├── phase-reporting.md           ← Report templates per phase
 │   │   └── team-orchestrator.md         ← Legacy (superseded by split files)
 │   │
-│   ├── 📂 skills/                  ← 22 agent roles, 254 skill files
-│   │   ├── cto/                    ← CTO skill library (10 files)
-│   │   ├── architect/              ← Architect skill library (13 files)
-│   │   ├── security_engineer/      ← Security skills (12 files)
-│   │   ├── backend_lead/           ← Backend skills (14 files)
+│   ├── 📂 memory/                  ← Runtime state (live session files)
+│   │   ├── checkpoint.md           ← Session continuity (resume from here)
+│   │   ├── lessons.md              ← Cross-session learning log
+│   │   ├── decisions.md            ← Architectural decisions
+│   │   ├── project_map.md          ← Module-level map of the whole system
+│   │   └── flow.md                 ← End-to-end system flow reference
+│   │
+│   ├── 📂 skills/                  ← 22 agent roles, 173 wired skill files
+│   │   ├── cto/                    ← CTO skill library
+│   │   ├── architect/              ← Architect skills + product_graph_update.md (Fix 46A)
+│   │   ├── security_engineer/      ← Security skills
+│   │   ├── backend_lead/           ← Backend skills
 │   │   ├── ... (18 more roles)
-│   │   └── shared/                 ← Cross-role shared skills
+│   │   └── shared/                 ← Cross-role shared skills + graph_patch_emit.md (Fix 46A)
 │   │
 │   ├── 📄 CLAUDE.md               ← Active fix register + pxpipe note
-│   └── 📄 CLAUDE-implemented.md   ← Full history of all 50 implemented fixes
+│   └── 📄 CLAUDE-implemented.md   ← Full history: Fix 1–47D
 │
 ├── 📂 scripts/                     ← Utility scripts
 │   └── start-kiro-pxpipe.sh        ← Launch Kiro through pxpipe proxy (run this)
@@ -355,13 +363,16 @@ loopEngineering/
 ├── 📄 pxpipe-research.md           ← R&D: pxpipe token compression assessment
 ├── 📄 oneagent-search.md           ← R&D: 67TB logs/metrics/traces search architecture
 │
-└── 📂 docs/                        ← Evidence, decisions, memory
-    ├── checkpoint.md               ← Session continuity (resume from here)
-    ├── lessons.md                  ← Cross-session learning log
-    ├── decisions.md                ← Architectural decisions
-    ├── project_map.md              ← Module-level map of the whole system
+└── 📂 docs/                        ← Evidence, decisions, artifacts
+    ├── product-graph.yaml          ← Living product knowledge graph (Fix 46A)
+    ├── product-graph.html          ← D3 interactive graph viz, updated each GATE 5 (Fix 46A)
     ├── ponytail-rung-disqualification-guide.md  ← Dep disqualification protocol
-    └── dry-run-*.md                ← 11 full pipeline verification runs
+    ├── dry-run-*.md                ← 11 full pipeline verification runs
+    ├── Audits/
+    │   └── external-validator-outreach.md  ← R1: HN/Reddit/LinkedIn/Discord posts (R1)
+    └── research/
+        ├── compression-fidelity-methodology.md  ← Fix 45B: exact test methodology
+        └── competitor-comparison.md             ← Fix 45C: MemGPT, LangMem, Devin comparison
 ```
 
 ---
@@ -762,19 +773,20 @@ Full analysis in [`pxpipe-research.md`](pxpipe-research.md), including:
 
 ## 🔧 The Fix Register — What Was Built
 
-This system was built across **51 incremental fixes** over multiple sessions.
+This system was built across **47D+ incremental fixes** over multiple sessions. **Phase 1 is complete as of 2026-07-17.**
 
-![Fixes](https://img.shields.io/badge/total%20fixes-51-blue) ![Implemented](https://img.shields.io/badge/implemented-50-brightgreen) ![Candidate](https://img.shields.io/badge/candidate-1-yellow)
+![Fixes](https://img.shields.io/badge/fix%20cycles-Fix%201--47D-blue) ![Phase](https://img.shields.io/badge/phase%201-complete-brightgreen) ![Skills](https://img.shields.io/badge/skill%20files%20wired-173-informational)
 
 ### By Type
 
 | Type | Count | Description |
 |------|-------|-------------|
-| 🚀 **Feature** | 20 | New capabilities added to the system |
+| 🚀 **Feature** | 22 | New capabilities added to the system |
 | 🔧 **Fix** | 18 | Bugs and gaps patched |
 | 🛡️ **Guard** | 7 | Runtime protection mechanisms |
-| 🚪 **Gate** | 7 | Quality enforcement checkpoints |
+| 🚪 **Gate** | 8 | Quality enforcement checkpoints |
 | 🏗️ **Architecture** | 5 | Structural changes to how files are organized |
+| 📊 **Audit/Coverage** | 4 | Fix 47A-D skill activation coverage sweep |
 
 ### Key Milestones
 
@@ -788,9 +800,15 @@ This system was built across **51 incremental fixes** over multiple sessions.
 | Fix 39–42 | Protection: memory progression, comprehension debt, bad loop scoping |
 | Fix 43 | Verification: lesson age clock, dep disqualification, cross-tenant gate |
 | Fix 44G | ✅ Infra: pxpipe integration — GUARD 3, launch script, CLAUDE.md note |
-| Fix 44A | 🔲 Pending: Mode 5 advisory for security/rbac stories without GATE S2 |
+| Fix 44A | ✅ Mode 5 advisory for security/rbac stories |
+| Fix 45A | ✅ Open-source artifacts: LICENSE (MIT) + CONTRIBUTING.md |
+| Fix 45B | ✅ Compression-fidelity methodology doc (docs/research/) |
+| Fix 45C | ✅ Competitor comparison: MemGPT, LangMem, Cognition Devin |
+| Fix 46A | ✅ Product Knowledge Graph: graph_patch_emit, product_graph_update, D3 viz |
+| Fix 47A–D | ✅ Skill Activation Audit: 37→119 label rows, phase auto-triggers, universal defaults |
+| R1 | ✅ External Validator Outreach: HN + Reddit + LinkedIn + Discord posts drafted |
 
-> Full history: [`kiro/CLAUDE-implemented.md`](kiro/CLAUDE-implemented.md) · Active register: [`kiro/CLAUDE.md`](kiro/CLAUDE.md)
+> **Phase 1 complete.** Full history: [`kiro/CLAUDE-implemented.md`](kiro/CLAUDE-implemented.md) · Active register: [`kiro/CLAUDE.md`](kiro/CLAUDE.md)
 
 ---
 
@@ -863,31 +881,34 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 ---
 
 ### ✅ Phase 0 — Foundation (Complete)
-*What exists today, July 2026*
+*Completed by 2026-07-10*
 
 | Item | Status |
 |------|--------|
 | 12-pattern production failure taxonomy | ✅ Documented + cataloged |
-| Four-layer process architecture | ✅ Production-validated (44 fix cycles) |
+| Four-layer process architecture | ✅ Production-validated (47+ fix cycles) |
 | Degradation tier system (PEAK → CRITICAL) | ✅ Implemented in CLAUDE.md + session-guards.md |
 | Session continuity (resume vector + checkpoint) | ✅ Active across all sessions |
 | Gist/exact-string recall bifurcation finding | ✅ Measured, documented, mitigated via GUARD 3 |
-| Compression data (59–70% on code-heavy sessions) | ✅ Measured across 44 sessions |
+| Compression data (59–70% on code-heavy sessions) | ✅ Measured across 47+ sessions |
 | Three-tier guard architecture | ✅ In session-guards.md |
 | White paper v5 (problem-first, 34 pages) | ✅ DOCX + PDF published |
 | GOAT analysis | ✅ Honest gap + strength inventory |
 
 ---
 
-### 🔜 Phase 1 — Reproducibility (Next 30 days)
+### ✅ Phase 1 — Reproducibility (Complete · 2026-07-17)
 *Transform the practitioner contribution into a replicable one*
 
-| Item | What + Why |
-|------|------------|
-| **Open-source the core artifacts** | Publish the CLAUDE.md behavioral spec template, checkpoint schema, degradation tier definition, and guard system spec as standalone reusable components. Right now only we can run the framework — others need installable artifacts to replicate. |
-| **Methodology doc for compression-fidelity finding** | Write up the exact test conditions: how many sessions, what content types, what compression parameters, how misreads were detected. Without this, the 11–17% misread rate is an observation, not a finding. |
-| **Fix 44A** | Mode 5 advisory for security/RBAC stories — the one remaining open candidate from Dry Run v11. Small but completes the gate coverage. |
-| **Competitor comparison section** | Document MemGPT, LangMem, LangGraph memory modules, Cognition Devin architecture. Show where the Loop Engineering approach is complementary, where it diverges, and why. The white paper currently doesn't acknowledge these exist. |
+| Item | Status | What Was Done |
+|------|--------|---------------|
+| **Open-source the core artifacts** | ✅ Done | LICENSE (MIT) + CONTRIBUTING.md published. Fix 45A. |
+| **Methodology doc for compression-fidelity finding** | ✅ Done | `docs/research/compression-fidelity-methodology.md` — exact test conditions, session count, content types, misread detection methodology. Fix 45B. |
+| **Fix 44A** | ✅ Done | Mode 5 advisory for security/RBAC stories wired into session-guards.md + orchestrator-routing.md. |
+| **Competitor comparison section** | ✅ Done | `docs/research/competitor-comparison.md` — MemGPT, LangMem, LangGraph, Cognition Devin. Fix 45C. |
+| **Fix 46A — Product Knowledge Graph** | ✅ Done | Two-agent flow: SE emits graph-patch YAML per story; ARCHITECT merges at GATE 5. D3 HTML viz at `docs/product-graph.html`. |
+| **Fix 47A-D — Skill Activation Audit** | ✅ Done | 37→119 label rows, phase auto-triggers, universal role defaults, ~60 keyword fallback patterns. 173 skill files now wired. |
+| **R1 — External Validator Outreach** | ✅ Drafted | HN + Reddit + LinkedIn + Discord posts at `docs/Audits/external-validator-outreach.md`. Ready to post. |
 
 ---
 
@@ -967,21 +988,27 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  LOOP ENGINEERING — STATUS BOARD                        │
+│  LOOP ENGINEERING — STATUS BOARD · 2026-07-17           │
 ├─────────────────────────────────────────────────────────┤
-│  Dry Run v11 complete          ✅ 9.5/10                │
-│  Fixes 1–43C implemented       ✅ 50/51                 │
+│  Phase 0 complete              ✅ Foundation             │
+│  Phase 1 complete              ✅ 2026-07-17             │
+│  Dry Run v11                   ✅ 9.5/10                │
 │  Fix 44G pxpipe integration    ✅ GUARD 3 + script      │
-│  Fix 44A (Mode 5 advisory)     🔲 Candidate             │
+│  Fix 44A Mode 5 advisory       ✅ Done                  │
+│  Fix 45A open-source artifacts ✅ LICENSE + CONTRIBUTING│
+│  Fix 45B compression methodology ✅ docs/research/       │
+│  Fix 45C competitor comparison ✅ docs/research/         │
+│  Fix 46A product knowledge graph ✅ D3 viz + YAML       │
+│  Fix 47A-D skill coverage      ✅ 173 files wired       │
+│  R1 outreach                   ✅ Drafted · Ready to post│
 │  pxpipe token compression      ✅ ~59-70% savings       │
 │  White paper v5                ✅ 34pp · DOCX + PDF     │
-│  GOAT analysis                 ✅ Strengths + gaps doc  │
-│  Git repo status               ✅ Clean (committed)     │
-│  Adapters                      ⏸️ Intentionally skipped │
-│  Next action                   → npm install -g pxpipe-proxy │
-│                                → ./scripts/start-kiro-pxpipe.sh │
-│                                → Implement Fix 44A       │
-│                                → git push                │
+│  Git repo                      ⏸️ Push pending (SSH/PAT)│
+├─────────────────────────────────────────────────────────┤
+│  Next actions                                           │
+│    → git push (run from terminal via SSH)               │
+│    → Post R1 outreach: HN → Reddit → LinkedIn → Discord │
+│    → Phase 2: External validator study (recruit 1 dev)  │
 └─────────────────────────────────────────────────────────┘
 ```
 
