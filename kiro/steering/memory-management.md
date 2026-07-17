@@ -105,7 +105,7 @@ When task fails due to lost context:
 | `high` | Observed in 5+ sprints. Zero contradictions. User explicitly confirmed at least once. |
 
 **Rules:**
-- Model checks `docs/checkpoint.md` dates to count sprint occurrences before upgrading confidence.
+- Model checks `kiro/memory/checkpoint.md` dates to count sprint occurrences before upgrading confidence.
 - Model CANNOT self-assign `high` — requires user confirmation AND 5+ sprint count.
 - When upgrading confidence: add note `upgraded: [date] sprint-count=[N] confirmed-by=[user|sprint-data]`
 - A contradiction (behavior observed but lesson said otherwise) → DOWNGRADE to `low`, add `contradiction-noted: [date]`

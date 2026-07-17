@@ -66,9 +66,9 @@ If your project already has memory files from previous Kiro sessions:
 
 1. Click **"Add Content"** → **"Upload files"**
 2. Upload from your `docs/` folder:
-   - `docs/lessons.md` ← accumulated lessons (HIGH-confidence ones apply immediately)
-   - `docs/decisions.md` ← ADR index (architectural constraints)
-   - `docs/checkpoint.md` ← where you left off (optional — paste the latest entry in your first message instead)
+   - `kiro/memory/lessons.md` ← accumulated lessons (HIGH-confidence ones apply immediately)
+   - `kiro/memory/decisions.md` ← ADR index (architectural constraints)
+   - `kiro/memory/checkpoint.md` ← where you left off (optional — paste the latest entry in your first message instead)
 
 ---
 
@@ -169,7 +169,7 @@ If you don't want to set up a Project:
 | Skill routing | `kiro/steering/skill-selection-matrix.md` | Every role activation |
 | Story loop | `kiro/steering/loop-engine.md` | DEVELOP phase |
 | Mode selection | `kiro/steering/discovery-engine.md` | New builds |
-| Memory | `docs/lessons.md`, `docs/decisions.md` | Session start |
+| Memory | `kiro/memory/lessons.md`, `kiro/memory/decisions.md` | Session start |
 | Skill files | `kiro/skills/<role>/*.md` | Per role activation |
 | Shared skills | `kiro/skills/shared/*.md` | UI, code review, debugging |
 | Design gate | `kiro/skills/shared/design_system_gate.md` | Before any UI code |

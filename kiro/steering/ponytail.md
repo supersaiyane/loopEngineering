@@ -43,7 +43,7 @@ incompatibility. **Do NOT jump straight to Rung 7 (custom).** Do NOT proceed wit
 4. Any escalation past Rung 2 → mandatory ADR.
 5. CVE-triggered disqualification → security_engineer sign-off BEFORE story enters DEVELOP.
 
-**Full protocol:** `docs/ponytail-rung-disqualification-guide.md`
+**Full protocol:** `docs/research/ponytail-rung-disqualification-guide.md`
 
 This is the authoritative reference for agents, engineers, and reviewers when a rung is blocked.
 A skip without an RDR = NON-NEGOTIABLE violation (same as skipping rungs without justification).

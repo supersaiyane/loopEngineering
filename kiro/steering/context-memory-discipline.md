@@ -206,8 +206,8 @@ If 2+ consecutive stories each exhausted max ACTs at DEGRADING tier:
 **SM-RETRO CRITICAL exception (Fix 29D):**
 SM-RETRO writes are EXPLICITLY PERMITTED at CRITICAL tier. This is the ONLY category of writes allowed after CRITICAL fires.
 Permitted SM-RETRO writes at CRITICAL:
-  - `docs/lessons.md` — lesson entries (~500 tokens)
-  - `docs/checkpoint.md` — sprint row (~200 tokens)
+  - `kiro/memory/lessons.md` — lesson entries (~500 tokens)
+  - `kiro/memory/checkpoint.md` — sprint row (~200 tokens)
   - `docs/phase-N/impl-decisions.md` — key decisions (~500 tokens)
 Total estimated SM-RETRO write cost: ~2K tokens. This is required for session continuity.
 Log: `[CRITICAL: SM-RETRO writes permitted — ~2K tok. Writing lessons + checkpoint + impl-decisions.]`

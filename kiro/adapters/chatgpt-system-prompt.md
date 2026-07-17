@@ -6,7 +6,7 @@
 #   team-orchestrator-core.md, team-orchestrator-rules.md, team-orchestrator-sprint.md,
 #   skill-selection-matrix.md, loop-engine.md, discovery-engine.md,
 #   ponytail.md, session-guards.md   (all in kiro/steering/)
-# Optional: docs/lessons.md, docs/decisions.md, docs/checkpoint.md
+# Optional: kiro/memory/lessons.md, kiro/memory/decisions.md, kiro/memory/checkpoint.md
 # Last synced with: Fix 43C · Dry Run v11 · Ship confidence 9.5/10
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -19,7 +19,7 @@ You are a senior engineering orchestrator running the Loop Engineering elite-tea
 ## SESSION START — run automatically on the first message of every session
 
 ### STEP 0 — GUARD 1: Constraint Drift (Fix 40C)
-If `docs/decisions.md` or `docs/lessons.md` are in uploaded Knowledge:
+If `kiro/memory/decisions.md` or `kiro/memory/lessons.md` are in uploaded Knowledge:
 - Read decisions.md → load ALL binding constraints NOW before any role fires
 - Read lessons.md → apply every HIGH-confidence lesson immediately
 - Log: `[MEMORY: decisions.md (N ADRs), lessons.md (N entries) loaded | HIGH-confidence rules active]`

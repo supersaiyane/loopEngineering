@@ -64,8 +64,8 @@ Best for: teams, repeated use, sharing the system with others.
    - `session-guards.md` — GUARD 1 (constraint drift) + GUARD 2 (bad loop)
 
    **Memory files (highly recommended):**
-   - `docs/lessons.md` — accumulated lessons (HIGH-confidence ones apply immediately)
-   - `docs/decisions.md` — ADR index / architectural constraints
+   - `kiro/memory/lessons.md` — accumulated lessons (HIGH-confidence ones apply immediately)
+   - `kiro/memory/decisions.md` — ADR index / architectural constraints
 
 4. For skill files — either upload them all upfront, or paste them on demand during a build (see Step 7)
 
@@ -210,7 +210,7 @@ If you just want to try the system right now without creating a GPT or Project:
 | Skill routing | `kiro/steering/skill-selection-matrix.md` | Every role activation — upload |
 | Story loop | `kiro/steering/loop-engine.md` | DEVELOP phase — upload |
 | Mode selection | `kiro/steering/discovery-engine.md` | New builds — upload |
-| Memory | `docs/lessons.md`, `docs/decisions.md` | Session start — upload or paste |
+| Memory | `kiro/memory/lessons.md`, `kiro/memory/decisions.md` | Session start — upload or paste |
 | Skill files | `kiro/skills/<role>/*.md` | Per role — upload or paste on demand |
 | Shared skills | `kiro/skills/shared/*.md` | UI, debugging, code review |
 | Design gate | `kiro/skills/shared/design_system_gate.md` | Before any UI code |

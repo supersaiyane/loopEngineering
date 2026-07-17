@@ -16,4 +16,4 @@
 Add [PROMOTE] marker when:
 - Decision applies to ≥2 stories or will recur in future sprints
 - Decision encodes a non-obvious trade-off worth remembering
-- SM-RETRO GATE 4 step 2b item 4b: any [PROMOTE]-marked entry → move to docs/decisions.md as ADR
+- SM-RETRO GATE 4 step 2b item 4b: any [PROMOTE]-marked entry → move to kiro/memory/decisions.md as ADR

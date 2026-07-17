@@ -95,7 +95,7 @@ Security is not a phase. It is a continuous gate. The `security_engineer` is emb
    □ ADR must exist for any escalation past Rung 2
    □ CVE disqualification → security_engineer sign-off in ADR before DEVELOP started
    Missing RDR or ADR = GATE S2 FAIL (same severity as unjustified rung skip)
-   Full protocol: docs/ponytail-rung-disqualification-guide.md
+   Full protocol: docs/research/ponytail-rung-disqualification-guide.md
 
 5b. CROSS-TENANT ISOLATION TEST — conditional, runs alongside item 5 (Fix 43C):
    Applies when story labels include `security/rbac` OR `data/multi-tenant` OR `security/auth`
@@ -355,7 +355,7 @@ LANE RULES:
 
 ### FEATURE BRANCH LIFECYCLE (Fix 10D)
 
-Every story follows this 4-stage lifecycle. See CLAUDE.md Fix 10D for full detail.
+Every story follows this 4-stage lifecycle. See kiro/claude-working.md Fix 10D for full detail.
 
 ```
 STAGE 1 — BRANCH CREATION at story assignment (not at commit time)
@@ -398,9 +398,9 @@ STAGE 4 — PR + CI + MERGE
 ## SESSION CONTINUITY
 
 At the start of every session involving a product build:
-1. Read `.kiro/init_docs/checkpoint.md` — get current phase + resume vector
-2. Read `.kiro/init_docs/decisions.md` — load ADR index (binding constraints)
-3. Read `.kiro/init_docs/project_map.md` — workspace orientation
+1. Read `.kiro/init_kiro/memory/checkpoint.md` — get current phase + resume vector
+2. Read `.kiro/init_kiro/memory/decisions.md` — load ADR index (binding constraints)
+3. Read `.kiro/init_kiro/memory/project_map.md` — workspace orientation
 4. Announce: `"Resuming [product]. Phase: [X]. Last: [action]. Next: [action]."`
 
 At the end of every session:

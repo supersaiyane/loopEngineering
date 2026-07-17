@@ -91,7 +91,7 @@ exact strings at ~13% rate on Fable 5, ~100% on Opus 4.8.
 - Exact error codes, IDs, ticket numbers → re-read the relevant file or tool result
 - camelCase function/variable names → re-read the source file
 - API keys, secrets, credentials → never in images (verbatim-risk guard)
-- Checkpoint timestamps / gate_fired_at values → re-read `docs/checkpoint.md`
+- Checkpoint timestamps / gate_fired_at values → re-read `kiro/memory/checkpoint.md`
 
 **What IS safe to use from imaged context:**
 - Decisions made ("we chose Postgres over MySQL")

@@ -149,7 +149,7 @@ Token count: ~[N]
 
 **PRE-ACTIVATION: LESSONS SCAN (Fix 28B) — runs before every role activation:**
 Before any role generates output, run:
-> "Scan docs/lessons.md for entries WHERE domain matches current story labels [X, Y, Z].
+> "Scan kiro/memory/lessons.md for entries WHERE domain matches current story labels [X, Y, Z].
 >  Cite each applicable lesson explicitly: `[LESSON APPLIED: <lesson text> — source: sprint N]`
 >  If no match: log `[LESSONS: no match for labels=[X,Y,Z]]` and proceed."
 This step is MANDATORY and AUDITABLE. Silent lessons application is not permitted.
@@ -574,7 +574,7 @@ Jira is not a one-time creation. Every status change, blocker, decision, and com
 | Story moves to In Progress | `jira.transitionIssue(id, status="In Progress")` + add comment with sprint goal reminder |
 | Blocker discovered | `jira.addComment(id, "BLOCKED: <what> — needs <who> — ETA <date>")` + `jira.flagIssue(id)` |
 | Blocker resolved | `jira.addComment(id, "UNBLOCKED: <resolution>")` + `jira.unflagIssue(id)` |
-| Design decision made (ADR) | `jira.addComment(id, "ADR-NNN decided: <one-line decision> — see .kiro/init_docs/decisions.md")` |
+| Design decision made (ADR) | `jira.addComment(id, "ADR-NNN decided: <one-line decision> — see .kiro/init_kiro/memory/decisions.md")` |
 | Sub-task completed | `jira.transitionIssue(subtask_id, status="Done")` + `jira.addComment(story_id, "Sub-task <name> done by <role>")` |
 | QA pass | `jira.addComment(id, "QA PASSED: coverage=X% · contracts=green · load=within targets · security=clean")` |
 | QA fail | `jira.addComment(id, "QA FAILED: <specific failure> — returned to <role>")` + transition back to In Progress |
