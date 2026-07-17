@@ -828,6 +828,32 @@ Three research documents park findings from experiments and third-party tool ana
 
 ---
 
+## 🔁 How to Reproduce
+
+The core claim: a process layer structurally independent of model capability reduces production failure rates in agentic AI. Here is how to test that yourself.
+
+**1. Clone:**
+```bash
+git clone https://github.com/supersaiyane/loopEngineering.git
+cd loopEngineering
+```
+
+**2. Activate (Kiro IDE):**
+```bash
+ln -s kiro .kiro
+# Open Kiro — hook auto-loads on first prompt
+```
+
+**Claude Projects:** Paste `kiro/adapters/claude-system-prompt.md` as system prompt + attach 8 knowledge files (see `kiro/adapters/claude-setup-guide.md`).
+
+**3. Run on a real project for ≥5 sessions.** The 12 failure modes (F01–F12) surface within the first 3–5 sessions.
+
+**4. Record observations** — which failure modes appeared, at what frequency, before and after the framework. Open a GitHub Issue with your findings.
+
+Full reproduction guide: [CONTRIBUTING.md](CONTRIBUTING.md) · White paper: [loop-engineering-white-paper-v5.pdf](loop-engineering-white-paper-v5.pdf)
+
+---
+
 ## 🗺️ Roadmap
 
 > Based on the [GOAT analysis](GOAT.md) — where the framework is already first in field, and what it needs to become the definitive reference.
