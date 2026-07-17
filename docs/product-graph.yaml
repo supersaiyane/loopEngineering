@@ -1,0 +1,88 @@
+# Product Knowledge Graph
+# Maintained by: ARCHITECT (merges at GATE 5) + SENIOR_ENGINEER (emits patches per story)
+# DO NOT edit manually between GATE 5 cycles. Use graph-patch-sprint{N}-{story}.yaml instead.
+# Last updated: sprint 0 (schema initialization)
+
+meta:
+  project: "<project name>"
+  created: "<date>"
+  last_merge_sprint: 0
+  total_nodes: 0
+  total_edges: 0
+
+# ── NODES ──────────────────────────────────────────────────────────────────
+# Types: service | module | component | function | api | database | decision
+nodes: []
+
+# Example (uncomment and adapt for Sprint 1):
+#
+# nodes:
+#   - id: auth-service
+#     type: service
+#     label: Auth Service
+#     file: src/auth/index.ts
+#     sprint: 1
+#     description: Handles user authentication and token lifecycle.
+#
+#   - id: jwt-validator
+#     type: component
+#     label: JwtValidator
+#     file: src/auth/jwt.ts
+#     line: 12
+#     sprint: 1
+#     description: Validates JWT signature and expiry against public key cache.
+#
+#   - id: validate-expiry
+#     type: function
+#     label: validateExpiry
+#     file: src/auth/jwt.ts
+#     line: 45
+#     sprint: 1
+#     description: Checks exp claim against current UTC timestamp.
+#
+#   - id: post-auth-login
+#     type: api
+#     label: POST /auth/login
+#     file: src/auth/routes.ts
+#     line: 22
+#     sprint: 1
+#     description: Authenticates user credentials and issues access + refresh tokens.
+#
+#   - id: users-table
+#     type: database
+#     label: users (PostgreSQL)
+#     sprint: 1
+#     description: Stores user accounts, hashed passwords, and roles.
+#
+#   - id: decision-jwt-stateless
+#     type: decision
+#     label: Stateless JWT
+#     sprint: 1
+#     description: Chose stateless JWT over Redis sessions for horizontal scale.
+#     choice: Stateless JWT validation via public key cache
+#     reason: Eliminates Redis as SPOF. See TRD §4.2.
+#     alternatives_rejected: [redis-session-store, database-session-store]
+
+# ── EDGES ──────────────────────────────────────────────────────────────────
+# Types: owns | depends_on | implements | calls | guards_against | decided_by
+edges: []
+
+# Example:
+#
+# edges:
+#   - from: auth-service
+#     to: jwt-validator
+#     type: owns
+#   - from: jwt-validator
+#     to: validate-expiry
+#     type: owns
+#   - from: post-auth-login
+#     to: users-table
+#     type: depends_on
+#   - from: decision-jwt-stateless
+#     to: jwt-validator
+#     type: decided_by
+
+# ── DECISIONS ──────────────────────────────────────────────────────────────
+# ARCHITECT-authored only. Summarizes WHY the graph looks the way it does.
+decisions: []
