@@ -229,10 +229,12 @@ echo "7/8  Writing trigger-prompt template..."
 cat > "$TARGET/trigger-prompt.md" << TRIGGER_EOF
 # Kiro Trigger Prompt — $PROJECT_NAME
 
-Copy this prompt into Kiro to start the full THINK → DESIGN → DEVELOP pipeline.
-Replace the placeholders, then delete this file (or keep it for reference).
+Paste the prompt below into Kiro to start the pipeline.
+Replace placeholders, then keep this file for reference.
 
 ---
+
+## YOUR OPENING PROMPT (paste this into Kiro)
 
 Build $PROJECT_NAME — [one-sentence product description].
 
@@ -245,10 +247,37 @@ Multi-tenant: [yes/no + model — e.g., "yes, tenant per subdomain, RBAC per org
 
 ---
 
-Expected pipeline:
-1. market_researcher → cto → product_manager → architect → database_architect → cloud_architect → finops_architect → security_engineer
-2. scrum_master [SM-GATE] → sprint planning → story cards
-3. Engineering sprint → GATE 5 → SM-RETRO
+## WHAT HAPPENS NEXT (three-phase flow)
+
+PHASE 1 — THINK (automatic, ~2 exchanges)
+  Kiro asks 7 discovery questions (platform, scale, complexity, deployment,
+  revenue, design, security). Answer them. Score is calculated, Mode recommended.
+  Reply: "Proceed with this plan" to confirm Mode 1 (Full Army).
+
+PHASE 2 — DESIGN (automatic after Proceed, no more questions)
+  If scope touches auth/payments/compliance → bad-loop gate fires once.
+    Answer: "greenfield / from scratch / I approve" → gate clears → DESIGN starts.
+  Agents fire in sequence — NO picker dialog, NO "Build a Feature" prompt:
+    market_researcher → docs/foundation/market-research.md
+    cto              → docs/foundation/tech-strategy.md
+    product_manager  → docs/foundation/prd.md
+    architect        → docs/foundation/architecture.md + docs/adrs/
+    database_architect → docs/foundation/db-schema.md
+    cloud_architect  → docs/foundation/cloud-architecture.md
+    finops_architect → docs/foundation/finops.md
+    security_engineer → docs/foundation/security-posture.md
+    scrum_master [SM-GATE] → VERDICT: GREEN or RED
+
+PHASE 3 — DEVELOP (triggered by you after SM-GATE GREEN)
+  Type: "start sprint 1"
+  SM-PLAN → story cards → engineering sprint → GATE 5 → SM-RETRO → repeat.
+
+---
+
+## IF YOU SEE "Build a Feature / Fix a Bug / Quick Plan"
+  Do NOT click it. Type: "skip this, start market_researcher now"
+  This dialog is Kiro's native spec picker — the hook blocks it but
+  if it appears, dismissing it and re-prompting starts the agent chain.
 TRIGGER_EOF
 
 echo "     ✅ trigger-prompt.md written"
@@ -268,7 +297,7 @@ check() {
   fi
 }
 
-check "$TARGET/.kiro/hooks/elite-team-orchestrator.kiro.hook" "hook: elite-team-orchestrator"
+check "$TARGET/.kiro/hooks/elite-team-orchestrator.json" "hook: elite-team-orchestrator"
 check "$TARGET/.kiro/steering/loop-engine.md"                  "steering: loop-engine"
 check "$TARGET/.kiro/steering/team-orchestrator-core.md"       "steering: team-orchestrator-core"
 check "$TARGET/.kiro/steering/team-orchestrator-sprint.md"     "steering: team-orchestrator-sprint"
@@ -280,7 +309,7 @@ check "$TARGET/.kiro/memory/checkpoint.md"                     "memory: checkpoi
 check "$TARGET/kiro"                                           "symlink: kiro → .kiro"
 
 # Count what we built
-HOOK_COUNT=$(find "$TARGET/.kiro/hooks/"    -name "*.hook" 2>/dev/null | wc -l | tr -d ' ')
+HOOK_COUNT=$(find "$TARGET/.kiro/hooks/"    -name "*.json" 2>/dev/null | wc -l | tr -d ' ')
 STEER_COUNT=$(find "$TARGET/.kiro/steering/" -name "*.md"  2>/dev/null | wc -l | tr -d ' ')
 SKILL_COUNT=$(find "$TARGET/.kiro/skills/"   -name "*.md"  2>/dev/null | wc -l | tr -d ' ')
 REF_COUNT=$(find "$TARGET/.kiro/reference/"  -type f       2>/dev/null | wc -l | tr -d ' ')
@@ -304,11 +333,18 @@ echo "  Skills    : $SKILL_COUNT files"
 echo "  Reference : $REF_COUNT files  (was docs/research/ — path fixed)"
 echo ""
 echo "  Next steps:"
-echo "    1. Open $TARGET in Kiro"
-echo "    2. Kiro loads hook automatically from .kiro/hooks/"
-echo "    3. Type (or paste from trigger-prompt.md):"
+echo "    1. Edit trigger-prompt.md — fill in your product description + signals"
+echo "    2. Open $TARGET in Kiro — hook loads automatically from .kiro/hooks/"
+echo "    3. Paste trigger-prompt.md into Kiro and send"
 echo ""
-echo "       Build $PROJECT_NAME — [your description here]"
+echo "  Three-phase flow:"
+echo "    THINK  → Hook asks 7 discovery questions → answer them → Mode confirmed"
+echo "    DESIGN → Say 'Proceed' → market_researcher fires immediately (no picker)"
+echo "             → cto → product_manager → architect → ... → SM-GATE"
+echo "    DEVELOP→ Say 'start sprint 1' → engineering pipeline begins"
 echo ""
-echo "  Tip: docs/foundation/, docs/sprint-1/, docs/graph/ are ready for output."
+echo "  If 'Build a Feature' picker appears, type:"
+echo "    skip this, start market_researcher now"
+echo ""
+echo "  Tip: docs/foundation/ docs/sprint-1/ docs/graph/ are ready for agent output."
 echo ""
