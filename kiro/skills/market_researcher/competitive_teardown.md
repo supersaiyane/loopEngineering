@@ -17,6 +17,16 @@ outputs:
 
 # Competitive Teardown
 
+> **DATE-STAMPING (FIX G):** Before any competitor research, execute:
+> ```bash
+> CURRENT_DATE=$(date "+%B %Y")
+> CURRENT_YEAR=$(date "+%Y")
+> ```
+> All web searches MUST include `$CURRENT_DATE`: e.g., "Omnicell pricing $CURRENT_DATE" not "Omnicell pricing".
+> Every competitor data point: `[Source: <URL> | Retrieved: $CURRENT_DATE]`
+> Pricing pages, release notes, job posts older than 6 months: `⚠️ STALE — sourced <period>, may not reflect $CURRENT_DATE state`
+> Any competitor feature from training data only: `⚠️ TRAINING DATA — unverified as of $CURRENT_DATE. Must web-search to confirm.`
+
 A teardown is **not** a feature matrix from their website. It's:
 
 1. **Sign up under a real-looking persona.** Free trial, screenshots,

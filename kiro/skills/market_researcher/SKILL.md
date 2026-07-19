@@ -17,3 +17,26 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - market_sizing_tam_sam_som.md
 - positioning_april_dunford.md
 - pricing_van_westendorp.md
+
+---
+
+## DATE-STAMPING — MANDATORY (FIX G)
+
+**At the start of EVERY market research session, run this shell command:**
+```bash
+CURRENT_DATE=$(date "+%B %Y")
+CURRENT_YEAR=$(date "+%Y")
+```
+
+**Rules:**
+1. Use `$CURRENT_DATE` (e.g., "July 2026") in ALL web search queries:
+   - BAD: "pharmacy adherence platforms market size"
+   - GOOD: "pharmacy adherence platforms market size $CURRENT_DATE"
+2. Tag every data point with its source and retrieval date:
+   - Format: `[Source: <URL or publication> | Retrieved: $CURRENT_DATE]`
+3. Flag any figure that cannot be verified with a live web search:
+   - `⚠️ TRAINING DATA — unverified as of $CURRENT_DATE. Verify before using in business decisions.`
+4. **Never hardcode a year.** Always derive from shell. If shell is unavailable, state:
+   - `[DATE: shell unavailable — using session context date: <date from context>]`
+5. Competitor data older than 6 months = stale. Flag with:
+   - `⚠️ STALE DATA — sourced from <period>, may not reflect current state.`

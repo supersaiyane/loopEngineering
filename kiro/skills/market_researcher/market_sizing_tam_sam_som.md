@@ -15,6 +15,15 @@ outputs:
 
 # TAM / SAM / SOM
 
+> **DATE-STAMPING (FIX G):** Before running any sizing research, execute:
+> ```bash
+> CURRENT_DATE=$(date "+%B %Y")
+> CURRENT_YEAR=$(date "+%Y")
+> ```
+> All web searches MUST include `$CURRENT_DATE` (e.g., "global pharmacy SaaS market size July 2026").
+> Every number must cite source + date: `[Source: <name> | $CURRENT_DATE]`
+> Any number from training data (not from a live search): `⚠️ TRAINING DATA — unverified as of $CURRENT_DATE`
+
 **TAM** (Total Addressable Market) — total spend if everyone with the
 job bought from us.
 **SAM** (Serviceable Addressable Market) — TAM minus segments we can't

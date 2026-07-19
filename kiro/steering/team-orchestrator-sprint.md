@@ -11,6 +11,10 @@ inclusion: manual
 - **Design system gate (Fix 25B)**: BLOCKS Sprint 1 start. web→design_system.md, mobile→design_system_mobile.md.
 - **SM-RETRO**: velocity + DoD + lessons write (5-step protocol) + impl-decisions.md + ADR promotions.
 - **CHECKPOINT write**: Type=SPRINT. Last SPRINT row = session resume point. [Fix 25O/26A]
+- **STORY DONE PROTOCOL (FIX B+C+D+F)**: After every qa_engineer PASS → git commit → knowledge graph HTML → checkpoint.md write → tracker close. ALL 4 mandatory.
+- **TRACKER_MODE (FIX C)**: Detect at SM-PLAN start. jira-mcp=MCP calls. txt=write docs/sprint-N/jira/<ID>.txt. Never skip.
+- **Discipline reports (FIX E)**: SM-RETRO generates docs/reports/sprint-N-discipline.md + appends docs/reports/discipline-dashboard.md.
+- **Memory writes (FIX F)**: flow.md on every gate change, checkpoint.md after every story/sprint, project_map.md at phase end.
 ---
 # Team Orchestrator — Sprint & Phase Gates (Fix 19 split)
 # Loads at: Sprint end (GATE 4 trigger) and Phase end (GATE 5 trigger)
@@ -21,6 +25,38 @@ inclusion: manual
 **Trigger:** User confirms "Proceed to Sprint N+1?" (YES) — before any story is assigned or work begins.
 **AUTO-ACTIVATE: scrum_master [SM-PLAN-TRIGGER]** — fires regardless of story labels.
 **Actions in order:**
+
+#### STEP 0 — TRACKER_MODE DETECTION (FIX C)
+Before creating any stories, detect tracker mode ONCE and hold for entire sprint:
+```
+TRY: $TRACKER.listProjects() or $TRACKER.getProject()
+  → If succeeds (Jira MCP connected): TRACKER_MODE=jira-mcp
+      → Use $TRACKER.createStory() / transitionIssue() / addComment() as per core.md
+  → If fails / tool unavailable: TRACKER_MODE=txt
+      → Create directory: docs/sprint-N/jira/
+      → For EACH story card written in docs/sprint-N/stories/<ID>.md, ALSO write
+         docs/sprint-N/jira/<STORY-ID>.txt with this template:
+```
+```
+STORY_ID: <ID>
+TITLE: <story title>
+STATUS: To Do
+EPIC: <epic name>
+STORY_POINTS: <N>
+SPRINT: Sprint N
+LABELS: <labels>
+ASSIGNEE: <role>
+SPRINT_GOAL: <goal>
+ACCEPTANCE_CRITERIA:
+  <AC items from story card — one per line>
+DESCRIPTION:
+  <full story description>
+CREATED_AT: <ISO date>
+LAST_UPDATED: <ISO date>
+```
+Log: `[TRACKER-DETECT: TRACKER_MODE=<jira-mcp|txt> | Sprint N]`
+**RULE:** TRACKER_MODE is set once at step 0. Never re-detect mid-sprint. All story-close events use the same mode.
+
 1. `scrum_master` [SM-PLAN mode]:
    - Load kiro/skills/scrum_master/sprint_planning_facilitation.md
    - Load kiro/skills/scrum_master/sprint_artifacts.md
@@ -34,6 +70,91 @@ inclusion: manual
    - If any story in Sprint N+1 involves NEW services, NEW modules, or crosses component boundaries →
      load kiro/skills/architect/system_design_workshop.md for those stories
    - Otherwise: skip (architecture already established)
+
+---
+
+### STORY DONE PROTOCOL (FIX B + FIX C + FIX D + FIX F-story)
+
+**Trigger:** `qa_engineer` emits `[GATE3: PASS]` for a story.
+**ALL 4 steps are MANDATORY. Log each. Story is NOT closed until all 4 complete.**
+
+#### Step 1 — Git Commit (FIX B)
+Immediately after GATE3 PASS:
+```bash
+git add -A
+git commit -m "<type>(<scope>): <description> — story <STORY-ID> [Sprint N]"
+```
+- `type`: `feat` | `fix` | `test` | `refactor` | `docs` | `chore`
+- `scope`: primary label of story (e.g. `be/api`, `fe/component`, `mobile/ios`)
+- `description`: ≤60 chars, present tense, what was built
+- Use conventional commits format only. No freeform messages.
+
+Log: `[GIT: committed | story=<STORY-ID> | type=<type> | sprint=N]`
+
+**RULE:** Never batch multiple stories into one commit. One story = one commit minimum.
+
+#### Step 2 — Per-Story Knowledge Graph (FIX D)
+After git commit, write `docs/graph/knowledge-graph-sprint-N-story-<STORY-ID>.html` — self-contained D3 v7 force-directed graph showing everything this story touched.
+
+**Node requirements:**
+- Include every service / module / table / API endpoint / UI component created OR modified by this story
+- Node schema: `{ id, type, label, file_path, story_id, sprint }`
+- Node types (with color): `service`=#4299e1 · `api`=#63b3ed · `datastore`=#48bb78 · `ui_component`=#ed8936 · `security_policy`=#e53e3e · `external`=#a0aec0
+
+**Edge requirements:**
+- Edge schema: `{ source, target, label }`
+- Edge labels: `calls` | `reads` | `writes` | `authenticates` | `validates` | `emits`
+
+**HTML structure (D3 v7, fully self-contained):**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Knowledge Graph — Sprint N · Story <STORY-ID></title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <style>
+    body { margin: 0; background: #1a1a2e; color: #eee; font-family: sans-serif; }
+    #graph { width: 100vw; height: 100vh; }
+    .tooltip { position: absolute; background: #2d2d4e; padding: 8px 12px; border-radius: 4px; font-size: 12px; pointer-events: none; }
+    .legend { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); padding: 8px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+<div id="header" style="padding:8px 16px;background:#2d2d4e">
+  <strong>Sprint N · Story <STORY-ID></strong> — <span id="counts">nodes=N · edges=N</span>
+</div>
+<svg id="graph"></svg>
+<div class="legend"><!-- color legend for node types --></div>
+<div class="tooltip" id="tooltip" style="display:none"></div>
+<script>
+  const nodes = [ /* { id, type, label, file_path } */ ];
+  const links = [ /* { source, target, label } */ ];
+  /* D3 v7 forceSimulation + zoom + drag + tooltip on mouseover */
+  /* Arrow markers for directed edges */
+  /* node click → highlight connected nodes */
+</script>
+</body>
+</html>
+```
+
+Log: `[GRAPH-STORY: docs/graph/knowledge-graph-sprint-N-story-<STORY-ID>.html | nodes=N | edges=N]`
+
+**RULE:** Do NOT skip even for simple stories. A story with 2 files = a graph with ≥2 nodes.
+
+#### Step 3 — Checkpoint Write (FIX F)
+After knowledge graph is written, append to `kiro/memory/checkpoint.md`:
+```
+| <YYYY-MM-DD HH:MM> | Story <STORY-ID> DONE | COMPLETE | <key files changed — comma-separated> | docs/sprint-N/stories/<STORY-ID>.md |
+```
+Log: `[CHECKPOINT: story <STORY-ID> logged | kiro/memory/checkpoint.md updated]`
+
+#### Step 4 — Tracker Close (FIX C)
+Route based on TRACKER_MODE detected at SM-PLAN step 0:
+- `TRACKER_MODE=jira-mcp` → `jira.transitionIssue(id, "Done")` + `jira.addComment(id, "QA PASSED: coverage=X% · git=<sha> · graph=✅")`
+- `TRACKER_MODE=txt` → update `docs/sprint-N/jira/<STORY-ID>.txt`: set `STATUS: Done`, add `COMPLETED_AT: <ISO>`, append `QA_NOTES: coverage=X% · git=<sha>`
+
+Log: `[TRACKER-CLOSE: story <STORY-ID> | mode=<jira-mcp|txt> | status=Done]`
 
 ---
 
@@ -85,6 +206,20 @@ inclusion: manual
         Log: `[IMPL-DECISIONS: N entries reviewed, N promoted to ADR/lessons, N queued, N skipped-dedup]`
         If nothing to promote: log `[IMPL-DECISIONS: N entries reviewed, 0 promoted]`
     5. Log: `[MEMORY WRITE: N entries updated/added, N ADRs updated]`
+    5b. FLOW STATE WRITE (FIX F): Write `kiro/memory/flow.md`:
+        ```
+        Current Sprint: N (COMPLETE)
+        Phase: <N>
+        Gate Status: GATE 4 PASSED — Sprint N done
+        Sprint N result: shipped <X>/<Y> stories | velocity <Z> pts | carry <N>
+        Last updated: <YYYY-MM-DD HH:MM>
+        ```
+        Log: `[FLOW: kiro/memory/flow.md updated | sprint=N | status=COMPLETE]`
+    5c. CHECKPOINT WRITE (FIX F): Append to `kiro/memory/checkpoint.md`:
+        ```
+        | <YYYY-MM-DD HH:MM> | Sprint N END — SM-RETRO complete | COMPLETE | lessons.md + decisions.md + flow.md | docs/sprint-N/sprint-plan.md |
+        ```
+        Log: `[CHECKPOINT: sprint N end logged | kiro/memory/checkpoint.md updated]`
     6. MEMORY REFRESH — re-inject into active context the 3 most recently written/upgraded entries:
        Pull last 3 entries by date from kiro/memory/lessons.md after step 5 write completes.
        LESSON PROJECT SCOPE (Fix 25Q): Load lessons WHERE:
@@ -137,6 +272,51 @@ inclusion: manual
      ⚠️ LESSON AGE BLOCK: [N] Stage-1-Fail lessons are stale (>1 sprint old with no progression).
      Sprint N+1 is blocked. Required: for each stale lesson, move to Stage 2 (Investigate) or
      document why it's deprioritized. Reply "Lessons reviewed — resume sprint N+1" to continue.
+
+3b. `scrum_master` [DISCIPLINE-SPRINT — FIX E]:
+   After SM-RETRO completes, generate `docs/reports/sprint-N-discipline.md`:
+   ```markdown
+   # Sprint N Discipline Report — <PROJECT_NAME>
+   Date: <YYYY-MM-DD>
+
+   ## Story Completion
+   | Stories committed | Stories done | Carry-over | Completion rate |
+   |---|---|---|---|
+   | N | N | N | N% |
+
+   ## Engineering Discipline
+   | Check | Compliant | Violations | Notes |
+   |---|---|---|---|
+   | Git commit after every story (FIX B) | Y/N | N | list any skipped |
+   | Tracker updated per story (FIX C) | Y/N | N | list any skipped |
+   | Knowledge graph per story (FIX D) | Y/N | N | list any skipped |
+   | Checkpoint.md updated per story (FIX F) | Y/N | N | list any skipped |
+   | Memory writes at sprint end (FIX F) | Y/N | N | |
+
+   ## QA Metrics
+   | Metric | Value |
+   |---|---|
+   | QA PASS rate | N% |
+   | Test coverage delta | ±N% |
+   | Regressions found | N |
+
+   ## Velocity
+   | Metric | Value |
+   |---|---|
+   | Points committed | N |
+   | Points delivered | N |
+   | Velocity trend | ↑/↓/→ vs Sprint N-1 |
+
+   ## Grade: GREEN / YELLOW / RED
+   GREEN = ≥80% completion, 100% FIX compliance, ≥90% QA PASS
+   YELLOW = 60-79% completion OR any FIX violations
+   RED = <60% completion OR multiple FIX violations
+   ```
+   Append one summary row to `docs/reports/discipline-dashboard.md`:
+   ```
+   | Sprint N | <X>/<Y> | <Z> pts | <QA%> | <git Y/N> | <tracker Y/N> | <memory Y/N> | GREEN/YELLOW/RED |
+   ```
+   Log: `[DISCIPLINE: sprint-N-discipline.md written | dashboard updated | grade=<grade>]`
 
 **Announce:** `"Sprint N complete. Shipped: X/Y stories. Velocity: Z pts. Blockers carried: N. Proceed to Sprint N+1?"`
 Wait for explicit YES.
@@ -270,7 +450,27 @@ When GATE 5 passes:
    - Log: `[GRAPH-MERGE: COMPLETE | sprint-html=✅ | live-html=✅ | patches-cleaned=N | GATE5-unblocked]`
 
    **HARD RULE:** GATE 5 cannot close until `[GRAPH-MERGE: COMPLETE]` is logged. The HTML files are NOT optional. This was the root failure in GAP-48C — YAML was merged but HTML was silently skipped.
-5. Announce: `"Phase N CLOSED. QA: GREEN. Security: GREEN. Docs: UPDATED. Graph: MERGED. Ready to begin Phase N+1?"`
+4b. `architect` [PROJECT-MAP-UPDATE — FIX F]:
+   Update `kiro/memory/project_map.md` — add all new modules/services shipped this phase.
+   For each new service/module/datastore not yet in the map:
+     → Add row to Module Directory table: `| <directory> | <responsibility> | <key files> | <dependencies> |`
+   For each module significantly changed this phase:
+     → Update its row with new key files or dependency changes.
+   Update `kiro/memory/flow.md`:
+   ```
+   Current Sprint: N (PHASE N COMPLETE)
+   Phase: N → CLOSED
+   Gate Status: GATE 5 PASSED
+   Phase N result: <X> sprints | <Y> stories shipped | <Z> deferred
+   Last updated: <YYYY-MM-DD HH:MM>
+   ```
+   Append to `kiro/memory/checkpoint.md`:
+   ```
+   | <YYYY-MM-DD HH:MM> | Phase N CLOSED — GATE 5 PASSED | COMPLETE | project_map.md + flow.md updated | docs/phase-N/QA-REPORT.md |
+   ```
+   Log: `[MAP-UPDATE: kiro/memory/project_map.md | N modules added/updated | GATE5 checkpoint written]`
+
+5. Announce: `"Phase N CLOSED. QA: GREEN. Security: GREEN. Docs: UPDATED. Graph: MERGED. Map: UPDATED. Ready to begin Phase N+1?"`
 5. Wait for explicit YES before starting next phase
 
 **Non-negotiable:** Code in Phase N+1 CANNOT begin while GATE 5 is RED. No "we'll fix it later" carries.

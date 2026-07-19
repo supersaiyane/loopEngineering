@@ -56,7 +56,7 @@ fi
 
 # ── 1. Create directory skeleton ───────────────────────────────────────────────
 echo "1/8  Creating directory structure..."
-mkdir -p "$TARGET"/{docs/{foundation,graph,research},services,infra/terraform,scripts}
+mkdir -p "$TARGET"/{docs/{foundation,graph,reports,research},services,infra/terraform,scripts}
 mkdir -p "$TARGET/.kiro"/{hooks,steering,skills,adapters,memory,reference}
 echo "     ✅ directories created"
 
@@ -221,7 +221,49 @@ for f in checkpoint decisions flow project_map lessons; do
   fi
 done
 
-echo "     ✅ memory initialized (checkpoint + decisions + flow + project_map + lessons)"
+# baseline.md — sprint discipline baseline (FIX E)
+cat > "$TARGET/docs/reports/baseline.md" << BASELINE_EOF
+# Discipline Baseline — $PROJECT_NAME
+
+**Created:** $(date +%Y-%m-%d)
+**Framework:** Loop Engineering v9.5
+
+## Sprint 0 Baseline (project start)
+
+| KPI | Baseline | Sprint 1 Target |
+|-----|---------|-----------------|
+| Velocity | 0 pts | TBD after Sprint 1 |
+| Story completion rate | — | ≥ 80% |
+| QA PASS rate | — | ≥ 90% |
+| Git commit compliance | — | 100% |
+| Jira/tracker update compliance | — | 100% |
+| Memory write compliance | — | 100% |
+
+## Discipline Dashboard
+
+*Sprint reports: docs/reports/sprint-N-discipline.md*
+*Cumulative dashboard: docs/reports/discipline-dashboard.md*
+
+| Sprint | Completion | QA PASS | Git Commits | Tracker | Memory | Grade |
+|--------|-----------|---------|-------------|---------|--------|-------|
+| (populated by SM-RETRO after each sprint) | | | | | | |
+
+BASELINE_EOF
+
+# discipline-dashboard.md — cumulative (FIX E)
+cat > "$TARGET/docs/reports/discipline-dashboard.md" << DASH_EOF
+# Discipline Dashboard — $PROJECT_NAME
+
+**Framework:** Loop Engineering v9.5
+**Created:** $(date +%Y-%m-%d)
+
+| Sprint | Stories Done | Velocity | QA PASS | Git Commits | Tracker Updates | Memory Writes | Grade |
+|--------|-------------|---------|---------|-------------|-----------------|---------------|-------|
+
+*(Appended by SM-RETRO at end of each sprint)*
+DASH_EOF
+
+echo "     ✅ memory initialized (checkpoint + decisions + flow + project_map + lessons + baseline)"
 
 # ── 6. Create kiro ↔ .kiro symlink ────────────────────────────────────────────
 echo "6/8  Creating symlink kiro → .kiro..."
@@ -292,7 +334,7 @@ TRIGGER_EOF
 echo "     ✅ trigger-prompt.md written"
 
 # ── 8. Verify and print summary ────────────────────────────────────────────────
-echo "8/8  Verifying bootstrap..."
+echo "8/9  Verifying bootstrap..."
 
 ERRORS=0
 
@@ -318,6 +360,8 @@ check "$TARGET/.kiro/memory/checkpoint.md"                     "memory: checkpoi
 check "$TARGET/kiro"                                           "symlink: kiro → .kiro"
 check "$TARGET/scripts/bootstrap-project.sh"                   "script: bootstrap-project.sh"
 check "$TARGET/scripts/start-kiro-pxpipe.sh"                   "script: start-kiro-pxpipe.sh"
+check "$TARGET/docs/reports/baseline.md"                       "report: discipline baseline"
+check "$TARGET/docs/reports/discipline-dashboard.md"           "report: discipline dashboard"
 
 # Count what we built
 HOOK_COUNT=$(find "$TARGET/.kiro/hooks/"    -name "*.json" 2>/dev/null | wc -l | tr -d ' ')
@@ -335,6 +379,16 @@ else
   echo "║  ⚠️   Bootstrap complete with $ERRORS error(s)               "
   echo "╚══════════════════════════════════════════════════════════════╝"
 fi
+
+# ── 9. Git init + initial commit (FIX A) ──────────────────────────────────────
+echo "9/9  Initializing git repository..."
+(
+  cd "$TARGET"
+  git init -q
+  git add -A
+  git commit -q -m "chore: bootstrap Loop Engineering v9.5 — $PROJECT_NAME"
+)
+echo "     ✅ git repository initialized + initial commit"
 
 echo ""
 echo "  Location  : $TARGET"

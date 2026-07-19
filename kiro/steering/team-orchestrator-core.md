@@ -481,6 +481,19 @@ Skill: `.kiro/skills/scrum_master/prebuild_documentation_gate.md`
 **If ANY item RED:** SM-GATE blocks. Names the role responsible. Does not proceed.
 **If ALL GREEN:** SM-GATE announces `"VERDICT: GREEN — DESIGN approved."` Then SM-PLAN fires (separate call).
 
+**FLOW STATE WRITE (FIX F):** Immediately on GATE GREEN, write `kiro/memory/flow.md`:
+```
+Current Sprint: 0 (pre-sprint)
+Phase: DESIGN → DEVELOP transition
+Gate Status: SM-GATE PASSED — DESIGN approved
+Last updated: <YYYY-MM-DD HH:MM>
+```
+And append to `kiro/memory/checkpoint.md`:
+```
+| <YYYY-MM-DD HH:MM> | SM-GATE VERDICT: GREEN | COMPLETE | All DESIGN artifacts approved | docs/foundation/prd.md |
+```
+Log: `[FLOW: kiro/memory/flow.md written | gate=SM-GATE | status=GREEN]` `[CHECKPOINT: SM-GATE GREEN logged]`
+
 **→ PRODUCE FOUNDATION ROADMAP (Scrum Master):**
 
 Before Jira creation, `scrum_master` produces `/docs/foundation/roadmap.md` — the master execution plan:
@@ -615,7 +628,7 @@ Jira is not a one-time creation. Every status change, blocker, decision, and com
 | Story moves to In Progress | `jira.transitionIssue(id, status="In Progress")` + add comment with sprint goal reminder |
 | Blocker discovered | `jira.addComment(id, "BLOCKED: <what> — needs <who> — ETA <date>")` + `jira.flagIssue(id)` |
 | Blocker resolved | `jira.addComment(id, "UNBLOCKED: <resolution>")` + `jira.unflagIssue(id)` |
-| Design decision made (ADR) | `jira.addComment(id, "ADR-NNN decided: <one-line decision> — see .kiro/init_kiro/memory/decisions.md")` |
+| Design decision made (ADR) | `jira.addComment(id, "ADR-NNN decided: <one-line decision> — see kiro/memory/decisions.md")` **AND** write to `kiro/memory/decisions.md`: `\| ADR-NNN \| Sprint N \| <decision> \| <rationale> \| <alternatives rejected> \|` — Log: `[DECISIONS: ADR-NNN written to kiro/memory/decisions.md]` |
 | Sub-task completed | `jira.transitionIssue(subtask_id, status="Done")` + `jira.addComment(story_id, "Sub-task <name> done by <role>")` |
 | QA pass | `jira.addComment(id, "QA PASSED: coverage=X% · contracts=green · load=within targets · security=clean")` |
 | QA fail | `jira.addComment(id, "QA FAILED: <specific failure> — returned to <role>")` + transition back to In Progress |
