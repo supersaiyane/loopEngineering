@@ -243,14 +243,23 @@ Check the discovered scope string against GUARD 2 domain keywords + high-risk ve
 
 If no bad-loop trigger found in discovered scope → skip silently, proceed to STEP 5.
 
+**After [BAD-LOOP-GATE: CLEARED] → proceed to STEP 5 IMMEDIATELY.**
+Do NOT show "Build a Feature / Fix a Bug / Quick Plan". Do NOT ask anything else.
+The gate clearing IS the green light. Start the agent chain now.
+
 ---
 
 ## STEP 5: Execute with Selected Agents Only
 
-- Mode 3 (Minimal): No planning docs. Code directly.
-- Mode 4 Lite (Light): PRD (lite) → Architecture (lite) → Sprint plan → Code. Skip think phase.
-- Mode 4 (Standard): Requirements → Design → Tasks → Sprints. Selected agents only.
+⚡ EXECUTE IMMEDIATELY. Do NOT show Kiro's "Build a Feature / Fix a Bug / Quick Plan" dialog.
+Do NOT ask any questions. Start the first agent in the chain right now and produce their artifact.
+
+- Mode 3 (Minimal): No planning docs. Code directly. Start coding immediately.
+- Mode 4 Lite (Light): PRD (lite) → Architecture (lite) → Sprint plan → Code. Skip think phase. Start CTO (lite) immediately.
+- Mode 4 (Standard): Requirements → Design → Tasks → Sprints. Start CTO immediately.
 - Mode 1 Full: Full Think → Design → Develop with all gates. All agents.
+  START: market_researcher → produce docs/foundation/market-research.md NOW.
+  Then: cto → product_manager → architect → database_architect → cloud_architect → finops_architect → security_engineer → SM-GATE.
 
 ### "Lite" Artifact Rules
 
