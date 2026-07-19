@@ -14,6 +14,18 @@
       }
     },
     {
+      "name": "Block spec picker (user_input) until DESIGN chain starts",
+      "description": "Blocks Kiro's user_input tool when it would show the 'Build a Feature / Fix a Bug / Quick Plan' picker before the Loop Engineering DESIGN agent chain has produced any artifacts. Once market-research.md or prd.md exists, unblocked.",
+      "trigger": "PreToolUse",
+      "matcher": "user_input",
+      "enabled": true,
+      "action": {
+        "type": "command",
+        "command": "if [ -f docs/prd.md ] || [ -f .kiro/specs/requirements.md ] || [ -f docs/foundation/project-index.md ] || [ -f docs/foundation/market-research.md ]; then exit 0; else echo 'BLOCKED by Loop Engineering: Do NOT call user_input or show a spec picker. Discovery is complete and Mode is confirmed. Start the DESIGN agent chain immediately: write docs/foundation/market-research.md now using file write tools. Do not prompt the user with any dialog — produce the market research artifact directly.' >&2; exit 2; fi",
+        "timeout": 5000
+      }
+    },
+    {
       "name": "Orchestrator Router",
       "description": "Kiro-native integration (v4, migrated to IDE 1.0 hook schema). Stays silent during Kiro spec phase. Activates Loop Engineering DEVELOP pipeline (GUARD 4, role contracts, sprint gates, SM-RETRO) when specs are ready. Delegates all role execution to team-orchestrator-core.md.",
       "trigger": "UserPromptSubmit",
