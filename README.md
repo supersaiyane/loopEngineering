@@ -7,7 +7,7 @@
 ![Phase](https://img.shields.io/badge/phase%201-complete%20%E2%9C%85-brightgreen?style=for-the-badge)
 ![Dry Runs](https://img.shields.io/badge/dry%20runs-v11-blue?style=for-the-badge)
 ![Ship Confidence](https://img.shields.io/badge/ship%20confidence-9.5%2F10-success?style=for-the-badge)
-![Fixes](https://img.shields.io/badge/fixes%20implemented-61%20%E2%9C%85-orange?style=for-the-badge)
+![Fixes](https://img.shields.io/badge/fixes%20implemented-68%20%E2%9C%85-orange?style=for-the-badge)
 ![Roles](https://img.shields.io/badge/agent%20roles-22-purple?style=for-the-badge)
 ![Skill Files](https://img.shields.io/badge/skill%20files-173%20wired-informational?style=for-the-badge)
 ![pxpipe](https://img.shields.io/badge/pxpipe-token%20compression%20%E2%88%9260%25-ff6b35?style=for-the-badge)
@@ -114,7 +114,7 @@ Agents do the work → quality gates run → code merges
                       │
                       ▼
 ┌─────────────────────────────────────────────────────────┐
-│         HOOK  (elite-team-orchestrator.kiro.hook)       │
+│         HOOK  (elite-team-orchestrator.json)            │
 │  ≤60 lines · thin router · reads ENV, classifies task   │
 │                                                         │
 │  STEP 0: Is this trivial? → Mode 3 (direct answer)     │
@@ -315,21 +315,26 @@ At the end of every sprint, the Scrum Master runs a 4-question binary check (yes
 loopEngineering/
 │
 ├── 📄 README.md                    ← You are here
+├── 📄 CONTRIBUTING.md              ← Reproduction guide + citation format
+├── 📄 LICENSE                      ← MIT License (Fix 45A)
+├── 📄 index.html                   ← Showcase website (one-pager)
+├── 📄 context_index.md             ← Function-level index of the whole system
+├── 📄 project_map.md               ← Module-level map of the whole system
 ├── 🔗 .kiro → kiro/                ← Symlink: Kiro reads from here
 │
 ├── 📂 kiro/                        ← All orchestration files live here
 │   │
 │   ├── 📂 hooks/
-│   │   └── elite-team-orchestrator.kiro.hook  ← Entry point (≤60 lines)
+│   │   └── elite-team-orchestrator.json  ← Entry point (Kiro hook definition)
 │   │
 │   ├── 📂 steering/                ← The constitution (14 files)
 │   │   ├── orchestrator-routing.md      ← Mode routing + phase/event auto-triggers (Fix 47B)
-│   │   ├── team-orchestrator-core.md    ← Core execution rules
-│   │   ├── team-orchestrator-sprint.md  ← Sprint lifecycle + GATE 5 graph merge (Fix 46A)
+│   │   ├── team-orchestrator-core.md    ← Core execution rules + ADR decisions.md writes (FIX F)
+│   │   ├── team-orchestrator-sprint.md  ← Sprint lifecycle + STORY DONE PROTOCOL (FIX B/C/D/E/F)
 │   │   ├── team-orchestrator-rules.md   ← NON-NEGOTIABLES + GATE S1/S2
 │   │   ├── discovery-engine.md          ← 7-question discovery + scoring
 │   │   ├── ponytail.md                  ← 7-rung ladder enforcement
-│   │   ├── session-guards.md            ← GUARD 1 + GUARD 2 + GUARD 3 (pxpipe)
+│   │   ├── session-guards.md            ← GUARD 1 + GUARD 2 + GUARD 3 (pxpipe) + GUARD 4
 │   │   ├── skill-selection-matrix.md    ← Story label → skill file mapping (119 rows, Fix 47C/D)
 │   │   ├── skill-label-index.md         ← 173 skill files indexed across 22 roles (Fix 47A)
 │   │   ├── loop-engine.md               ← PLAN→DO→VERIFY→DECIDE loop spec
@@ -345,40 +350,48 @@ loopEngineering/
 │   │   ├── project_map.md          ← Module-level map of the whole system
 │   │   └── flow.md                 ← End-to-end system flow reference
 │   │
-│   ├── 📂 reference/               ← Framework reference docs (NEW — replaces docs/research/)
-│   │   ├── ponytail-rung-disqualification-guide.md
-│   │   ├── compression-fidelity-methodology.md
-│   │   └── ... (5 more reference files)
-│   │
 │   ├── 📂 skills/                  ← 22 agent roles, 173 wired skill files
-│   │   ├── cto/                    ← CTO skill library
+│   │   ├── cto/                    ← CTO skill library (10 files)
 │   │   ├── architect/              ← Architect skills + product_graph_update.md (Fix 46A)
-│   │   ├── security_engineer/      ← Security skills
-│   │   ├── backend_lead/           ← Backend skills
+│   │   ├── security_engineer/      ← Security skills (24 files)
+│   │   ├── backend_lead/           ← Backend skills (14 files)
 │   │   ├── ... (18 more roles)
 │   │   └── shared/                 ← Cross-role shared skills + graph_patch_emit.md (Fix 46A)
 │   │
-│   ├── 📄 CLAUDE.md               ← Active fix register + pxpipe note
-│   └── 📄 CLAUDE-implemented.md   ← Full history: Fix 1–47D
+│   └── 📂 adapters/                ← Platform adapter files
+│       ├── claude-system-prompt.md      ← Paste into Claude Project Instructions
+│       ├── claude-setup-guide.md        ← Detailed Claude setup walkthrough
+│       ├── chatgpt-system-prompt.md     ← Paste into ChatGPT Instructions
+│       └── chatgpt-setup-guide.md       ← Detailed ChatGPT setup walkthrough
 │
 ├── 📂 scripts/                     ← Utility scripts
-│   ├── bootstrap-project.sh        ← One-command new project scaffolder (NEW)
+│   ├── bootstrap-project.sh        ← One-command new project scaffolder (FIX A: git init)
 │   └── start-kiro-pxpipe.sh        ← Launch Kiro through pxpipe proxy
 │
-├── 📄 gstack-research.md           ← R&D: gstack vs Loop Engineering analysis
-├── 📄 pxpipe-research.md           ← R&D: pxpipe token compression assessment
-├── 📄 oneagent-search.md           ← R&D: 67TB logs/metrics/traces search architecture
+├── 📂 healthguard-pro/             ← Live demo project (MedVault Sprint 1 — FIX A–G validated)
+│   ├── services/                   ← Go microservices (auth, patient, billing, alerting, ML)
+│   ├── apps/                       ← Frontend apps (clinician dashboard, patient mobile)
+│   ├── infra/terraform/            ← IaC: us-east-1 + eu-west-1 modules
+│   ├── docs/                       ← PRD, TRD, 5 ADRs, sprint-1/, schemas, graph/
+│   └── kiro/memory/                ← Project-specific checkpoint + lessons
 │
-└── 📂 docs/                        ← Evidence, decisions, artifacts
+└── 📂 docs/                        ← Evidence, decisions, research artifacts
     ├── product-graph.yaml          ← Living product knowledge graph (Fix 46A)
     ├── product-graph.html          ← D3 interactive graph viz, updated each GATE 5 (Fix 46A)
-    ├── ponytail-rung-disqualification-guide.md  ← Dep disqualification protocol
-    ├── dry-run-*.md                ← 11 full pipeline verification runs
-    ├── Audits/
-    │   └── external-validator-outreach.md  ← R1: HN/Reddit/LinkedIn/Discord posts (R1)
-    └── research/
+    ├── CLAUDE-working.md           ← Active fix register (68 fixes)
+    ├── CLAUDE-implemented.md       ← Full implementation history: Fix 1–FIX G
+    ├── Audits/                     ← 12 dry run files + system review audits
+    │   └── external-validator-outreach.md  ← R1: HN/Reddit/LinkedIn/Discord posts
+    ├── white-paper/
+    │   ├── loop-engineering-white-paper-v5.docx
+    │   └── loop-engineering-white-paper-v5.pdf  ← 34pp publication draft
+    └── research/                   ← R&D research files
+        ├── GOAT.md                          ← Honest gap + strength inventory
+        ├── competitor-comparison.md          ← Fix 45C: MemGPT, LangMem, Devin
         ├── compression-fidelity-methodology.md  ← Fix 45B: exact test methodology
-        └── competitor-comparison.md             ← Fix 45C: MemGPT, LangMem, Devin comparison
+        ├── gstack-research.md               ← gstack vs Loop Engineering analysis
+        ├── oneagent-search.md               ← 67TB logs/metrics/traces architecture
+        └── ponytail-rung-disqualification-guide.md  ← Dep disqualification protocol
 ```
 
 ---
@@ -395,7 +408,7 @@ loopEngineering/
 | `ponytail.md` | **Always** | 7-rung ladder — loaded before any agent fires |
 | `session-guards.md` | **Always** | GUARD 1 (constraint drift) + GUARD 2 (bad loop) + GUARD 3 (pxpipe image context) |
 | `skill-selection-matrix.md` | On demand | Maps story labels → exact skill files to load |
-| `skill-label-index.md` | On demand | Filename index for all 254 skill files |
+| `skill-label-index.md` | On demand | Filename index for all 173 skill files across 22 roles |
 | `loop-engine.md` | On demand | PLAN→DO→VERIFY→DECIDE loop specification |
 | `context-memory-discipline.md` | On demand | Token budgets, degradation tiers (PEAK→CRITICAL) |
 | `memory-management.md` | On demand | How to write, promote, and expire lessons |
@@ -488,14 +501,15 @@ This system runs on **three platforms**. Pick the one you use.
 
 #### How the Kiro integration works — Phase Split model
 
-Loop Engineering uses a **two-phase model** that works with Kiro's native behavior, not against it:
+Loop Engineering uses a **three-phase model** (THINK → DESIGN → DEVELOP) that works with Kiro's native behavior, not against it:
 
 | Phase | Owner | What happens |
 |-------|-------|-------------|
-| **Spec phase** | Kiro native | Type your build prompt → Kiro asks "Build a Feature?" → generates `requirements.md` + `design.md` in `.kiro/specs/` |
-| **Develop phase** | Loop Engineering | Say "start sprint 1" → hook activates: GUARD 4, sprint planning, story cards, role contracts, gates, SM-RETRO |
+| **THINK phase** | Kiro native | Type your build prompt → Kiro asks "Build a Feature?" → discovery questions, market context, constraints captured |
+| **DESIGN phase** | Kiro native | Kiro generates `requirements.md` + `design.md` in `.kiro/specs/` — PRD, TRD, ADRs, schema produced |
+| **DEVELOP phase** | Loop Engineering | Say "start sprint 1" → hook activates: GUARD 4, sprint planning, story cards, role contracts, gates, SM-RETRO |
 
-The hook stays silent during the spec phase — it activates automatically when specs exist and development begins.
+The hook stays silent during the THINK and DESIGN phases — it activates automatically when specs exist and development begins.
 
 #### Step 1 — Bootstrap a new project (recommended)
 
@@ -507,12 +521,12 @@ cd ~/MyTechExploration/loopEngineering
 ```
 
 This creates `~/Projects/MyProjectName/` with everything pre-wired:
-- `.kiro/hooks/` — hook v4 (Kiro-native integration)
+- `.kiro/hooks/` — `elite-team-orchestrator.json` (Kiro-native THREE-PHASE hook)
 - `.kiro/steering/` — all 14 steering files
-- `.kiro/skills/` — all 281 skill files
-- `.kiro/reference/` — framework reference docs (ponytail guide etc.) — path already fixed
-- `.kiro/memory/` — fresh checkpoint, decisions, lessons (Stage 4 framework universals)
+- `.kiro/skills/` — all 173 skill files across 22 roles
+- `.kiro/memory/` — fresh checkpoint.md, decisions.md, lessons.md, flow.md, project_map.md
 - `kiro → .kiro` symlink created automatically
+- `git init` + initial commit run automatically (FIX A)
 - `trigger-prompt.md` — fill-in template ready to paste into Kiro
 
 #### Step 2 — Or set up manually (existing project)
@@ -525,9 +539,9 @@ ln -s kiro .kiro    # Kiro reads .kiro/, this repo uses kiro/
 
 Verify:
 ```bash
-ls .kiro/hooks/       # → elite-team-orchestrator.kiro.hook
+ls .kiro/hooks/       # → elite-team-orchestrator.json
 ls .kiro/steering/    # → 14 steering files
-ls .kiro/reference/   # → ponytail guide + framework reference docs
+ls .kiro/memory/      # → checkpoint.md, lessons.md, decisions.md, flow.md, project_map.md
 ```
 
 #### Step 3 — Open in Kiro and run the spec phase
@@ -597,8 +611,8 @@ Click **"Add Content" → "Upload files"** and upload these from `kiro/steering/
 | `session-guards.md` | GUARD 1 + GUARD 2 |
 
 **Optional (recommended for existing projects):**
-- `docs/lessons.md` — past lessons (HIGH-confidence rules apply immediately)
-- `docs/decisions.md` — ADR constraints (bind all roles)
+- `kiro/memory/lessons.md` — past lessons (HIGH-confidence rules apply immediately)
+- `kiro/memory/decisions.md` — ADR constraints (bind all roles)
 
 #### Step 4 — Start your first session
 
@@ -721,7 +735,7 @@ kiro/adapters/
 └── chatgpt-setup-guide.md     ← Detailed ChatGPT setup walkthrough
 ```
 
-> Both system prompts are synced to **Fix 43C · Dry Run v11 · 9.5/10 ship confidence.**
+> Both system prompts are synced to **FIX A–G · Dry Run v11 · 9.5/10 ship confidence · 68 fixes implemented.**
 
 ---
 
@@ -782,16 +796,16 @@ Full analysis in [`pxpipe-research.md`](pxpipe-research.md), including:
 
 ## 🔧 The Fix Register — What Was Built
 
-This system was built across **47D+ incremental fixes** over multiple sessions. **Phase 1 is complete as of 2026-07-17.**
+This system was built across **68 fix cycles** (FIX A–G from live MedVault Sprint 1 testing) over multiple sessions. **Phase 1 is complete as of 2026-07-19.**
 
-![Fixes](https://img.shields.io/badge/fix%20cycles-Fix%201--47D-blue) ![Phase](https://img.shields.io/badge/phase%201-complete-brightgreen) ![Skills](https://img.shields.io/badge/skill%20files%20wired-173-informational)
+![Fixes](https://img.shields.io/badge/fix%20cycles-FIX%20A--G-blue) ![Phase](https://img.shields.io/badge/phase%201-complete-brightgreen) ![Skills](https://img.shields.io/badge/skill%20files%20wired-173-informational)
 
 ### By Type
 
 | Type | Count | Description |
 |------|-------|-------------|
-| 🚀 **Feature** | 22 | New capabilities added to the system |
-| 🔧 **Fix** | 18 | Bugs and gaps patched |
+| 🚀 **Feature** | 27 | New capabilities added to the system |
+| 🔧 **Fix** | 20 | Bugs and gaps patched |
 | 🛡️ **Guard** | 7 | Runtime protection mechanisms |
 | 🚪 **Gate** | 8 | Quality enforcement checkpoints |
 | 🏗️ **Architecture** | 5 | Structural changes to how files are organized |
@@ -820,10 +834,17 @@ This system was built across **47D+ incremental fixes** over multiple sessions. 
 | GAP-48B | ✅ GUARD 4 pre-code artifact gate — blocks code before PRD + sprint plan + story card exist |
 | GAP-48C | ✅ GATE 5 mandatory HTML knowledge graph — D3 viz auto-emitted, GATE 5 blocks if missing |
 | GAP-48D | ✅ Role contract table — 23 roles with PRECONDITIONS/POSTCONDITIONS, enforced in hook |
-| Hook v4 | ✅ Kiro-native integration — phase split model, no injection-guard conflicts |
+| Hook v4 | ✅ Kiro-native THREE-PHASE MODEL — THINK→DESIGN→DEVELOP, no injection-guard conflicts |
 | bootstrap | ✅ `scripts/bootstrap-project.sh` — one-command new project scaffolder with path fix |
+| FIX A | ✅ Bootstrap git init: step 9/9 — git init + initial commit on every new project |
+| FIX B | ✅ Story Commits Mandatory: git commit after every qa_engineer GATE3 PASS |
+| FIX C | ✅ Jira Two-Mode TRACKER_MODE: MCP detection at SM-PLAN, .txt fallback if unavailable |
+| FIX D | ✅ Per-Story Knowledge Graph: D3 v7 HTML after every GATE3 PASS |
+| FIX E | ✅ Sprint Discipline Reports: SM-RETRO generates discipline.md + cumulative dashboard |
+| FIX F | ✅ Memory Writes Wired CRITICAL: checkpoint/flow/decisions/project_map at every trigger |
+| FIX G | ✅ market_researcher Date-Stamping: dynamic shell date, all data tagged, training data flagged |
 
-> **Phase 1 complete.** Full history: [`kiro/CLAUDE-implemented.md`](kiro/CLAUDE-implemented.md) · Active register: [`kiro/CLAUDE.md`](kiro/CLAUDE.md)
+> **Phase 1 complete.** Full history: [`docs/CLAUDE-implemented.md`](docs/CLAUDE-implemented.md) · Active register: [`docs/CLAUDE-working.md`](docs/CLAUDE-working.md)
 
 ---
 
@@ -853,11 +874,11 @@ Three research documents park findings from experiments and third-party tool ana
 
 | File | What It Contains |
 |------|-----------------|
-| [`loop-engineering-white-paper-v5.pdf`](loop-engineering-white-paper-v5.pdf) | **Publication draft white paper (34 pages).** Problem-first framing: the 2026 production reliability crisis → why existing approaches fail → the Loop Engineering Framework as the response. Includes 12-pattern failure taxonomy, gist/exact-string recall bifurcation finding, compression data, guard effectiveness analysis. |
-| [`GOAT.md`](GOAT.md) | **Honest gap analysis.** Where this framework is genuinely first in field (failure mode taxonomy, degradation tiers, compression-fidelity bifurcation, session continuity architecture) vs. what is missing for full academic validation (external reproducibility, controlled methodology, competitor comparison). |
-| [`pxpipe-research.md`](pxpipe-research.md) | Full pxpipe assessment: benchmarks, compression math, Loop Engineering fit analysis, gist vs verbatim recall boundary, GUARD 3 rationale |
-| [`gstack-research.md`](gstack-research.md) | gstack vs Loop Engineering: 30+ slash command inventory, 5 additive capabilities, architectural conflict analysis, decision log (Debugging Iron Law, Edit Scope Lock, QA Executor concept) |
-| [`oneagent-search.md`](oneagent-search.md) | 67TB logs/metrics/traces search: AI agent as query layer on ClickHouse + VictoriaMetrics + Tempo, MCP server spec, cross-signal correlation architecture |
+| [`docs/white-paper/loop-engineering-white-paper-v5.pdf`](docs/white-paper/loop-engineering-white-paper-v5.pdf) | **Publication draft white paper (34 pages).** Problem-first framing: the 2026 production reliability crisis → why existing approaches fail → the Loop Engineering Framework as the response. Includes 12-pattern failure taxonomy, gist/exact-string recall bifurcation finding, compression data, guard effectiveness analysis. |
+| [`docs/research/GOAT.md`](docs/research/GOAT.md) | **Honest gap analysis.** Where this framework is genuinely first in field (failure mode taxonomy, degradation tiers, compression-fidelity bifurcation, session continuity architecture) vs. what is missing for full academic validation (external reproducibility, controlled methodology, competitor comparison). |
+| [`docs/research/pxpipe-research.md`](docs/research/pxpipe-research.md) | Full pxpipe assessment: benchmarks, compression math, Loop Engineering fit analysis, gist vs verbatim recall boundary, GUARD 3 rationale |
+| [`docs/research/gstack-research.md`](docs/research/gstack-research.md) | gstack vs Loop Engineering: 30+ slash command inventory, 5 additive capabilities, architectural conflict analysis, decision log (Debugging Iron Law, Edit Scope Lock, QA Executor concept) |
+| [`docs/research/oneagent-search.md`](docs/research/oneagent-search.md) | 67TB logs/metrics/traces search: AI agent as query layer on ClickHouse + VictoriaMetrics + Tempo, MCP server spec, cross-signal correlation architecture |
 
 ---
 
@@ -883,7 +904,7 @@ ln -s kiro .kiro
 
 **4. Record observations** — which failure modes appeared, at what frequency, before and after the framework. Open a GitHub Issue with your findings.
 
-Full reproduction guide: [CONTRIBUTING.md](CONTRIBUTING.md) · White paper: [loop-engineering-white-paper-v5.pdf](loop-engineering-white-paper-v5.pdf)
+Full reproduction guide: [CONTRIBUTING.md](CONTRIBUTING.md) · White paper: [loop-engineering-white-paper-v5.pdf](docs/white-paper/loop-engineering-white-paper-v5.pdf)
 
 ---
 
@@ -901,18 +922,18 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 | Item | Status |
 |------|--------|
 | 12-pattern production failure taxonomy | ✅ Documented + cataloged |
-| Four-layer process architecture | ✅ Production-validated (47+ fix cycles) |
+| Four-layer process architecture | ✅ Production-validated (68 fix cycles) |
 | Degradation tier system (PEAK → CRITICAL) | ✅ Implemented in CLAUDE.md + session-guards.md |
 | Session continuity (resume vector + checkpoint) | ✅ Active across all sessions |
 | Gist/exact-string recall bifurcation finding | ✅ Measured, documented, mitigated via GUARD 3 |
-| Compression data (59–70% on code-heavy sessions) | ✅ Measured across 47+ sessions |
+| Compression data (59–70% on code-heavy sessions) | ✅ Measured across 68+ fix-cycle sessions |
 | Three-tier guard architecture | ✅ In session-guards.md |
 | White paper v5 (problem-first, 34 pages) | ✅ DOCX + PDF published |
 | GOAT analysis | ✅ Honest gap + strength inventory |
 
 ---
 
-### ✅ Phase 1 — Reproducibility (Complete · 2026-07-17)
+### ✅ Phase 1 — Reproducibility (Complete · 2026-07-19)
 *Transform the practitioner contribution into a replicable one*
 
 | Item | Status | What Was Done |
@@ -924,6 +945,7 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 | **Fix 46A — Product Knowledge Graph** | ✅ Done | Two-agent flow: SE emits graph-patch YAML per story; ARCHITECT merges at GATE 5. D3 HTML viz at `docs/product-graph.html`. |
 | **Fix 47A-D — Skill Activation Audit** | ✅ Done | 37→119 label rows, phase auto-triggers, universal role defaults, ~60 keyword fallback patterns. 173 skill files now wired. |
 | **R1 — External Validator Outreach** | ✅ Drafted | HN + Reddit + LinkedIn + Discord posts at `docs/Audits/external-validator-outreach.md`. Ready to post. |
+| **FIX A–G — Live MedVault Sprint 1 Testing** | ✅ Done | 7 gaps found + fixed: git init, story commits, Jira two-mode, per-story graph, discipline reports, memory writes, date-stamping. |
 
 ---
 
@@ -946,7 +968,7 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 |------|------------|
 | **arXiv preprint** | Submit the white paper v5 (with Phase 1 additions: methodology, competitor comparison) as an arXiv preprint. This establishes a timestamp on the failure taxonomy and bifurcation finding before others document them. |
 | **Practitioner venue submission** | Target MLSys, EMNLP Systems track, or the ACL Workshop on Natural Language Processing for Programming — venues that accept practitioner research with production-validated findings. The MOMENTO paper creates a natural citation bridge. |
-| **Case study publication** | Write the 44-fix development history as a structured case study. The progression from patch-level to framework-level resolution across 44 iterations is itself a publishable finding about how production AI frameworks emerge iteratively. |
+| **Case study publication** | Write the 68-fix development history as a structured case study. The progression from patch-level to framework-level resolution across 68 iterations — including live Sprint 1 production testing on MedVault — is itself a publishable finding about how production AI frameworks emerge iteratively. |
 | **Open standard proposal** | Propose the CLAUDE.md behavioral spec format and checkpoint schema as a community standard for process-layer LLM agent configuration. Similar to how `.editorconfig` standardized editor behavior — a `process.md` format could standardize agent process-layer contracts. |
 
 ---
@@ -959,7 +981,7 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 | **Multi-team validation study** | Coordinate 3–5 development teams running the framework across different codebases, tech stacks, and team sizes. Report aggregate failure mode rates and framework adoption patterns. This is what moves the work from "strong practitioner contribution" to "field-defining paper." |
 | **Generalization research** | Test whether the failure mode taxonomy generalizes beyond software development. The twelve failure modes were derived from coding agents — how many apply to agents in other stateful domains (legal document review, financial analysis, scientific research automation)? |
 | **Benchmark contribution** | Contribute production-derived test cases to MOMENTO or a successor benchmark. The resume vector + checkpoint patterns are directly translatable to multi-session evaluation scenarios with ground-truth correctness criteria. |
-| **Tooling** | Build a lightweight framework validation tool — something that audits an existing agent configuration against the twelve failure modes and reports which ones are mitigated vs. exposed. Makes the framework accessible to teams without the 44-fix development journey. |
+| **Tooling** | Build a lightweight framework validation tool — something that audits an existing agent configuration against the twelve failure modes and reports which ones are mitigated vs. exposed. Makes the framework accessible to teams without the 68-fix development journey. |
 
 ---
 
@@ -1003,10 +1025,10 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  LOOP ENGINEERING — STATUS BOARD · 2026-07-17           │
+│  LOOP ENGINEERING — STATUS BOARD · 2026-07-19           │
 ├─────────────────────────────────────────────────────────┤
 │  Phase 0 complete              ✅ Foundation             │
-│  Phase 1 complete              ✅ 2026-07-17             │
+│  Phase 1 complete              ✅ 2026-07-19             │
 │  Dry Run v11                   ✅ 9.5/10                │
 │  Fix 44G pxpipe integration    ✅ GUARD 3 + script      │
 │  Fix 44A Mode 5 advisory       ✅ Done                  │
@@ -1019,8 +1041,16 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 │  pxpipe token compression      ✅ ~59-70% savings       │
 │  White paper v5                ✅ 34pp · DOCX + PDF     │
 │  GAP-48A/B/C/D resolved        ✅ 61/61 implemented     │
-│  Hook v4 Kiro-native           ✅ Phase split · no conflict│
+│  Hook v4 Kiro-native           ✅ THREE-PHASE MODEL     │
 │  bootstrap-project.sh          ✅ One-command scaffolder │
+│  FIX A — git init in bootstrap ✅ Auto-init + commit    │
+│  FIX B — story commits         ✅ Mandatory after GATE3 │
+│  FIX C — Jira two-mode         ✅ MCP detect + .txt fallback│
+│  FIX D — per-story graph       ✅ D3 v7 HTML per story  │
+│  FIX E — discipline reports    ✅ SM-RETRO + dashboard  │
+│  FIX F — memory writes         ✅ All triggers wired    │
+│  FIX G — date-stamping         ✅ Shell date, tagged data│
+│  Total fixes                   ✅ 68/68 implemented     │
 │  Git repo                      ⏸️ Push pending (SSH/PAT)│
 ├─────────────────────────────────────────────────────────┤
 │  Next actions                                           │
