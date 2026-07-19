@@ -1,0 +1,393 @@
+# Knowledge Graph Patch — Sprint 1
+# Fix 46A: SENIOR_ENGINEER emits per-sprint, ARCHITECT merges at GATE 5
+#
+# Format:
+#   nodes: entities introduced or significantly changed this sprint
+#   edges: relationships between entities (directed)
+#   patch_meta: provenance for merge conflict resolution
+#
+# Merged by: ARCHITECT
+# Sprint: 1
+# Date: 2026-07-31
+# GATE 5 status: PASS
+
+patch_meta:
+  sprint: 1
+  emitted_by: SENIOR_ENGINEER
+  merged_by: ARCHITECT
+  merged_at: "2026-07-31T17:00:00Z"
+  stories_covered:
+    - AUTH-001
+    - AUTH-003
+    - AUTH-004
+    - PAT-001
+    - INFRA-001
+    - INFRA-002
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NODES
+# Each node has: id, type, label, file (canonical location), sprint_introduced
+# ─────────────────────────────────────────────────────────────────────────────
+
+nodes:
+
+  # ── Domain Entities ────────────────────────────────────────────────────────
+
+  - id: entity.tenant
+    type: domain_entity
+    label: Tenant (Hospital Network)
+    file: docs/schema/postgres.sql#tenants
+    sprint_introduced: 1
+    properties:
+      - id (UUID PK)
+      - slug (unique URL slug)
+      - name
+      - region (us-east-1 | eu-west-1)
+      - gdpr_scope (bool)
+    constraints:
+      - All data scoped to tenant_id — no cross-tenant reads
+
+  - id: entity.user
+    type: domain_entity
+    label: Clinician User
+    file: docs/schema/postgres.sql#users
+    sprint_introduced: 1
+    properties:
+      - id, tenant_id (FK), email, display_name
+      - role (NURSE | PHYSICIAN | ADMIN | IT_ADMIN)
+      - scim_external_id (IdP link)
+      - is_active, last_login_at
+      - deleted_at (soft delete — HIPAA)
+    constraints:
+      - Soft delete only — no hard DELETE
+      - Role embedded in JWT at login
+
+  - id: entity.webauthn_credential
+    type: domain_entity
+    label: WebAuthn/FIDO2 Credential
+    file: docs/schema/postgres.sql#webauthn_credentials
+    sprint_introduced: 1
+    properties:
+      - id, user_id (FK), tenant_id (FK)
+      - credential_id ([]byte, base64url)
+      - public_key ([]byte, CBOR)
+      - sign_count (uint32 — replay detection)
+      - aaguid, transport, backed_up, user_present
+    constraints:
+      - sign_count must only increase — reject if not
+      - tenant_id on credential prevents cross-tenant use
+
+  - id: entity.patient
+    type: domain_entity
+    label: Patient Record
+    file: docs/schema/postgres.sql#patients
+    sprint_introduced: 1
+    properties:
+      - id, tenant_id (FK) [TENANT-SCOPED]
+      - mrn [PII][GDPR-ERASABLE] — encrypted
+      - first_name, last_name [PII] — encrypted
+      - date_of_birth [PII] — encrypted
+      - ward, admitted_at, discharge_at
+      - deleted_at (soft delete)
+    constraints:
+      - UNIQUE(tenant_id, mrn) — MRN namespace is per-hospital
+      - pgp_sym_encrypt for all PII fields
+      - No hard DELETE (HIPAA)
+
+  - id: entity.scim_token
+    type: domain_entity
+    label: SCIM Bearer Token
+    file: docs/schema/postgres.sql#scim_tokens
+    sprint_introduced: 1
+    properties:
+      - id, tenant_id (FK)
+      - token_hash (bcrypt, DefaultCost=10)
+      - description, last_used_at, expires_at
+    constraints:
+      - Plaintext shown exactly once at creation
+      - All SCIM operations scoped to token's tenant_id
+
+  - id: entity.audit_log
+    type: domain_entity
+    label: HIPAA Audit Log
+    file: docs/schema/postgres.sql#audit_log
+    sprint_introduced: 1
+    properties:
+      - id, tenant_id (FK)
+      - actor_id (FK → users), actor_role
+      - action (string), resource_type, resource_id
+      - ip_address, user_agent, metadata (jsonb)
+      - occurred_at
+    constraints:
+      - Append-only — no UPDATE or DELETE ever
+      - Partitioned by year (6 partitions = 6yr HIPAA retention)
+      - Must be written on: all auth events, all patient accesses, all SCIM ops
+
+  # ── Services ───────────────────────────────────────────────────────────────
+
+  - id: service.auth
+    type: service
+    label: Auth Service (Go)
+    file: services/auth-service/
+    sprint_introduced: 1
+    tech: Go 1.22, Gin, distroless runtime
+    owns:
+      - WebAuthn registration + authentication
+      - SCIM 2.0 provisioning
+      - JWT issuance
+      - Tenant + RBAC middleware
+    exposes:
+      - POST /v1/auth/register/begin
+      - POST /v1/auth/register/complete
+      - POST /v1/auth/login/begin
+      - POST /v1/auth/login/complete
+      - GET/POST/PUT/PATCH/DELETE /scim/v2/Users
+      - GET /scim/v2/ServiceProviderConfig
+
+  - id: service.postgres
+    type: datastore
+    label: PostgreSQL 16 (Multi-AZ)
+    file: infra/terraform/us-east-1/main.tf#rds
+    sprint_introduced: 1
+    tech: PostgreSQL 16, pgcrypto, uuid-ossp
+    region: us-east-1 (HIPAA) + eu-west-1 (GDPR)
+    stores:
+      - tenants, users, webauthn_credentials
+      - scim_tokens, audit_log, patients, vitals
+
+  - id: service.redis
+    type: datastore
+    label: Redis 7
+    file: docker-compose.yml#redis
+    sprint_introduced: 1
+    tech: Redis 7-alpine
+    stores:
+      - WebAuthn challenge nonces (TTL 5min, DEL on use)
+      - JWT revocation list (Sprint 2)
+
+  - id: service.clickhouse
+    type: datastore
+    label: ClickHouse 24
+    file: docs/schema/clickhouse.sql
+    sprint_introduced: 1
+    tech: ClickHouse 24, MergeTree
+    stores:
+      - sepsis_scores, vitals_raw, vitals_hourly
+      - alert_events, api_usage
+
+  - id: service.eks_us
+    type: infrastructure
+    label: EKS Cluster us-east-1 (HIPAA)
+    file: infra/terraform/us-east-1/main.tf
+    sprint_introduced: 1
+    properties:
+      - VPC 10.0.0.0/16
+      - endpoint_public_access: false
+      - KMS CMK for secrets
+      - RDS Multi-AZ
+
+  - id: service.eks_eu
+    type: infrastructure
+    label: EKS Cluster eu-west-1 (GDPR)
+    file: infra/terraform/eu-west-1/main.tf
+    sprint_introduced: 1
+    properties:
+      - VPC 10.1.0.0/16
+      - No VPC peering to us-east-1
+      - No cross-region replication
+      - RDS Multi-AZ
+
+  # ── Code Components ────────────────────────────────────────────────────────
+
+  - id: component.tenant_middleware
+    type: code_component
+    label: Tenant + RBAC Middleware
+    file: services/auth-service/middleware/tenant.go
+    sprint_introduced: 1
+    exports:
+      - RequireJWT(jwtSecret string) gin.HandlerFunc
+      - RequireRole(roles ...Role) gin.HandlerFunc
+      - AssertSameTenant(c, resourceTenantID) bool
+      - TenantID(c), UserID(c), Role(c) — safe extractors
+
+  - id: component.webauthn_handler
+    type: code_component
+    label: WebAuthn Handler
+    file: services/auth-service/handlers/webauthn.go
+    sprint_introduced: 1
+    exports:
+      - BeginRegistration, CompleteRegistration
+      - BeginLogin, CompleteLogin
+    deps:
+      - github.com/go-webauthn/webauthn v0.10.2 (Rung 2)
+
+  - id: component.scim_handler
+    type: code_component
+    label: SCIM 2.0 Handler (RFC 7644)
+    file: services/auth-service/handlers/scim.go
+    sprint_introduced: 1
+    exports:
+      - GetServiceProviderConfig, ListUsers, GetUser
+      - CreateUser, ReplaceUser, PatchUser, DeleteUser
+    no_external_dep: true  # RFC 7644 implemented directly
+
+  - id: component.postgres_store
+    type: code_component
+    label: PostgreSQL Store
+    file: services/auth-service/store/postgres.go
+    sprint_introduced: 1
+    invariant: ALL queries include tenant_id filter — no exceptions
+
+  # ── Security Policies ──────────────────────────────────────────────────────
+
+  - id: policy.cross_tenant_isolation
+    type: security_policy
+    label: Cross-Tenant Isolation
+    sprint_introduced: 1
+    enforcement:
+      - All SQL: WHERE ... AND tenant_id = $N
+      - AssertSameTenant() at handler level (IDOR prevention)
+      - JWT tenant_id extracted from token (never request body)
+      - SCIM token scoped to one tenant
+    test: TestCrossTenantDenial — mandatory GATE S2 (Fix 43C)
+
+  - id: policy.webauthn_hipaa
+    type: security_policy
+    label: WebAuthn HIPAA Config
+    sprint_introduced: 1
+    config:
+      userVerification: required  # not preferred
+      residentKey: required
+      challengeTTL: 5min
+      challengeDeleteOnUse: true  # replay prevention
+
+  - id: policy.hipaa_audit
+    type: compliance_policy
+    label: HIPAA Audit Requirements
+    sprint_introduced: 1
+    rules:
+      - audit_log append-only (no UPDATE/DELETE)
+      - 6-year retention (partitioned by year)
+      - Must capture: actor, action, resource, ip, timestamp
+      - All patient accesses, auth events, SCIM ops must be logged
+
+  - id: policy.gdpr_data_residency
+    type: compliance_policy
+    label: GDPR Data Residency Hard Constraint
+    sprint_introduced: 1
+    rules:
+      - EU data MUST NOT leave eu-west-1
+      - No VPC peering us-east-1 ↔ eu-west-1
+      - No cross-region S3 replication
+      - Terraform state for eu-west-1 stored in eu-west-1
+
+# ─────────────────────────────────────────────────────────────────────────────
+# EDGES
+# src → dst via relationship type
+# ─────────────────────────────────────────────────────────────────────────────
+
+edges:
+
+  # Domain entity relationships
+  - src: entity.user
+    dst: entity.tenant
+    rel: belongs_to
+    cardinality: many-to-one
+
+  - src: entity.webauthn_credential
+    dst: entity.user
+    rel: owned_by
+    cardinality: many-to-one
+
+  - src: entity.webauthn_credential
+    dst: entity.tenant
+    rel: scoped_to
+    cardinality: many-to-one
+    note: tenant_id on credential prevents cross-tenant replay
+
+  - src: entity.patient
+    dst: entity.tenant
+    rel: belongs_to
+    cardinality: many-to-one
+
+  - src: entity.scim_token
+    dst: entity.tenant
+    rel: authorizes_for
+    cardinality: many-to-one
+
+  - src: entity.audit_log
+    dst: entity.tenant
+    rel: partitioned_by
+    cardinality: many-to-one
+
+  # Service → datastore
+  - src: service.auth
+    dst: service.postgres
+    rel: reads_writes
+    entities: [user, webauthn_credential, scim_token, audit_log, patient]
+
+  - src: service.auth
+    dst: service.redis
+    rel: reads_writes
+    entities: [webauthn_challenge_nonces]
+
+  # Component → policy enforcement
+  - src: component.tenant_middleware
+    dst: policy.cross_tenant_isolation
+    rel: enforces
+
+  - src: component.webauthn_handler
+    dst: policy.webauthn_hipaa
+    rel: enforces
+
+  - src: component.postgres_store
+    dst: policy.hipaa_audit
+    rel: enforces
+    note: WriteAuditLog called on every mutation
+
+  # Infrastructure → compliance policy
+  - src: service.eks_eu
+    dst: policy.gdpr_data_residency
+    rel: constrained_by
+
+  # Cross-service isolation
+  - src: service.eks_us
+    dst: service.eks_eu
+    rel: isolated_from
+    reason: GDPR data residency — no VPC peering, no replication
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DEFERRED NODES (Sprint 2 — not yet in graph)
+# ─────────────────────────────────────────────────────────────────────────────
+
+deferred:
+  - id: entity.vitals
+    type: domain_entity
+    sprint_target: 2
+    story: PAT-002
+
+  - id: entity.sepsis_score
+    type: domain_entity
+    sprint_target: 2
+    story: ML-001
+
+  - id: service.sepsis_scoring
+    type: service
+    sprint_target: 2
+    story: ML-001/002/003
+
+  - id: service.websocket_gateway
+    type: service
+    sprint_target: 2
+    story: RT-001
+
+  - id: service.mobile_ios
+    type: service
+    sprint_target: 2
+    story: MOB-001
+
+  - id: policy.saml_sso
+    type: security_policy
+    sprint_target: 2
+    story: AUTH-002
+    blocked_by: IAM budget constraint (Fix 33A)

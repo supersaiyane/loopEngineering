@@ -1,0 +1,148 @@
+version: "3.9"
+
+services:
+  # ── Databases ────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: healthguard
+      POSTGRES_USER: healthguard
+      POSTGRES_PASSWORD: dev_password_change_in_prod
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docs/schema/postgres.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U healthguard"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24-alpine
+    ports:
+      - "8123:8123"   # HTTP interface
+      - "9000:9000"   # Native protocol
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - ./docs/schema/clickhouse.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
+  # ── Auth Service ─────────────────────────────────────────────────
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8080"
+    environment:
+      DATABASE_URL: postgres://healthguard:dev_password_change_in_prod@postgres:5432/healthguard?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev_jwt_secret_32_chars_minimum_x
+      WEBAUTHN_RP_ID: localhost
+      WEBAUTHN_RP_ORIGIN: http://localhost:3000
+      WEBAUTHN_RP_DISPLAY_NAME: HealthGuard Pro (Dev)
+      ENVIRONMENT: development
+      LOG_LEVEL: debug
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ── Patient Data Service (Sprint 2) ──────────────────────────────
+  patient-data-service:
+    build:
+      context: ./services/patient-data-service
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8080"
+    environment:
+      DATABASE_URL: postgres://healthguard:dev_password_change_in_prod@postgres:5432/healthguard?sslmode=disable
+      AUTH_SERVICE_URL: http://auth-service:8080
+      ENVIRONMENT: development
+    depends_on:
+      - auth-service
+    profiles:
+      - sprint2  # Not started in default compose up
+
+  # ── Sepsis Scoring (Sprint 2) ─────────────────────────────────────
+  sepsis-scoring-service:
+    build:
+      context: ./services/sepsis-scoring-service
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8000"
+    environment:
+      DATABASE_URL: postgres://healthguard:dev_password_change_in_prod@postgres:5432/healthguard?sslmode=disable
+      MODEL_PATH: /app/models/sepsis_v1.onnx
+      ENVIRONMENT: development
+    profiles:
+      - sprint2
+
+  # ── Alerting (Sprint 2) ───────────────────────────────────────────
+  alerting-service:
+    build:
+      context: ./services/alerting-service
+      dockerfile: Dockerfile
+    ports:
+      - "8004:8080"
+    environment:
+      DATABASE_URL: postgres://healthguard:dev_password_change_in_prod@postgres:5432/healthguard?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      AUTH_SERVICE_URL: http://auth-service:8080
+      ENVIRONMENT: development
+    profiles:
+      - sprint2
+
+  # ── Analytics Ingestion (Sprint 2) ────────────────────────────────
+  analytics-ingestion-service:
+    build:
+      context: ./services/analytics-ingestion-service
+      dockerfile: Dockerfile
+    ports:
+      - "8005:8080"
+    environment:
+      CLICKHOUSE_URL: clickhouse://clickhouse:9000/healthguard
+      ENVIRONMENT: development
+    profiles:
+      - sprint2
+
+  # ── Clinician Dashboard (Sprint 2) ────────────────────────────────
+  clinician-dashboard:
+    build:
+      context: ./apps/clinician-dashboard
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_AUTH_URL: http://localhost:8001
+      REACT_APP_API_URL: http://localhost:8002
+    profiles:
+      - sprint2
+
+volumes:
+  postgres_data:
+  clickhouse_data:
+  redis_data:
+
+networks:
+  default:
+    name: healthguard-net

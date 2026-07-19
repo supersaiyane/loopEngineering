@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealthGuard Pro — Knowledge Graph Sprint 1</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
+    overflow: hidden;
+  }
+
+  #header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid #21262d;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  #header h1 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #f0f6fc;
+    letter-spacing: 0.02em;
+  }
+
+  #header .sprint-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: #1f6feb22;
+    border: 1px solid #1f6feb55;
+    border-radius: 12px;
+    color: #58a6ff;
+  }
+
+  #header .gate-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: #23863622;
+    border: 1px solid #23863655;
+    border-radius: 12px;
+    color: #3fb950;
+  }
+
+  #controls {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  #controls button {
+    background: #21262d;
+    border: 1px solid #30363d;
+    color: #e6edf3;
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.15s;
+  }
+
+  #controls button:hover { background: #30363d; }
+
+  #filter-bar {
+    position: fixed;
+    top: 49px; left: 0; right: 0;
+    z-index: 99;
+    background: rgba(13,17,23,0.88);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid #21262d;
+    padding: 8px 20px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-label { font-size: 11px; color: #8b949e; margin-right: 4px; }
+
+  .filter-chip {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .filter-chip.active { opacity: 1; }
+  .filter-chip.inactive { opacity: 0.35; }
+
+  #svg-container {
+    position: fixed;
+    top: 88px; left: 0; right: 0; bottom: 0;
+  }
+
+  svg { width: 100%; height: 100%; }
+
+  .link {
+    fill: none;
+    stroke-width: 1.5px;
+    opacity: 0.55;
+  }
+
+  .link.belongs_to   { stroke: #58a6ff; stroke-dasharray: none; }
+  .link.owned_by     { stroke: #a5d6ff; stroke-dasharray: 4,3; }
+  .link.scoped_to    { stroke: #f0883e; }
+  .link.authorizes_for { stroke: #e3b341; }
+  .link.partitioned_by { stroke: #bc8cff; }
+  .link.reads_writes { stroke: #3fb950; stroke-width: 2px; }
+  .link.enforces     { stroke: #ff7b72; stroke-width: 2px; }
+  .link.constrained_by { stroke: #ffa657; stroke-dasharray: 6,3; stroke-width: 2px; }
+  .link.isolated_from { stroke: #ff4444; stroke-dasharray: 8,4; stroke-width: 2.5px; }
+
+  .node circle {
+    stroke-width: 2px;
+    cursor: pointer;
+    transition: r 0.1s;
+  }
+
+  .node:hover circle { stroke-width: 3px; }
+
+  .node text {
+    font-size: 10px;
+    fill: #e6edf3;
+    pointer-events: none;
+    text-anchor: middle;
+  }
+
+  .node text.label {
+    dominant-baseline: middle;
+    font-weight: 500;
+  }
+
+  .node text.sub {
+    font-size: 9px;
+    fill: #8b949e;
+    dominant-baseline: middle;
+  }
+
+  /* Node type colors */
+  .node.domain_entity circle  { fill: #1f3a5f; stroke: #58a6ff; }
+  .node.service circle        { fill: #1a3a2a; stroke: #3fb950; }
+  .node.datastore circle      { fill: #2d2a1a; stroke: #e3b341; }
+  .node.infrastructure circle { fill: #2a1f3a; stroke: #bc8cff; }
+  .node.code_component circle { fill: #3a1f1f; stroke: #ff7b72; }
+  .node.security_policy circle { fill: #3a2a1f; stroke: #ffa657; }
+  .node.compliance_policy circle { fill: #1f3a3a; stroke: #39d353; }
+
+  #tooltip {
+    position: fixed;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 12px;
+    line-height: 1.6;
+    max-width: 280px;
+    pointer-events: none;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.1s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+
+  #tooltip.visible { opacity: 1; }
+
+  #tooltip .tt-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: #f0f6fc;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #21262d;
+    padding-bottom: 6px;
+  }
+
+  #tooltip .tt-type {
+    font-size: 10px;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 4px;
+  }
+
+  #tooltip .tt-file {
+    font-size: 10px;
+    color: #58a6ff;
+    font-family: monospace;
+    margin-top: 4px;
+  }
+
+  #tooltip .tt-prop {
+    font-size: 10px;
+    color: #8b949e;
+    margin-top: 2px;
+  }
+
+  #legend {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(22,27,34,0.92);
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 11px;
+    z-index: 100;
+    min-width: 160px;
+  }
+
+  #legend h3 {
+    font-size: 11px;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  .legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    color: #e6edf3;
+  }
+
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 1.5px solid;
+    flex-shrink: 0;
+  }
+
+  .legend-line {
+    width: 24px; height: 2px;
+    flex-shrink: 0;
+  }
+
+  #edge-legend {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(22,27,34,0.92);
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 11px;
+    z-index: 100;
+  }
+
+  #stats {
+    position: fixed;
+    top: 96px;
+    right: 20px;
+    background: rgba(22,27,34,0.85);
+    border: 1px solid #21262d;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 11px;
+    color: #8b949e;
+    z-index: 100;
+  }
+
+  #stats span { color: #e6edf3; font-weight: 600; }
+
+  .link-label {
+    font-size: 9px;
+    fill: #8b949e;
+    pointer-events: none;
+  }
+
+  /* Sprint 2 deferred nodes */
+  .node.deferred circle {
+    fill: #1a1a1a;
+    stroke: #444;
+    stroke-dasharray: 5,3;
+    opacity: 0.5;
+  }
+  .node.deferred text { fill: #555; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>HealthGuard Pro — Knowledge Graph</h1>
+  <span class="sprint-badge">Sprint 1</span>
+  <span class="gate-badge">GATE 5 PASS · 2026-07-31</span>
+  <div id="controls">
+    <button onclick="resetZoom()">Reset View</button>
+    <button onclick="toggleDeferred()">Toggle Deferred</button>
+  </div>
+</div>
+
+<div id="filter-bar">
+  <span class="filter-label">Filter:</span>
+  <div class="filter-chip active" data-type="domain_entity" style="background:#1f3a5f44;border-color:#58a6ff;color:#58a6ff" onclick="toggleFilter(this)">Domain Entities</div>
+  <div class="filter-chip active" data-type="service" style="background:#1a3a2a44;border-color:#3fb950;color:#3fb950" onclick="toggleFilter(this)">Services</div>
+  <div class="filter-chip active" data-type="datastore" style="background:#2d2a1a44;border-color:#e3b341;color:#e3b341" onclick="toggleFilter(this)">Datastores</div>
+  <div class="filter-chip active" data-type="infrastructure" style="background:#2a1f3a44;border-color:#bc8cff;color:#bc8cff" onclick="toggleFilter(this)">Infrastructure</div>
+  <div class="filter-chip active" data-type="code_component" style="background:#3a1f1f44;border-color:#ff7b72;color:#ff7b72" onclick="toggleFilter(this)">Components</div>
+  <div class="filter-chip active" data-type="security_policy" style="background:#3a2a1f44;border-color:#ffa657;color:#ffa657" onclick="toggleFilter(this)">Security Policies</div>
+  <div class="filter-chip active" data-type="compliance_policy" style="background:#1f3a3a44;border-color:#39d353;color:#39d353" onclick="toggleFilter(this)">Compliance</div>
+</div>
+
+<div id="svg-container">
+  <svg id="graph"></svg>
+</div>
+
+<div id="tooltip"></div>
+
+<div id="legend">
+  <h3>Node Types</h3>
+  <div class="legend-row"><div class="legend-dot" style="background:#1f3a5f;border-color:#58a6ff"></div>Domain Entity</div>
+  <div class="legend-row"><div class="legend-dot" style="background:#1a3a2a;border-color:#3fb950"></div>Service</div>
+  <div class="legend-row"><div class="legend-dot" style="background:#2d2a1a;border-color:#e3b341"></div>Datastore</div>
+  <div class="legend-row"><div class="legend-dot" style="background:#2a1f3a;border-color:#bc8cff"></div>Infrastructure</div>
+  <div class="legend-row"><div class="legend-dot" style="background:#3a1f1f;border-color:#ff7b72"></div>Code Component</div>
+  <div class="legend-row"><div class="legend-dot" style="background:#3a2a1f;border-color:#ffa657"></div>Security Policy</div>
+  <div class="legend-row"><div class="legend-dot" style="background:#1f3a3a;border-color:#39d353"></div>Compliance</div>
+  <div class="legend-row"><div class="legend-dot" style="background:#1a1a1a;border-color:#444;opacity:0.6"></div>Deferred (S2)</div>
+</div>
+
+<div id="edge-legend">
+  <h3 style="font-size:11px;color:#8b949e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Relationships</h3>
+  <div class="legend-row"><div class="legend-line" style="background:#58a6ff"></div>belongs_to</div>
+  <div class="legend-row"><div class="legend-line" style="background:#3fb950;height:3px"></div>reads_writes</div>
+  <div class="legend-row"><div class="legend-line" style="background:#ff7b72;height:3px"></div>enforces</div>
+  <div class="legend-row"><div class="legend-line" style="background:#f0883e"></div>scoped_to</div>
+  <div class="legend-row"><div class="legend-line" style="background:#e3b341"></div>authorizes_for</div>
+  <div class="legend-row"><div class="legend-line" style="background:#ffa657;height:3px;opacity:0.7"></div>constrained_by</div>
+  <div class="legend-row"><div class="legend-line" style="background:#ff4444;height:3px"></div>isolated_from</div>
+</div>
+
+<div id="stats">
+  Nodes: <span id="node-count">0</span> &nbsp;|&nbsp; Edges: <span id="edge-count">0</span>
+</div>
+
+<script>
+const nodes = [
+  // Domain Entities
+  { id: "entity.tenant",               label: "Tenant",              sub: "Hospital Network", type: "domain_entity",   file: "postgres.sql#tenants", note: "All data scoped by tenant_id" },
+  { id: "entity.user",                 label: "User",                sub: "Clinician",        type: "domain_entity",   file: "postgres.sql#users",   note: "Role: NURSE|PHYSICIAN|ADMIN|IT_ADMIN" },
+  { id: "entity.webauthn_credential",  label: "WebAuthn Cred",       sub: "FIDO2",            type: "domain_entity",   file: "postgres.sql#webauthn_credentials", note: "sign_count prevents replay" },
+  { id: "entity.patient",              label: "Patient",             sub: "PII encrypted",    type: "domain_entity",   file: "postgres.sql#patients",note: "pgp_sym_encrypt on PII, soft delete only" },
+  { id: "entity.scim_token",           label: "SCIM Token",          sub: "bcrypt hash",      type: "domain_entity",   file: "postgres.sql#scim_tokens", note: "Per-tenant, bcrypt stored" },
+  { id: "entity.audit_log",            label: "Audit Log",           sub: "Append-only",      type: "domain_entity",   file: "postgres.sql#audit_log",   note: "6yr HIPAA retention, partitioned by year" },
+
+  // Services
+  { id: "service.auth",                label: "Auth Service",        sub: "Go 1.22",          type: "service",         file: "services/auth-service/", note: "WebAuthn + SCIM + JWT + RBAC" },
+
+  // Datastores
+  { id: "service.postgres",            label: "PostgreSQL 16",       sub: "Multi-AZ",         type: "datastore",       file: "infra/terraform/*/rds", note: "us-east-1 (HIPAA) + eu-west-1 (GDPR)" },
+  { id: "service.redis",               label: "Redis 7",             sub: "Challenge cache",  type: "datastore",       file: "docker-compose.yml#redis", note: "Challenge TTL 5min, DEL on use" },
+  { id: "service.clickhouse",          label: "ClickHouse 24",       sub: "Analytics",        type: "datastore",       file: "schema/clickhouse.sql",  note: "sepsis_scores, vitals, api_usage" },
+
+  // Infrastructure
+  { id: "service.eks_us",              label: "EKS us-east-1",       sub: "HIPAA",            type: "infrastructure",  file: "infra/terraform/us-east-1/", note: "VPC 10.0.0.0/16, public endpoint=false" },
+  { id: "service.eks_eu",              label: "EKS eu-west-1",       sub: "GDPR",             type: "infrastructure",  file: "infra/terraform/eu-west-1/", note: "VPC 10.1.0.0/16, no cross-region" },
+
+  // Code Components
+  { id: "component.tenant_middleware", label: "Tenant Middleware",   sub: "RBAC + isolation", type: "code_component",  file: "middleware/tenant.go",   note: "RequireJWT, RequireRole, AssertSameTenant" },
+  { id: "component.webauthn_handler",  label: "WebAuthn Handler",    sub: "Registration+Auth",type: "code_component",  file: "handlers/webauthn.go",   note: "Begin/Complete Registration+Login" },
+  { id: "component.scim_handler",      label: "SCIM Handler",        sub: "RFC 7644 direct",  type: "code_component",  file: "handlers/scim.go",       note: "No external SCIM lib (Ponytail Rung 3)" },
+  { id: "component.postgres_store",    label: "Postgres Store",      sub: "All tenant-scoped",type: "code_component",  file: "store/postgres.go",      note: "ALL queries include tenant_id filter" },
+
+  // Security Policies
+  { id: "policy.cross_tenant_isolation", label: "X-Tenant Isolation", sub: "Fix 43C",        type: "security_policy", file: "middleware/tenant.go",   note: "TestCrossTenantDenial mandatory at GATE S2" },
+  { id: "policy.webauthn_hipaa",       label: "WebAuthn HIPAA",      sub: "userVerif=req",   type: "security_policy", file: "handlers/webauthn.go",   note: "userVerification=required, residentKey=required" },
+
+  // Compliance Policies
+  { id: "policy.hipaa_audit",          label: "HIPAA Audit",         sub: "Append-only 6yr", type: "compliance_policy", file: "postgres.sql#audit_log",note: "WriteAuditLog on all mutations" },
+  { id: "policy.gdpr_data_residency",  label: "GDPR Residency",      sub: "No cross-region", type: "compliance_policy", file: "infra/terraform/eu-west-1/", note: "EU data must not leave eu-west-1" },
+
+  // Deferred Sprint 2
+  { id: "entity.sepsis_score",         label: "Sepsis Score",        sub: "Sprint 2",        type: "domain_entity",   file: "clickhouse.sql#sepsis_scores", deferred: true },
+  { id: "service.sepsis_scoring",      label: "Sepsis Scoring",      sub: "Sprint 2 · ML",   type: "service",         file: "services/sepsis-scoring-service/", deferred: true },
+  { id: "service.websocket_gateway",   label: "WS Gateway",          sub: "Sprint 2 · RT",   type: "service",         file: "services/websocket-gateway/",      deferred: true },
+];
+
+const edges = [
+  // Domain entity relationships
+  { source: "entity.user",                 target: "entity.tenant",               rel: "belongs_to" },
+  { source: "entity.webauthn_credential",  target: "entity.user",                 rel: "owned_by" },
+  { source: "entity.webauthn_credential",  target: "entity.tenant",               rel: "scoped_to" },
+  { source: "entity.patient",              target: "entity.tenant",               rel: "belongs_to" },
+  { source: "entity.scim_token",           target: "entity.tenant",               rel: "authorizes_for" },
+  { source: "entity.audit_log",            target: "entity.tenant",               rel: "partitioned_by" },
+
+  // Service → Datastore
+  { source: "service.auth",               target: "service.postgres",             rel: "reads_writes" },
+  { source: "service.auth",               target: "service.redis",                rel: "reads_writes" },
+
+  // Component → Policy
+  { source: "component.tenant_middleware", target: "policy.cross_tenant_isolation", rel: "enforces" },
+  { source: "component.webauthn_handler",  target: "policy.webauthn_hipaa",       rel: "enforces" },
+  { source: "component.postgres_store",    target: "policy.hipaa_audit",          rel: "enforces" },
+
+  // Infrastructure → Compliance
+  { source: "service.eks_eu",             target: "policy.gdpr_data_residency",  rel: "constrained_by" },
+  { source: "service.eks_us",             target: "service.eks_eu",              rel: "isolated_from" },
+
+  // Sprint 2 deferred edges
+  { source: "service.sepsis_scoring",     target: "entity.sepsis_score",         rel: "reads_writes",   deferred: true },
+  { source: "entity.sepsis_score",        target: "service.clickhouse",          rel: "belongs_to",     deferred: true },
+];
+
+// ─── D3 Setup ────────────────────────────────────────────────────────────────
+
+const width  = window.innerWidth;
+const height = window.innerHeight - 88;
+
+const svg = d3.select("#graph")
+  .attr("viewBox", [0, 0, width, height]);
+
+const g = svg.append("g");
+
+// Zoom
+const zoom = d3.zoom()
+  .scaleExtent([0.15, 4])
+  .on("zoom", e => g.attr("transform", e.transform));
+svg.call(zoom);
+
+// Arrow markers
+const defs = svg.append("defs");
+const markerColors = {
+  belongs_to: "#58a6ff",
+  owned_by: "#a5d6ff",
+  scoped_to: "#f0883e",
+  authorizes_for: "#e3b341",
+  partitioned_by: "#bc8cff",
+  reads_writes: "#3fb950",
+  enforces: "#ff7b72",
+  constrained_by: "#ffa657",
+  isolated_from: "#ff4444",
+};
+
+Object.entries(markerColors).forEach(([rel, color]) => {
+  defs.append("marker")
+    .attr("id", `arrow-${rel}`)
+    .attr("viewBox", "0 -4 8 8")
+    .attr("refX", 22)
+    .attr("refY", 0)
+    .attr("markerWidth", 5)
+    .attr("markerHeight", 5)
+    .attr("orient", "auto")
+    .append("path")
+    .attr("d", "M0,-4L8,0L0,4Z")
+    .attr("fill", color)
+    .attr("opacity", 0.8);
+});
+
+// Force simulation
+const simulation = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(edges)
+    .id(d => d.id)
+    .distance(d => {
+      if (d.rel === "isolated_from") return 240;
+      if (d.rel === "reads_writes") return 160;
+      if (d.rel === "enforces") return 130;
+      return 100;
+    })
+    .strength(0.4)
+  )
+  .force("charge", d3.forceManyBody()
+    .strength(d => d.deferred ? -60 : -250)
+  )
+  .force("center", d3.forceCenter(width / 2, height / 2))
+  .force("collision", d3.forceCollide(d => d.deferred ? 30 : 50))
+  .force("x", d3.forceX(width / 2).strength(0.04))
+  .force("y", d3.forceY(height / 2).strength(0.04));
+
+// Edges
+const link = g.append("g").attr("class", "links")
+  .selectAll("line")
+  .data(edges)
+  .join("line")
+  .attr("class", d => `link ${d.rel}`)
+  .attr("marker-end", d => `url(#arrow-${d.rel})`)
+  .style("opacity", d => d.deferred ? 0.2 : 0.55);
+
+// Node radius by type
+const radius = t => {
+  if (t === "domain_entity") return 28;
+  if (t === "service")       return 32;
+  if (t === "datastore")     return 26;
+  if (t === "infrastructure")return 26;
+  if (t === "code_component")return 24;
+  return 22;
+};
+
+// Nodes
+const node = g.append("g").attr("class", "nodes")
+  .selectAll("g")
+  .data(nodes)
+  .join("g")
+  .attr("class", d => `node ${d.type}${d.deferred ? " deferred" : ""}`)
+  .call(d3.drag()
+    .on("start", dragstarted)
+    .on("drag", dragged)
+    .on("end", dragended)
+  )
+  .on("mouseover", showTooltip)
+  .on("mousemove", moveTooltip)
+  .on("mouseout", hideTooltip);
+
+node.append("circle")
+  .attr("r", d => d.deferred ? 20 : radius(d.type));
+
+node.append("text")
+  .attr("class", "label")
+  .attr("y", d => d.sub ? -5 : 0)
+  .text(d => d.label);
+
+node.append("text")
+  .attr("class", "sub")
+  .attr("y", 8)
+  .text(d => d.sub || "");
+
+// Simulation tick
+simulation.on("tick", () => {
+  link
+    .attr("x1", d => d.source.x)
+    .attr("y1", d => d.source.y)
+    .attr("x2", d => d.target.x)
+    .attr("y2", d => d.target.y);
+
+  node.attr("transform", d => `translate(${d.x},${d.y})`);
+});
+
+// Stats
+document.getElementById("node-count").textContent = nodes.filter(n => !n.deferred).length + " (+" + nodes.filter(n => n.deferred).length + " deferred)";
+document.getElementById("edge-count").textContent = edges.filter(e => !e.deferred).length + " (+" + edges.filter(e => e.deferred).length + " deferred)";
+
+// Drag
+function dragstarted(event, d) {
+  if (!event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x; d.fy = d.y;
+}
+function dragged(event, d) {
+  d.fx = event.x; d.fy = event.y;
+}
+function dragended(event, d) {
+  if (!event.active) simulation.alphaTarget(0);
+  d.fx = null; d.fy = null;
+}
+
+// Tooltip
+const tt = document.getElementById("tooltip");
+
+function showTooltip(event, d) {
+  tt.innerHTML = `
+    <div class="tt-type">${d.type.replace(/_/g, " ")}</div>
+    <div class="tt-title">${d.label}</div>
+    ${d.note ? `<div class="tt-prop">${d.note}</div>` : ""}
+    ${d.file ? `<div class="tt-file">📁 ${d.file}</div>` : ""}
+    ${d.deferred ? `<div class="tt-prop" style="color:#ffa657;margin-top:6px">⏳ Deferred — Sprint 2</div>` : ""}
+  `;
+  tt.classList.add("visible");
+  moveTooltip(event);
+}
+
+function moveTooltip(event) {
+  const x = event.clientX + 16;
+  const y = event.clientY - 10;
+  tt.style.left = Math.min(x, window.innerWidth - 300) + "px";
+  tt.style.top  = Math.min(y, window.innerHeight - 160) + "px";
+}
+
+function hideTooltip() {
+  tt.classList.remove("visible");
+}
+
+// Filter chips
+const activeFilters = new Set(["domain_entity","service","datastore","infrastructure","code_component","security_policy","compliance_policy"]);
+
+function toggleFilter(chip) {
+  const type = chip.dataset.type;
+  if (activeFilters.has(type)) {
+    activeFilters.delete(type);
+    chip.classList.remove("active");
+    chip.classList.add("inactive");
+  } else {
+    activeFilters.add(type);
+    chip.classList.add("active");
+    chip.classList.remove("inactive");
+  }
+
+  node.style("opacity", d => {
+    if (d.deferred) return 0.3;
+    return activeFilters.has(d.type) ? 1 : 0.05;
+  });
+
+  link.style("opacity", d => {
+    const srcVisible = activeFilters.has(d.source.type);
+    const dstVisible = activeFilters.has(d.target.type);
+    if (d.deferred) return 0.1;
+    return (srcVisible && dstVisible) ? 0.55 : 0.05;
+  });
+}
+
+// Toggle deferred
+let deferredVisible = true;
+function toggleDeferred() {
+  deferredVisible = !deferredVisible;
+  node.filter(d => d.deferred)
+    .transition().duration(200)
+    .style("opacity", deferredVisible ? 0.35 : 0);
+  link.filter(d => d.deferred)
+    .transition().duration(200)
+    .style("opacity", deferredVisible ? 0.2 : 0);
+}
+
+function resetZoom() {
+  svg.transition().duration(400)
+    .call(zoom.transform, d3.zoomIdentity.translate(0,0).scale(1));
+}
+
+// Resize
+window.addEventListener("resize", () => {
+  const w = window.innerWidth;
+  const h = window.innerHeight - 88;
+  svg.attr("viewBox", [0, 0, w, h]);
+  simulation.force("center", d3.forceCenter(w/2, h/2)).restart();
+});
+</script>
+</body>
+</html>
