@@ -61,7 +61,7 @@ mkdir -p "$TARGET/.kiro"/{hooks,steering,skills,adapters,memory,reference}
 echo "     ✅ directories created"
 
 # ── 2. Copy framework layers ───────────────────────────────────────────────────
-echo "2/8  Copying framework (hooks / steering / skills / adapters)..."
+echo "2/8  Copying framework (hooks / steering / skills / adapters / scripts)..."
 
 cp -r "$FRAMEWORK_DIR/kiro/hooks/."    "$TARGET/.kiro/hooks/"
 cp -r "$FRAMEWORK_DIR/kiro/steering/." "$TARGET/.kiro/steering/"
@@ -69,6 +69,15 @@ cp -r "$FRAMEWORK_DIR/kiro/skills/."   "$TARGET/.kiro/skills/"
 
 if [[ -d "$FRAMEWORK_DIR/kiro/adapters" ]] && [[ -n "$(ls -A "$FRAMEWORK_DIR/kiro/adapters")" ]]; then
   cp -r "$FRAMEWORK_DIR/kiro/adapters/." "$TARGET/.kiro/adapters/"
+fi
+
+# Copy framework scripts (bootstrap + pxpipe launcher)
+if [[ -d "$FRAMEWORK_DIR/scripts" ]]; then
+  cp -r "$FRAMEWORK_DIR/scripts/." "$TARGET/scripts/"
+  chmod +x "$TARGET/scripts/"*.sh 2>/dev/null || true
+  echo "     ✅ scripts copied ($(ls "$TARGET/scripts/"*.sh 2>/dev/null | wc -l | tr -d ' ') shell scripts)"
+else
+  echo "     ⚠️  scripts/ not found in framework — skipping"
 fi
 
 echo "     ✅ framework layers copied"
@@ -297,7 +306,7 @@ check() {
   fi
 }
 
-check "$TARGET/.kiro/hooks/elite-team-orchestrator.json" "hook: elite-team-orchestrator"
+check "$TARGET/.kiro/hooks/elite-team-orchestrator.json"       "hook: elite-team-orchestrator"
 check "$TARGET/.kiro/steering/loop-engine.md"                  "steering: loop-engine"
 check "$TARGET/.kiro/steering/team-orchestrator-core.md"       "steering: team-orchestrator-core"
 check "$TARGET/.kiro/steering/team-orchestrator-sprint.md"     "steering: team-orchestrator-sprint"
@@ -307,6 +316,8 @@ check "$TARGET/.kiro/reference/ponytail-rung-disqualification-guide.md" "referen
 check "$TARGET/.kiro/memory/lessons.md"                        "memory: lessons"
 check "$TARGET/.kiro/memory/checkpoint.md"                     "memory: checkpoint"
 check "$TARGET/kiro"                                           "symlink: kiro → .kiro"
+check "$TARGET/scripts/bootstrap-project.sh"                   "script: bootstrap-project.sh"
+check "$TARGET/scripts/start-kiro-pxpipe.sh"                   "script: start-kiro-pxpipe.sh"
 
 # Count what we built
 HOOK_COUNT=$(find "$TARGET/.kiro/hooks/"    -name "*.json" 2>/dev/null | wc -l | tr -d ' ')
