@@ -10,7 +10,7 @@ This is the only point where `docs/product-graph.yaml` is written. Senior engine
 ---
 
 ## Step 1 — Collect patches
-- [ ] Find all `docs/graph-patch-sprint{N}-*.yaml` files for the current sprint
+- [ ] Find all `docs/graph/graph-patch-sprint{N}*.yaml` files for the current sprint (path: `docs/graph/`)
 - [ ] If none found → log `[GRAPH: no patches this sprint — skipping merge]` and stop
 - [ ] Log: `[GRAPH-COLLECT: N patch files found for sprint N]`
 
@@ -61,27 +61,72 @@ Add edge:
 
 - [ ] Log: `[GRAPH-DECISIONS: N decision nodes added/updated this sprint]`
 
-## Step 5 — Regenerate docs/product-graph.html
-Regenerate the self-contained HTML visualization with all current graph data embedded.
-The HTML file contains the graph data as an inline JavaScript object — no server required.
+## Step 5 — Generate sprint-specific knowledge graph HTML (GAP-48C — MANDATORY)
 
-Use the template at `docs/product-graph.html`. Replace the `GRAPH_DATA` constant with current
-graph nodes and edges serialized as JSON. Key rendering rules:
-- `service` nodes → large circle, blue (#3B82F6)
-- `module` nodes → medium circle, indigo (#6366F1)
-- `component` nodes → medium circle, violet (#8B5CF6)
-- `function` nodes → small circle, purple (#A855F7)
-- `api` nodes → rounded rectangle, green (#10B981)
-- `database` nodes → cylinder shape, amber (#F59E0B)
-- `decision` nodes → diamond, orange (#F97316) — always rendered prominently
+This step is NOT optional. HTML visualization MUST be produced at GATE 5. This was the root gap in GAP-48C.
 
-- [ ] Write updated `docs/product-graph.html`
-- [ ] Verify it opens in a browser without a server (double-click test)
+**File A — Sprint-specific (new each sprint):** `docs/graph/knowledge-graph-sprint{N}.html`
+**File B — Cumulative live graph (updated every sprint):** `docs/graph/product-graph.html`
 
-## Step 6 — Clean up
-- [ ] Delete all `docs/graph-patch-sprint{N}-*.yaml` files processed this sprint
-- [ ] Commit: `docs/product-graph.yaml`, `docs/product-graph.html`
-- [ ] Log: `[GRAPH-DONE: product-graph.yaml updated | product-graph.html regenerated | N patch files deleted]`
+Both files are self-contained D3 v7 force-directed graphs. No server required. Embed graph data as inline JSON.
+
+**Node color coding (match exactly — by node `type` field in YAML):**
+| Node type | Color | Notes |
+|-----------|-------|-------|
+| `domain_entity` | `#6366F1` indigo | Core business objects |
+| `service` | `#3B82F6` blue | Microservices, API services |
+| `datastore` | `#F59E0B` amber | PostgreSQL, Redis, S3, etc. |
+| `infrastructure` | `#10B981` emerald | EKS, VPC, CI/CD, GitHub Actions |
+| `code_component` | `#8B5CF6` violet | Go packages, middleware, handlers |
+| `security_policy` | `#EF4444` red | Auth policies, RBAC, WAF rules |
+| `compliance_policy` | `#F97316` orange | HIPAA, GDPR, SOC2 rules |
+| `decision` | `#EC4899` pink — diamond shape | ADR/impl-decision nodes |
+| `api` | `#14B8A6` teal | API endpoints |
+
+**Edge patterns:**
+| Edge `type` | Dash pattern | Meaning |
+|-------------|-------------|---------|
+| `data-flow` | solid | Data passes between nodes |
+| `calls` | `5,5` dashed | Service A calls Service B |
+| `manages` | `10,4` long-dash | Orchestration relationship |
+| `stores-in` | `3,3` dotted | Service writes to datastore |
+| `enforces` | `8,3,3,3` dash-dot | Policy applied to node |
+| `decided_by` | `4,4` dashed | Decision node linked to component |
+
+**Required HTML features:**
+- [ ] D3 v7 loaded from CDN: `https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js`
+- [ ] Force-directed simulation: `d3.forceSimulation` with `forceLink`, `forceCharge`, `forceCenter`
+- [ ] Zoom + pan: `d3.zoom()` applied to root SVG group
+- [ ] Drag: `d3.drag()` per node
+- [ ] Hover tooltip: shows node `id`, `label`, `type`, and `description` (if present)
+- [ ] Filter chips at top: one chip per node type — clicking a type hides/shows those nodes
+- [ ] Deferred nodes (field `deferred: true` in YAML): render at 50% opacity with dashed border
+- [ ] Legend: node color → type name (bottom or side panel)
+- [ ] Edge legend: pattern → relationship name
+- [ ] Header: "Product Knowledge Graph — Sprint N" + node count + edge count
+
+**Generation protocol:**
+1. Read merged `docs/graph/product-graph.yaml` (or local patch data if first sprint)
+2. Serialize `nodes` and `edges` arrays as inline JSON constants in the HTML script block
+3. Apply the node/edge styling rules above
+4. Write to File A (`knowledge-graph-sprint{N}.html`) — snapshot for this sprint
+5. Write to File B (`product-graph.html`) — update with ALL cumulative graph data
+
+- [ ] File A written: `docs/graph/knowledge-graph-sprint{N}.html`
+- [ ] File B written: `docs/graph/product-graph.html`
+- [ ] Both files open without a server (self-contained, no fetch() calls)
+- [ ] Log: `[GRAPH-HTML: sprint-html=knowledge-graph-sprint{N}.html ✅ | live-html=product-graph.html ✅ | nodes=N | edges=N]`
+
+**GATE 5 BLOCK condition:** If either HTML file is missing or empty after this step → GATE 5 CANNOT CLOSE.
+Emit: `[GRAPH-ERROR: HTML generation incomplete — GATE 5 BLOCKED]` and re-run this step.
+
+## Step 6 — Clean up and verify
+- [ ] Delete all `docs/graph/graph-patch-sprint{N}*.yaml` files processed this sprint
+- [ ] Verify `docs/graph/product-graph.yaml` exists and has increased node count vs pre-merge
+- [ ] Verify `docs/graph/knowledge-graph-sprint{N}.html` exists and is non-empty (> 5KB)
+- [ ] Verify `docs/graph/product-graph.html` exists and is non-empty
+- [ ] Commit: `docs/graph/product-graph.yaml`, `docs/graph/product-graph.html`, `docs/graph/knowledge-graph-sprint{N}.html`
+- [ ] Log: `[GRAPH-DONE: yaml ✅ | sprint-html ✅ | live-html ✅ | N patches deleted | GATE5 GRAPH-MERGE: COMPLETE]`
 
 ---
 

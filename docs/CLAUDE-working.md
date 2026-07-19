@@ -3,7 +3,7 @@
 # (reference only, never auto-loads). This file = PENDING work only.
 # Read this every session. Skip CLAUDE-implemented.md unless debugging.
 
-Last updated: 2026-07-17
+Last updated: 2026-07-31
 
 # ══════════════════════════════════════════════════════════════════════
 # POST-FIX WIRING VERIFICATION — MANDATORY AFTER EVERY FIX
@@ -57,6 +57,85 @@ Last updated: 2026-07-17
 
 # ── PENDING FIXES ──────────────────────────────────────────────
 # Fixes 44A, 45A, 45B, 45C, R1(outreach), 46A, 47A–D moved to CLAUDE-implemented.md
+
+## GAP-48A — Lesson graduation STAGE 1→2 not automated  [PRIORITY: MEDIUM · Fix 48A pending]
+# Found in: Dry Run v12 (2026-07-17)
+# What: Lessons enter Stage 1 but never automatically graduate. No age counter, no trigger,
+#   no alert when a lesson has been confirmed in a second sprint. Fix 40A defined the 5-stage
+#   system but never wired the graduation mechanism.
+# Root cause: lessons.md has the stage schema but team-orchestrator-sprint.md SM-RETRO section
+#   only checks for STAGE 1-FAIL lessons (Fix 42B) — it doesn't check whether STAGE 1 lessons
+#   have been confirmed in a second sprint and are ready to graduate to STAGE 2.
+# Fix needed:
+#   1. Add `confirmed_at` and `confirmed_in_sprint` fields to each Stage 1 lesson
+#   2. SM-RETRO: for each Stage 1 lesson, check if it appeared + was correctly applied in the
+#      sprint just closed → if yes, set stage: 2, add graduation date
+#   3. lessons.md gets a GRADUATION LOG section to track stage transitions
+# Files to change: team-orchestrator-sprint.md (SM-RETRO section), lessons.md template
+# Wiring: L1✅ L2✅ L3✅ L4✅ (SM-RETRO trigger) L5✅ L6✅ L7✅
+# Status: ✅ RESOLVED — 2026-07-31 | team-orchestrator-sprint.md GATE 4 MEMORY WRITE step 3b added; STAGE TEMPLATE with confirmed_at + confirmed_in_sprint required fields defined
+
+## GAP-48B — Process artifacts not auto-emitted before code — no pre-code gate  [PRIORITY: HIGH · Fix 48B pending]
+# Found in: HealthGuard Pro build (2026-07-31)
+# User feedback: "I did not see the sprint planning, git commits, jiras and documents"
+# What: In single-agent Cowork mode the framework skips straight to code. No hook gate checks
+#   whether required process docs exist before allowing writes to services/ or infra/.
+#   The process layer (PRD, sprint plan, story cards) only appeared when explicitly asked.
+# Root cause: Hook has no pre-code artifact gate. The hook STEP 4 loads steering files but
+#   nothing in the execution path checks "does docs/prd.md exist?" before BACKEND_LEAD starts.
+# Fix needed:
+#   BEFORE any write to services/, infra/, or src/ → verify these exist:
+#     □ docs/prd.md (or equivalent product requirements)
+#     □ docs/sprint-{N}/sprint-plan.md
+#     □ docs/sprint-{N}/stories/{STORY-ID}.md for the story being implemented
+#   If missing → STOP. Emit the missing artifact first. This makes process docs a compiler
+#   error rather than documentation debt.
+# Files to change: elite-team-orchestrator.kiro.hook (new STEP — pre-code artifact gate),
+#   session-guards.md (GUARD 4 — process layer required before code)
+# Wiring: L1✅ L2✅ L3✅ L4✅ L5✅ L6✅ (session guard) L7✅
+# Status: ✅ RESOLVED — 2026-07-31 | session-guards.md GUARD 4 added; hook STEP 4 DEVELOP entry wired with GUARD 4 check before loop-engine.md loads
+
+## GAP-48C — Fix 46A incomplete: YAML patch only, no HTML viz auto-emitted at GATE 5  [PRIORITY: MEDIUM · Fix 48C pending]
+# Found in: HealthGuard Pro build (2026-07-31)
+# What: Fix 46A says "D3 viz regenerated at GATE 5" but implementation only produces
+#   graph-patch-{sprint}-{story}.yaml. The HTML knowledge graph visualization was not
+#   auto-generated — it only appeared when explicitly asked. ARCHITECT's GATE 5 behavior
+#   does not include HTML emission.
+# Partial fix applied: HTML viz built manually this session (docs/graph/knowledge-graph-sprint1.html).
+#   Remaining gap: ARCHITECT must auto-emit the HTML as part of GATE 5, not as a separate ask.
+# Fix needed:
+#   1. GATE 5 in team-orchestrator-sprint.md: ARCHITECT step must include
+#      "merge graph patches → emit graph-patch-sprint{N}.yaml AND regenerate knowledge-graph.html"
+#   2. product_graph_update.md skill (already exists per Fix 46A) → add HTML generation step
+#   3. A template HTML file or generator script so the ARCHITECT has a repeatable pattern
+# Files to change: team-orchestrator-sprint.md (GATE 5 ARCHITECT step),
+#   kiro/skills/architect/product_graph_update.md
+# Wiring: L1✅ L2✅ L3✅ L4✅ (GATE 5 trigger) L5✅ L6✅ L7✅
+# Status: ✅ RESOLVED — 2026-07-31 | team-orchestrator-sprint.md GATE 5 Step 4 expanded to G1-G4 substeps; product_graph_update.md Step 5 replaced with full D3 HTML spec (sprint-specific + cumulative); GATE 5 blocks if HTML missing
+
+## GAP-48D — Single-agent collapse: 22-agent handoffs lose enforcement in Cowork mode  [PRIORITY: HIGH · Fix 48D pending]
+# Found in: HealthGuard Pro build (2026-07-31)
+# What: The framework assumes agents are separate invocations with forced artifact emission
+#   per role. In Cowork mode one Claude instance plays all roles. Inter-agent handoff contracts
+#   are implicit — there is no mechanism that says "BACKEND_LEAD cannot start until SM has
+#   written the sprint plan." In a true multi-agent setup the file write IS the handoff signal.
+#   In single-agent Cowork mode there is nothing equivalent.
+# Root cause: Framework was designed for the Kiro multi-agent runtime where each role is
+#   a separate agent invocation. Cowork collapses this to one instance. The process layer
+#   enforcement relied on inter-agent handoff friction that no longer exists.
+# Fix needed (two-part):
+#   PART 1 — Immediate (GAP-48B covers this): Pre-code artifact gate in hook.
+#   PART 2 — Structural: Define explicit "role contracts" in team-orchestrator-core.md.
+#     Each agent role has: PRECONDITIONS (what must exist before I start) and
+#     POSTCONDITIONS (what I must emit before returning control).
+#     Example:
+#       BACKEND_LEAD PRECONDITIONS: sprint-plan.md exists, story card for this story exists
+#       BACKEND_LEAD POSTCONDITIONS: code committed, story card updated to DONE, GATE S2 checklist signed
+#     These role contracts are checked by the hook even in single-agent mode.
+# Files to change: team-orchestrator-core.md (role contract table),
+#   elite-team-orchestrator.kiro.hook (contract verification at role handoff)
+# Wiring: L1✅ L2✅ L3✅ L4✅ L5✅ L6✅ L7✅ (new F13 failure mode: role-contract collapse)
+# Status: ✅ RESOLVED — 2026-07-31 | ROLE CONTRACT TABLE (23 roles) added to team-orchestrator-core.md; hook STEP 4 Mode 1/4/5 wired CONTRACT CHECK before/after every role activation with PASS/BLOCK logging
 
 ## Fix 46B — White Paper v6: Add External Validation Section  [PRIORITY: LOW · Phase 2 Roadmap]
 # What: When external validator(s) reproduce findings, update white paper with Section 11 results.
@@ -198,8 +277,8 @@ Last updated: 2026-07-17
 
 ---
 
-## MASTER FIX REGISTER — All Fixes (Fix 1 → Fix 44A)
-Last synced: 2026-07-17 | Total: 57 sub-fixes across 46 fix groups | 57 implemented ✅ · 0 pending 🔲 · Phase 2 queued
+## MASTER FIX REGISTER — All Fixes (Fix 1 → GAP-48D)
+Last synced: 2026-07-31 | Total: 61 entries across 50 fix groups | 61 implemented ✅ · 0 pending 🔲 · Phase 2 queued
 
 | Fix | Name | Why It Was Needed | Status | File(s) |
 |-----|------|-------------------|--------|---------|
@@ -270,6 +349,10 @@ Last synced: 2026-07-17 | Total: 57 sub-fixes across 46 fix groups | 57 implemen
 | Fix 47B | Phase/Event Triggers | CTO/SM/TW/ARCHITECT only fired on story labels — never at their natural system phases | ✅ | orchestrator-routing.md (PHASE/EVENT AUTO-TRIGGERS block), team-orchestrator-sprint.md (SM-PLAN section + GATE 5 TW trigger) |
 | Fix 47C | Universal Role Defaults | code_review_excellence / debugging / refactoring / devops defaults never loaded without labels | ✅ | skill-selection-matrix.md (UNIVERSAL ROLE DEFAULTS table) |
 | Fix 47D | Fallback Keyword Expansion | LABEL-BASED FALLBACK had 9 patterns; 82 new labels had zero fallback coverage for unlabeled stories | ✅ | skill-label-index.md (9 → ~60 keyword patterns covering all new lanes) |
+| GAP-48A | Lesson Graduation Not Automated | Fix 40A defined 5-stage system but never wired Stage 1→2 graduation trigger; lessons accumulate at Stage 1 indefinitely | ✅ IMPLEMENTED 2026-07-31 | team-orchestrator-sprint.md GATE 4 MEMORY WRITE step 3b; STAGE TEMPLATE with confirmed_at + confirmed_in_sprint |
+| GAP-48B | No Pre-Code Process Artifact Gate | Hook allows writes to services/ without PRD/sprint-plan/story card existing; process layer skipped until asked | ✅ IMPLEMENTED 2026-07-31 | session-guards.md GUARD 4; elite-team-orchestrator.kiro.hook STEP 4 DEVELOP entry |
+| GAP-48C | Fix 46A Incomplete — No Auto HTML Viz | Fix 46A wired YAML patch but not HTML viz at GATE 5; ARCHITECT doesn't auto-emit the graph visualization | ✅ IMPLEMENTED 2026-07-31 | team-orchestrator-sprint.md GATE 5 Steps G1-G4; product_graph_update.md Step 5 full D3 HTML spec |
+| GAP-48D | Single-Agent Role Contract Collapse | 22-agent handoff contracts evaporate in Cowork single-agent mode; no PRECONDITION/POSTCONDITION enforcement per role | ✅ IMPLEMENTED 2026-07-31 | team-orchestrator-core.md ROLE CONTRACT TABLE (23 roles); hook STEP 4 CONTRACT CHECK |
 | Skill: sprint_artifacts | SM Document Generation | SM had no way to produce pptx/pdf/xlsx sprint artifacts at GATE 5 / SM-RETRO / SM-PLAN | ✅ | kiro/skills/scrum_master/sprint_artifacts.md (HYBRID) |
 | Skill: web_app_testing | QA Browser Testing | QA had no browser-based testing capability; Anthropic web-app-tester unpublished | ✅ | kiro/skills/qa_engineer/web_app_testing.md (CHECKLIST) using claude-in-chrome tools |
 | R1 | Recruit External Validator | No independent reproduction — the single biggest gap to academic credibility | 🔲 PENDING | docs/external-validator-outreach.md (posts ready, not yet published) |
@@ -340,6 +423,10 @@ Last synced: 2026-07-10 | Found in: Dry Run v11
 | 🚀 Feature | Fix 43B | Ponytail Rung Disqualification Protocol — RDR + escalation path + ADR + artifact for users | Code Quality |
 | 🚪 Gate | Fix 43C | Cross-Tenant Isolation Test at GATE S2 — absence = GATE FAIL on rbac/multi-tenant stories | Security |
 | 🛡️ Guard | Fix 44A | Mode 5 Security/RBAC Advisory — warn when security/rbac story ships in Lean mode without GATE S2 | Security |
+| 🚪 Gate | GAP-48A | Lesson Graduation Gate — SM-RETRO confirms Stage 1 lessons applied correctly → auto-promotes to Stage 2 | Memory |
+| 🚪 Gate | GAP-48B | Pre-Code Artifact Gate — hook blocks service/ writes until PRD + sprint-plan + story card exist | Sprint Execution |
+| 🔧 Fix | GAP-48C | Fix 46A Completion — ARCHITECT auto-emits HTML viz at GATE 5 alongside YAML patch | Documentation |
+| 🏗️ Architecture | GAP-48D | Role Contract Table — PRECONDITIONS + POSTCONDITIONS per agent; enforced in single-agent Cowork mode | Infrastructure |
 
 ### Summary by Type
 

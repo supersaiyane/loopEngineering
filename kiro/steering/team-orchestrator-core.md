@@ -142,6 +142,47 @@ Token count: ~[N]
 - "Key decisions" = choices made that constrain downstream roles (tech stack, API contract, data model, etc.).
 - Total handoff block ≤ 250 tokens. If over: cut decisions to top 2.
 
+---
+
+## ROLE CONTRACT TABLE (GAP-48D)
+
+Every role activation is governed by this contract. In single-agent Cowork mode — where no separate agent invocation enforces handoff — the orchestrator MUST check PRECONDITIONS before activating a role and verify POSTCONDITIONS before handing off to the next role.
+
+**Enforcement rule:** If a PRECONDITION file is missing → emit `[CONTRACT BLOCK: role=<X> | missing precondition: <artifact>]` and halt. Do NOT proceed. Ask user whether to run the upstream role first or skip with debt logged.
+
+| Role | PRECONDITIONS (files that must exist) | POSTCONDITIONS (files this role must produce) |
+|------|---------------------------------------|----------------------------------------------|
+| `market_researcher` | None | `docs/foundation/market-research.md` |
+| `cto` | `docs/foundation/market-research.md` | `docs/foundation/tech-strategy.md` |
+| `product_manager` | `docs/foundation/tech-strategy.md` | `docs/foundation/prd.md` |
+| `architect` | `docs/foundation/prd.md` | `docs/foundation/architecture.md` + ≥1 ADR in `docs/adrs/` |
+| `database_architect` | `docs/foundation/architecture.md` | `docs/foundation/db-schema.md` OR `docs/phase-N/db-architecture.md` |
+| `cloud_architect` | `docs/foundation/architecture.md` | `docs/foundation/cloud-architecture.md` |
+| `finops_architect` | `docs/foundation/cloud-architecture.md` | `docs/foundation/finops.md` |
+| `security_engineer` (DESIGN) | `docs/foundation/architecture.md` + `docs/foundation/prd.md` | `docs/foundation/security-posture.md` |
+| `scrum_master` (SM-GATE) | All 8 foundation docs (from GATE 2 checklist) | VERDICT: GREEN or RED (in response — not a file) |
+| `scrum_master` (SM-PLAN) | SM-GATE VERDICT = GREEN | `docs/sprint-N/sprint-plan.md` + story cards in `docs/sprint-N/stories/` |
+| `backend_lead` | `docs/sprint-N/sprint-plan.md` + story card | Backend implementation plan (in story card comment or `docs/sprint-N/impl-plan-be.md`) |
+| `frontend_lead` | `docs/sprint-N/sprint-plan.md` + story card | Frontend implementation plan |
+| `senior_engineer_be` | backend_lead plan + story card + `[LOOP SPEC APPROVED]` logged + **GUARD 4 PASS** | Code in `services/` + tests + passing CI |
+| `senior_engineer_fe` | frontend_lead plan + story card + `[LOOP SPEC APPROVED]` logged + **GUARD 4 PASS** | Code in `apps/` or `packages/` + tests |
+| `ml_engineer` | `docs/foundation/prd.md` + `docs/foundation/architecture.md` | Model artifacts + inference API + `docs/sprint-N/ml-spec.md` |
+| `qa_engineer` | Implementation code complete | Test report + coverage % logged in story |
+| `devops_engineer` | Services built | CI/CD pipeline + IaC in `infra/` |
+| `sre_engineer` | Deployment config + `devops_engineer` artifacts | SLO definitions + runbooks in `docs/runbooks/` |
+| `technical_writer` | All sprint artifacts complete | API docs updated + `docs/sprint-N/sprint-summary.md` |
+| `scrum_master` (SM-RETRO) | All sprint stories = DONE + Sprint Discipline Card populated | Retro doc + velocity update + next sprint seeded |
+| `data_engineer` | `docs/foundation/architecture.md` + data requirements in PRD | Pipeline code in `data/` + schema docs |
+| `data_scientist` | Dataset available + experiment spec in story | Experiment results + statistical report |
+| `mobile_engineer` | `docs/foundation/app-flow.md` + story card + **GUARD 4 PASS** | Mobile code in `apps/mobile/` + tests |
+
+**Single-agent contract check protocol (Cowork mode):**
+Before activating any role, the orchestrator silently checks: does each PRECONDITION file exist?
+- ALL present → log `[CONTRACT: role=<X> | preconditions=✅ | proceeding]` → activate role
+- ANY missing → log `[CONTRACT BLOCK: role=<X> | missing=<artifact-path>]` → halt + prompt user
+- After role completes → verify POSTCONDITION file(s) exist → log `[CONTRACT: role=<X> | postconditions=✅ | handoff to <next>]`
+
+`Log format: [CONTRACT: role=<X> | pre=✅/❌ | post=✅/❌ | status=PASS/BLOCK]`
 
 ---
 

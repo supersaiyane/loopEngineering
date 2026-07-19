@@ -48,6 +48,28 @@ inclusion: manual
     3. If any low/medium entry confirmed this sprint → upgrade per objective criteria (Fix 20B):
        low→medium: this is the 2nd+ separate sprint confirming it, zero contradictions
        medium→high: 5+ sprint count + user confirmed at least once. Check checkpoint.md dates.
+    3b. LESSON STAGE GRADUATION (GAP-48A): For EACH Stage 1 lesson in lessons.md:
+        Check the lesson's `graduation_trigger` field — was that specific condition met during THIS sprint?
+        Evidence types (in descending strength):
+          a) SM-RETRO explicitly notes the lesson was applied and outcome matched prediction
+          b) A story with matching labels was shipped this sprint with zero re-occurrence of the issue
+          c) The lesson's exact pattern appeared in impl-decisions.md with the lesson cited
+        If evidence found for the lesson's graduation trigger:
+          → Set `stage: 2`
+          → Add `confirmed_at: Sprint N` (current sprint number)
+          → Add `confirmed_in_sprint: N`
+          → Log: `[LESSON-GRADUATED: "<title>" | Stage 1→2 | confirmed_in_sprint=N | evidence=<type>]`
+        If NO evidence found for the graduation trigger:
+          → Keep `stage: 1`. Do NOT promote.
+          → Log: `[LESSON-STAGE1: "<title>" | no graduation evidence this sprint | trigger=<trigger text>]`
+        STAGE TEMPLATE: All new lessons written to lessons.md MUST include these fields:
+          ```
+          stage: 1
+          graduation_trigger: "<exact condition that must be met to promote to Stage 2>"
+          confirmed_at: null
+          confirmed_in_sprint: null
+          ```
+        Log: `[LESSON-GRADUATION-SCAN: N Stage-1 entries | N graduated | N held at Stage 1]`
     4. Read kiro/memory/decisions.md — if any ADR made or superseded this sprint → update
        ADR SCOPE LOAD RULE (Fix 25P): When loading ADRs for a story, filter by:
          domain overlaps story labels AND (scope=global OR scope matches story component).
@@ -211,15 +233,43 @@ When GATE 5 passes:
      - `docs/sprint-N/review-deck.pptx` — one slide per story shipped this phase
      - `docs/sprint-N/retro-report.pdf` — SM-RETRO summary for async stakeholders
    - Log: `[TW-GATE5: docs updated | review-deck.pptx ✅ | retro-report.pdf ✅]`
-4. `architect` [GRAPH-MERGE — Fix 46A] — AUTO-ACTIVATES at GATE 5 after TW docs:
+4. `architect` [GRAPH-MERGE — Fix 46A + GAP-48C] — AUTO-ACTIVATES at GATE 5 after TW docs:
    - Load kiro/skills/architect/product_graph_update.md
-   - Collect all `docs/graph-patch-sprint{N}-*.yaml` files from this sprint
-   - Merge patches into `docs/product-graph.yaml`
-   - Add decision nodes for any architectural choices made this sprint
-   - Regenerate `docs/product-graph.html`
-   - Delete processed patch files
-   - Log: `[GRAPH-MERGE: +N nodes | +N edges | product-graph.html regenerated]`
-   - If no patch files found → log `[GRAPH: no patches this sprint]` and skip
+   - Collect all `docs/graph/graph-patch-sprint{N}*.yaml` files from this sprint
+   - If no patch files found → log `[GRAPH: no patches this sprint]` and SKIP (do not touch existing files)
+   - If patch files found — execute ALL 4 steps below in order. GATE 5 BLOCKS if any step fails:
+
+   **Step G1 — YAML merge:**
+   - Merge all patch YAML files into `docs/graph/product-graph.yaml`
+   - Add decision nodes for any architectural choices made this sprint (from impl-decisions.md)
+   - Verify merged YAML has valid structure (nodes + edges arrays, each node has id+type+label)
+   - Log: `[GRAPH-YAML: +N nodes | +N edges | product-graph.yaml updated]`
+
+   **Step G2 — HTML viz generation (MANDATORY — GAP-48C):**
+   - Read `product-graph.yaml` node/edge arrays from Step G1
+   - Generate `docs/graph/knowledge-graph-sprint{N}.html` — self-contained D3 v7 force-directed graph:
+     - All nodes color-coded by type (domain_entity / service / datastore / infrastructure / code_component / security_policy / compliance_policy)
+     - All edges with arrow markers and dash patterns (solid=data-flow, dashed=calls, dotted=compliance)
+     - Deferred/Sprint-N+1 nodes visually distinguished (lighter color or dashed border)
+     - Filter chips by node type
+     - Tooltip on hover showing node metadata
+     - Zoom + drag enabled
+     - Legend for node types + edge types
+     - Node/edge counts in header
+   - Log: `[GRAPH-HTML: knowledge-graph-sprint{N}.html generated | nodes=N | edges=N]`
+
+   **Step G3 — LIVE graph update:**
+   - Also regenerate `docs/graph/product-graph.html` (cumulative — all sprints to date)
+   - This is the always-current full knowledge graph. Sprint-specific HTML is for archival.
+   - Log: `[GRAPH-LIVE: product-graph.html updated | total nodes=N | total edges=N]`
+
+   **Step G4 — Cleanup + verification:**
+   - Delete processed patch YAML files (sprint-specific patches that have been merged)
+   - Verify both HTML files exist and are non-empty: `docs/graph/knowledge-graph-sprint{N}.html` + `docs/graph/product-graph.html`
+   - If either HTML is missing or empty after generation → EMIT ERROR and re-run Step G2/G3 before GATE 5 can close
+   - Log: `[GRAPH-MERGE: COMPLETE | sprint-html=✅ | live-html=✅ | patches-cleaned=N | GATE5-unblocked]`
+
+   **HARD RULE:** GATE 5 cannot close until `[GRAPH-MERGE: COMPLETE]` is logged. The HTML files are NOT optional. This was the root failure in GAP-48C — YAML was merged but HTML was silently skipped.
 5. Announce: `"Phase N CLOSED. QA: GREEN. Security: GREEN. Docs: UPDATED. Graph: MERGED. Ready to begin Phase N+1?"`
 5. Wait for explicit YES before starting next phase
 

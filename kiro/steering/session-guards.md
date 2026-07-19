@@ -107,3 +107,40 @@ re-read-before-edit protocol already in debugging_methodology.md — now with an
 explicit reason: the old context may be an image, not text.
 
 `Log: [GUARD-3: exact-string needed → re-fetching from source, not image memory]`
+
+---
+
+## GUARD 4 — PRE-CODE ARTIFACT GATE (GAP-48B)
+
+**When:** Any session where a write to `services/`, `infra/`, `packages/`, `apps/`, or any production code directory is about to happen.
+**Why:** In single-agent Cowork mode, there is no enforced DESIGN→DEVELOP handoff. Code gets written before PRD, sprint-plan, and story cards exist — producing untracked, unvalidated work with no audit trail and no gate compliance.
+
+**Trigger condition:**
+Any prompt that would result in writing files to `services/`, `infra/`, `packages/`, `apps/`, or any directory containing production source code. Applies even to scaffolding, stub directories, and placeholder files.
+
+**Verification checklist — ALL 3 must be TRUE before the first code write:**
+
+| # | Artifact | Expected path | Pass condition |
+|---|----------|---------------|---------------|
+| 1 | PRD | `docs/prd.md` OR `docs/foundation/prd.md` | File exists AND contains Personas section + Feature list + Hard Constraints |
+| 2 | Sprint plan | `docs/sprint-N/sprint-plan.md` | File exists AND has story list, point sizing, IAM budget check |
+| 3 | Story card | `docs/sprint-N/stories/<STORY-ID>.md` | File exists for the specific story being implemented right now |
+
+**Protocol when any artifact is missing:**
+```
+⚠️ PRE-CODE GATE BLOCKED (GUARD 4 / GAP-48B):
+Missing process artifacts detected. Code cannot be written yet.
+  - [ ] PRD: docs/prd.md — NOT FOUND
+  - [ ] Sprint plan: docs/sprint-1/sprint-plan.md — NOT FOUND
+  - [ ] Story card: docs/sprint-1/stories/<STORY-ID>.md — NOT FOUND
+
+DESIGN phase must complete before DEVELOP phase begins.
+Shall I run the THINK→DESIGN phase now to produce missing artifacts?
+```
+
+**Hard rules:**
+- Do NOT write any code — not even scaffolding, stubs, `main.go`, `index.ts`, empty `__init__.py`, directory structures — until all 3 artifacts exist.
+- If user explicitly overrides ("skip the docs, just write the code") → acknowledge the override, write one line: `[GUARD-4: OVERRIDDEN BY USER — process debt logged]`, then proceed. Do not silently comply.
+- This guard fires BEFORE loop-engine.md is loaded. If it blocks, loop-engine.md is not loaded.
+
+`Log: [GUARD-4: PRE-CODE-GATE | prd=✅/❌ | sprint-plan=✅/❌ | story-card=<ID>=✅/❌ | status=PASS/BLOCKED/OVERRIDDEN]`
