@@ -7,7 +7,7 @@
 ![Phase](https://img.shields.io/badge/phase%201-complete%20%E2%9C%85-brightgreen?style=for-the-badge)
 ![Dry Runs](https://img.shields.io/badge/dry%20runs-v11-blue?style=for-the-badge)
 ![Ship Confidence](https://img.shields.io/badge/ship%20confidence-9.5%2F10-success?style=for-the-badge)
-![Fixes](https://img.shields.io/badge/fixes%20implemented-Fix%201--47D-orange?style=for-the-badge)
+![Fixes](https://img.shields.io/badge/fixes%20implemented-61%20%E2%9C%85-orange?style=for-the-badge)
 ![Roles](https://img.shields.io/badge/agent%20roles-22-purple?style=for-the-badge)
 ![Skill Files](https://img.shields.io/badge/skill%20files-173%20wired-informational?style=for-the-badge)
 ![pxpipe](https://img.shields.io/badge/pxpipe-token%20compression%20%E2%88%9260%25-ff6b35?style=for-the-badge)
@@ -340,10 +340,15 @@ loopEngineering/
 │   │
 │   ├── 📂 memory/                  ← Runtime state (live session files)
 │   │   ├── checkpoint.md           ← Session continuity (resume from here)
-│   │   ├── lessons.md              ← Cross-session learning log
-│   │   ├── decisions.md            ← Architectural decisions
+│   │   ├── lessons.md              ← Cross-session learning log (5-stage graduation)
+│   │   ├── decisions.md            ← Architectural decisions (ADRs)
 │   │   ├── project_map.md          ← Module-level map of the whole system
 │   │   └── flow.md                 ← End-to-end system flow reference
+│   │
+│   ├── 📂 reference/               ← Framework reference docs (NEW — replaces docs/research/)
+│   │   ├── ponytail-rung-disqualification-guide.md
+│   │   ├── compression-fidelity-methodology.md
+│   │   └── ... (5 more reference files)
 │   │
 │   ├── 📂 skills/                  ← 22 agent roles, 173 wired skill files
 │   │   ├── cto/                    ← CTO skill library
@@ -357,7 +362,8 @@ loopEngineering/
 │   └── 📄 CLAUDE-implemented.md   ← Full history: Fix 1–47D
 │
 ├── 📂 scripts/                     ← Utility scripts
-│   └── start-kiro-pxpipe.sh        ← Launch Kiro through pxpipe proxy (run this)
+│   ├── bootstrap-project.sh        ← One-command new project scaffolder (NEW)
+│   └── start-kiro-pxpipe.sh        ← Launch Kiro through pxpipe proxy
 │
 ├── 📄 gstack-research.md           ← R&D: gstack vs Loop Engineering analysis
 ├── 📄 pxpipe-research.md           ← R&D: pxpipe token compression assessment
@@ -453,6 +459,21 @@ SAFE from image recall:     decisions made · file names · architecture intent
 
 See [Token Compression — pxpipe](#️-token-compression--pxpipe) for full setup.
 
+### GUARD 4 — Pre-Code Artifact Gate (GAP-48B)
+
+Blocks code writes until process artifacts exist. Fires before any file is written to `services/`, `apps/`, `infra/`, or `packages/`.
+
+```
+□ docs/prd.md (or .kiro/specs/requirements.md) exists?
+□ docs/sprint-N/sprint-plan.md exists?
+□ docs/sprint-N/stories/<STORY-ID>.md exists?
+
+ALL present → [GUARD-4: PRE-CODE-GATE PASS] → code may proceed
+ANY missing → [GUARD-4: BLOCKED] → create the missing artifact first
+```
+
+User may say "skip docs" to override — logged as process debt.
+
 ---
 
 ## ⚡ Setup & Usage — Kiro, Claude, ChatGPT
@@ -465,93 +486,81 @@ This system runs on **three platforms**. Pick the one you use.
 
 > **This is the primary platform.** The `.kiro/` folder and hook were built specifically for Kiro.
 
-#### Why Kiro sometimes reverts to its native behavior
+#### How the Kiro integration works — Phase Split model
 
-Kiro has a built-in "Build a Feature" dialog and spec-driven workflow (`.kiro/specs/`). Without explicit suppression, Kiro ignores the orchestration hook and falls back to its own defaults — asking "Is this a new feature or a bug fix?" and creating files you didn't ask for.
+Loop Engineering uses a **two-phase model** that works with Kiro's native behavior, not against it:
 
-**The fix is already baked into the hook** — it starts with a `SYSTEM AUTHORITY` block that explicitly disables all Kiro native behaviors. But the symlink must exist for the hook to load correctly.
+| Phase | Owner | What happens |
+|-------|-------|-------------|
+| **Spec phase** | Kiro native | Type your build prompt → Kiro asks "Build a Feature?" → generates `requirements.md` + `design.md` in `.kiro/specs/` |
+| **Develop phase** | Loop Engineering | Say "start sprint 1" → hook activates: GUARD 4, sprint planning, story cards, role contracts, gates, SM-RETRO |
 
-#### Step 1 — Clone the repo into your project
+The hook stays silent during the spec phase — it activates automatically when specs exist and development begins.
+
+#### Step 1 — Bootstrap a new project (recommended)
+
+Use the included script to create a complete, Kiro-ready project in one command:
 
 ```bash
-# Inside your project root (where you open Kiro):
+cd ~/MyTechExploration/loopEngineering
+./scripts/bootstrap-project.sh MyProjectName ~/Projects
+```
+
+This creates `~/Projects/MyProjectName/` with everything pre-wired:
+- `.kiro/hooks/` — hook v4 (Kiro-native integration)
+- `.kiro/steering/` — all 14 steering files
+- `.kiro/skills/` — all 281 skill files
+- `.kiro/reference/` — framework reference docs (ponytail guide etc.) — path already fixed
+- `.kiro/memory/` — fresh checkpoint, decisions, lessons (Stage 4 framework universals)
+- `kiro → .kiro` symlink created automatically
+- `trigger-prompt.md` — fill-in template ready to paste into Kiro
+
+#### Step 2 — Or set up manually (existing project)
+
+```bash
 git clone https://github.com/supersaiyane/loopEngineering.git
 cd loopEngineering
+ln -s kiro .kiro    # Kiro reads .kiro/, this repo uses kiro/
 ```
 
-#### Step 2 — Create the `.kiro` symlink (CRITICAL)
-
-Kiro reads from `.kiro/` at the project root. This repo stores everything in `kiro/`. The symlink bridges them:
-
+Verify:
 ```bash
-# Run this from the loopEngineering directory:
-ln -s kiro .kiro
+ls .kiro/hooks/       # → elite-team-orchestrator.kiro.hook
+ls .kiro/steering/    # → 14 steering files
+ls .kiro/reference/   # → ponytail guide + framework reference docs
 ```
 
-Verify it worked:
-```bash
-ls -la .kiro          # should show → kiro
-ls .kiro/hooks/       # should show elite-team-orchestrator.kiro.hook
-ls .kiro/steering/    # should show all 14 steering files
-```
+#### Step 3 — Open in Kiro and run the spec phase
 
-> ⚠️ **If `.kiro` already exists** in your project, remove it first: `rm -rf .kiro` then re-create the symlink.
-
-#### Step 3 — Open the project in Kiro
-
-Open the `loopEngineering/` folder in Kiro. The hook loads automatically on every prompt via `promptSubmit` event — no manual activation needed.
-
-#### Step 4 — Verify the hook is active
-
-Type any prompt and look for this log line at the start of the response:
-```
-[ENV] TRACKER_MODE=markdown | GIT_MODE=LOCAL
-```
-If you see this → the hook is active. ✅
-
-If you **don't** see it → the symlink is broken. Re-run Step 2.
-
-#### Step 5 — Start your first build
+Open your project in Kiro and type your build prompt. When Kiro asks "Build a Feature?" — select it. Let Kiro generate the spec. This is the correct behaviour.
 
 ```
-Build me a SaaS billing platform with Stripe integration
+i want to build "MedVault — Multi-tenant pharmacy adherence platform"
+HIPAA + PCI-DSS · AI refill predictions · iOS/Android · Multi-region AWS
 ```
 
-The system will:
-1. Score signals → HIGH confidence → Mode 1 selected
-2. Log `[MODE: 1 auto-inferred | confidence=HIGH]`
-3. Activate the full 22-agent pipeline
-4. Start with Think phase (Market Researcher + CTO)
+#### Step 4 — Activate the develop pipeline
 
-#### 🚨 Troubleshooting — Kiro Reverting to Native Behavior
-
-| Symptom | Root cause | Fix |
-|---------|-----------|-----|
-| Kiro asks "New feature or bug fix?" | Hook not loading — symlink missing | Run `ln -s kiro .kiro` from project root |
-| Kiro creates `.kiro/specs/` folder | Hook loaded but SYSTEM AUTHORITY ignored | Check hook file exists at `.kiro/hooks/elite-team-orchestrator.kiro.hook` |
-| Steering files "not found" errors | Kiro can't resolve `kiro/steering/` paths | Verify symlink: `ls -la .kiro` → should say `kiro` |
-| Hook fires but uses wrong mode | Signal count below threshold | Prefix prompt with `[LOOP]` to force full routing |
-| Kiro ignores orchestration mid-session | Native dialog intercepted a prompt | Prefix prompt with `[LOOP]` to bypass the complexity gate |
-
-#### Force Override — `[LOOP]` prefix
-
-If Kiro ever falls back to native behavior mid-session, prefix your prompt with `[LOOP]`:
+Once specs are ready, trigger Loop Engineering:
 
 ```
-[LOOP] Build me a notification service with real-time updates
+start sprint 1
 ```
 
-`[LOOP]` bypasses the Step 0 complexity gate and guarantees the full orchestration pipeline runs regardless of prompt length or signal count.
+The hook activates and runs:
+1. Reads `checkpoint.md` + `lessons.md` + `decisions.md`
+2. GUARD 4 — verifies `prd.md` + sprint plan + story card exist before any code is written
+3. Loads `team-orchestrator-core.md` + role contract table
+4. SM-PLAN → story cards → role-based implementation → GATE 5 → SM-RETRO
 
-#### Mode Shortcuts
+#### 🚨 Troubleshooting
 
-```
-mode 1: build me a [full platform]        → Full 22-agent army
-mode 2: write the architecture doc for X  → Single role (Architect)
-mode 3: fix the null pointer in auth.go   → Direct execution, no overhead
-mode 5: lean mode — 2-person startup      → 3 lite roles, 4-iteration cap
-run discovery questions                   → Forces 7-question scoping wizard
-```
+| Symptom | Fix |
+|---------|-----|
+| Hook not loading at all | Verify symlink: `ls -la .kiro` must show `→ kiro` |
+| Steering files not found | Both `kiro/steering/` and `.kiro/steering/` work via symlink |
+| GUARD 4 blocking code writes | Correct behaviour — create the missing artifact it lists first |
+| Hook silent when you want it to activate | Say explicitly: "start sprint 1" or "begin development" |
 
 ---
 
@@ -807,6 +816,12 @@ This system was built across **47D+ incremental fixes** over multiple sessions. 
 | Fix 46A | ✅ Product Knowledge Graph: graph_patch_emit, product_graph_update, D3 viz |
 | Fix 47A–D | ✅ Skill Activation Audit: 37→119 label rows, phase auto-triggers, universal defaults |
 | R1 | ✅ External Validator Outreach: HN + Reddit + LinkedIn + Discord posts drafted |
+| GAP-48A | ✅ Lesson graduation triggers — SM-RETRO now auto-promotes Stage 1 → Stage 2 lessons |
+| GAP-48B | ✅ GUARD 4 pre-code artifact gate — blocks code before PRD + sprint plan + story card exist |
+| GAP-48C | ✅ GATE 5 mandatory HTML knowledge graph — D3 viz auto-emitted, GATE 5 blocks if missing |
+| GAP-48D | ✅ Role contract table — 23 roles with PRECONDITIONS/POSTCONDITIONS, enforced in hook |
+| Hook v4 | ✅ Kiro-native integration — phase split model, no injection-guard conflicts |
+| bootstrap | ✅ `scripts/bootstrap-project.sh` — one-command new project scaffolder with path fix |
 
 > **Phase 1 complete.** Full history: [`kiro/CLAUDE-implemented.md`](kiro/CLAUDE-implemented.md) · Active register: [`kiro/CLAUDE.md`](kiro/CLAUDE.md)
 
@@ -1003,6 +1018,9 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 │  R1 outreach                   ✅ Drafted · Ready to post│
 │  pxpipe token compression      ✅ ~59-70% savings       │
 │  White paper v5                ✅ 34pp · DOCX + PDF     │
+│  GAP-48A/B/C/D resolved        ✅ 61/61 implemented     │
+│  Hook v4 Kiro-native           ✅ Phase split · no conflict│
+│  bootstrap-project.sh          ✅ One-command scaffolder │
 │  Git repo                      ⏸️ Push pending (SSH/PAT)│
 ├─────────────────────────────────────────────────────────┤
 │  Next actions                                           │

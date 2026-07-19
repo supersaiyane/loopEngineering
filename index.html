@@ -321,7 +321,7 @@ footer a:hover{color:#c4b5fd}
     <div class="stat"><div class="stat-n">22</div><div class="stat-l">Specialist Agents</div></div>
     <div class="stat"><div class="stat-n">5</div><div class="stat-l">Execution Modes</div></div>
     <div class="stat"><div class="stat-n">173</div><div class="stat-l">Skills Wired</div></div>
-    <div class="stat"><div class="stat-n">47D</div><div class="stat-l">Fix Cycles</div></div>
+    <div class="stat"><div class="stat-n">61</div><div class="stat-l">Fixes Shipped</div></div>
     <div class="stat"><div class="stat-n">12</div><div class="stat-l">Failure Modes</div></div>
     <div class="stat"><div class="stat-n">v5</div><div class="stat-l">White Paper</div></div>
   </div>
@@ -398,7 +398,7 @@ footer a:hover{color:#c4b5fd}
         <div style="font-size:.62rem;color:#64748b;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:.4rem">Developer productivity on novel tasks</div>
       </div>
       <div style="background:rgba(10,16,32,.7);border:1px solid rgba(244,63,94,.18);border-radius:12px;padding:1.2rem;text-align:center">
-        <div style="font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#10b981,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1">47D+</div>
+        <div style="font-size:1.8rem;font-weight:900;background:linear-gradient(135deg,#10b981,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1">61+</div>
         <div style="font-size:.62rem;color:#64748b;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:.4rem">Fix cycles — Phase 1 complete</div>
       </div>
     </div>
@@ -1281,6 +1281,12 @@ const FIXES = [
   {type:'Feature',      fix:'Fix 33A',desc:'IAM Budget Pre-Warning — auth scope estimate before sprint planning', cat:'Sprint Execution'},
   {type:'Feature',      fix:'Fix 33B',desc:'OQ Auto-Prompt — SM-PLAN blocked until open questions resolved with resume phrase', cat:'Sprint Execution'},
   {type:'Feature',      fix:'Fix 34', desc:'Strix Security Integration — pentesting skill files for security_engineer', cat:'Agent Roles'},
+  {type:'Fix',          fix:'GAP-48A', desc:'Lesson Graduation — SM-RETRO auto-promotes Stage 1 lessons with confirmed evidence to Stage 2', cat:'Memory System'},
+  {type:'Guard',        fix:'GAP-48B', desc:'GUARD 4: Pre-code artifact gate — blocks code writes until PRD + sprint plan + story card all exist', cat:'Guard'},
+  {type:'Gate',         fix:'GAP-48C', desc:'GATE 5 mandatory HTML graph — D3 force-directed viz auto-emitted every sprint, GATE 5 blocks if missing', cat:'Gate'},
+  {type:'Fix',          fix:'GAP-48D', desc:'Role Contract Table — 23 roles with explicit PRECONDITIONS/POSTCONDITIONS enforced in hook handoff', cat:'Infrastructure'},
+  {type:'Feature',      fix:'Hook v4', desc:'Kiro-native phase split — hook stays silent during spec phase, activates Loop Engineering for develop phase only', cat:'Infrastructure'},
+  {type:'Feature',      fix:'bootstrap', desc:'bootstrap-project.sh — One-command new project scaffolder: copies framework, fixes docs/research path, initialises fresh memory', cat:'Infrastructure'},
   {type:'Fix',          fix:'Fix 35', desc:'Dual-routing conflict — two competing hooks causing undefined behavior removed', cat:'Infrastructure'},
   {type:'Fix',          fix:'Fix 36', desc:'Hook SYSTEM AUTHORITY — Kiro native "Build a Feature" dialog suppressed', cat:'Infrastructure'},
   {type:'Feature',      fix:'Fix 37', desc:'Ponytail Lazy Senior Dev — 7-rung ladder enforced before any code is written', cat:'Code Quality'},
