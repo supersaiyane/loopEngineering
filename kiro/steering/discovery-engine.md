@@ -204,6 +204,9 @@ Based on your answers:
 - "Just build it" → Mode 3, no agents, direct code
 
 **Once confirmed → LOCKED for session.** No re-asking.
+**After confirmation → START market_researcher IMMEDIATELY.** Do NOT ask pre-flight questions.
+Do NOT ask "What should be built first?", "What is out of scope?", "Are you the project owner?",
+or any scoping question. Discovery data IS the brief. Produce artifacts now.
 
 ---
 
