@@ -137,6 +137,89 @@ Last updated: 2026-07-31
 # Wiring: L1✅ L2✅ L3✅ L4✅ L5✅ L6✅ L7✅ (new F13 failure mode: role-contract collapse)
 # Status: ✅ RESOLVED — 2026-07-31 | ROLE CONTRACT TABLE (23 roles) added to team-orchestrator-core.md; hook STEP 4 Mode 1/4/5 wired CONTRACT CHECK before/after every role activation with PASS/BLOCK logging
 
+## FIX A — Bootstrap Git Init  [PRIORITY: DONE · Found: FinsightAI live test 2026-07-19]
+# What: New projects created via bootstrap-project.sh had no git history. First commit was
+#   missing so phase-level commits had no parent.
+# Fix: scripts/bootstrap-project.sh step 9 — git init + git add -A + git commit -m "chore: bootstrap project"
+# Files changed: scripts/bootstrap-project.sh
+# Status: ✅ RESOLVED — 2026-07-19 | bootstrap-project.sh step 9/9 wired git init + initial commit
+
+## FIX B — Story DONE Commits  [PRIORITY: DONE · Found: FinsightAI live test 2026-07-19]
+# What: STORY DONE PROTOCOL had no mandatory git commit step. Stories closed in tracker
+#   with no corresponding commit SHA.
+# Fix: team-orchestrator-sprint.md STORY DONE PROTOCOL Step 1 — mandatory git commit
+#   after qa_engineer GATE3 PASS, before knowledge graph and checkpoint.
+# Files changed: kiro/steering/team-orchestrator-sprint.md
+# Status: ✅ RESOLVED — 2026-07-19
+
+## FIX C — TRACKER_MODE txt Fallback  [PRIORITY: DONE · Found: FinsightAI live test 2026-07-19]
+# What: When no Jira/Linear MCP was connected, SM-PLAN had no fallback — it attempted
+#   jira.* calls that failed silently.
+# Fix: TRACKER_MODE detection at SM-PLAN Step 0 — MCP check first, then txt fallback.
+#   TRACKER_MODE=txt creates docs/sprint-N/jira/<ID>.txt stubs.
+# Files changed: kiro/steering/team-orchestrator-sprint.md
+# Status: ✅ RESOLVED — 2026-07-19
+
+## FIX D — Per-Story Knowledge Graph  [PRIORITY: DONE · Found: FinsightAI live test 2026-07-19]
+# What: Knowledge graph (Fix 46A) was only updated at GATE 5 (sprint end).
+#   Story-level graph patches never fired during DEVELOP.
+# Fix: team-orchestrator-sprint.md STORY DONE PROTOCOL — D3 v7 HTML knowledge graph
+#   patch emitted after every GATE3 PASS (not just at sprint close).
+# Files changed: kiro/steering/team-orchestrator-sprint.md
+# Status: ✅ RESOLVED — 2026-07-19
+
+## FIX E — Sprint Discipline Report at SM-RETRO  [PRIORITY: DONE · Found: FinsightAI live test 2026-07-19]
+# What: SM-RETRO was defined but never emitted docs/reports/sprint-N-discipline.md.
+#   Discipline baseline.md was also never written at bootstrap.
+# Fix: SM-RETRO generates docs/reports/sprint-N-discipline.md + dashboard.
+#   bootstrap-project.sh creates docs/reports/baseline.md at project init.
+# Files changed: kiro/steering/team-orchestrator-sprint.md; scripts/bootstrap-project.sh
+# Status: ✅ RESOLVED — 2026-07-19
+
+## FIX F — Phase-Level Memory Writes  [PRIORITY: DONE · Found: FinsightAI live test 2026-07-19]
+# What: checkpoint.md, flow.md, decisions.md, project_map.md were not written at
+#   phase transitions (THINK→DESIGN, DESIGN→DEVELOP). Rules existed but were too
+#   buried to be followed consistently.
+# Fix: Explicit checkpoint/flow/decisions/project_map writes at every phase trigger.
+#   See PHASE COMPLETION PROTOCOL in team-orchestrator-sprint.md.
+# Files changed: kiro/steering/team-orchestrator-sprint.md
+# Status: ✅ RESOLVED — 2026-07-19
+
+## FIX G — market_researcher Date-Stamping  [PRIORITY: DONE · Found: FinsightAI live test 2026-07-19]
+# What: market_researcher was using hardcoded years in competitive and market data.
+#   Training-data figures were not flagged.
+# Fix: All searches include $CURRENT_DATE (shell-derived). Every data point tagged
+#   with source + date. Training data flagged with ⚠️ TRAINING DATA — unverified.
+# Files changed: kiro/skills/market_researcher/SKILL.md;
+#   kiro/skills/market_researcher/competitive_teardown.md;
+#   kiro/skills/market_researcher/market_sizing_tam_sam_som.md
+# Status: ✅ RESOLVED — 2026-07-19
+
+## FIX H — 8 System Gaps from FinsightAI Live Test  [PRIORITY: DONE · Found: FinsightAI live test 2026-07-20]
+# What: 8 gaps discovered from FinsightAI live run that were root-cause system issues,
+#   not just output-level defects. Required steering file changes to prevent recurrence
+#   in every future project.
+# Sub-fixes:
+#   H-A: ADR→decisions.md sync — architect artifact chain + GATE 2 checklist blocking item.
+#         Every accepted ADR must be logged in kiro/memory/decisions.md before GATE 2.
+#         GATE 2 BLOCKS if decisions.md empty when ≥1 ADR exists.
+#   H-B: Phase-level flow.md writes — PHASE COMPLETION PROTOCOL triggers.
+#   H-C: Phase-level checkpoint.md writes — PHASE COMPLETION PROTOCOL triggers.
+#   H-D: [BOOT] auto-trigger — STEP 3 in ENV detection; auto-run [BOOT] if project_map.md empty.
+#   H-E: TRACKER_MODE batch stubs — ALL jira stubs created as BATCH at SM-PLAN end.
+#         docs/sprint-N/jira/ must have N files before DEVELOP starts.
+#   H-F: Phase-level git commits — PHASE COMPLETION PROTOCOL: 1 commit per phase transition.
+#   H-G: TRAINING DATA derived estimate flag — derived/computed figures (SAM slices, SOM
+#         projections, CAGR extrapolations) require ⚠️ TRAINING DATA — derived estimate flag
+#         even when inputs are live-sourced.
+#   H-H: IAM warning write-to-file — Fix 33A strengthened: warning WRITTEN INTO sprint-plan.md
+#         as ## IAM Budget Pre-Warning section. SM-GATE BLOCKS if missing when IAM signals detected.
+# Files changed: kiro/steering/team-orchestrator-core.md; kiro/steering/team-orchestrator-sprint.md;
+#   kiro/steering/orchestrator-routing.md; kiro/skills/market_researcher/SKILL.md;
+#   kiro/skills/market_researcher/market_sizing_tam_sam_som.md; kiro/memory/checkpoint.md
+# Commit: b929413
+# Status: ✅ RESOLVED — 2026-07-20
+
 ## Fix 46B — White Paper v6: Add External Validation Section  [PRIORITY: LOW · Phase 2 Roadmap]
 # What: When external validator(s) reproduce findings, update white paper with Section 11 results.
 #   Also add: competitor comparison table (Fix 45C), compression methodology (Fix 45B).
