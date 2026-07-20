@@ -68,6 +68,24 @@ Run: git remote -v
 
 If this log line is absent, the session is NOT correctly initialized. Stop and re-run detection.
 
+### STEP 3 — PROJECT MAP CHECK (FIX H-D)
+
+Immediately after ENV detection, before any role activates:
+
+```
+Check: does kiro/memory/project_map.md contain a populated module table?
+→ YES (module table has ≥1 row): continue normally
+→ NO (file empty, missing, or contains only placeholder text like "(populated after first [BOOT])"):
+    AUTO-TRIGGER [BOOT]:
+    1. Scan directory structure (dirs, key files, responsibilities)
+    2. Write kiro/memory/project_map.md (module-level)
+    3. Write kiro/memory/context_index.md (function-level)
+    4. Log: [BOOT: project_map.md generated — N modules mapped]
+    5. THEN continue with normal session initialization
+```
+
+Rule: **Never proceed to discovery or role activation if project_map.md is empty.** [BOOT] is cheap — missing the map costs far more reads downstream.
+
 ---
 
 ## MANDATORY LOADS (Fix 4) — FIRE IMMEDIATELY AFTER ENV DETECTION

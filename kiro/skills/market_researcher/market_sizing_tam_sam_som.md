@@ -23,6 +23,8 @@ outputs:
 > All web searches MUST include `$CURRENT_DATE` (e.g., "global pharmacy SaaS market size July 2026").
 > Every number must cite source + date: `[Source: <name> | $CURRENT_DATE]`
 > Any number from training data (not from a live search): `⚠️ TRAINING DATA — unverified as of $CURRENT_DATE`
+> Any number DERIVED or COMPUTED by overlapping multiple sources (e.g., "SAM = 15% of TAM" or "SOM = 100 accounts × $250K ACV"): `⚠️ TRAINING DATA — derived estimate, unverified as of $CURRENT_DATE | Derived from: <source A> + <source B>`
+> Rule (FIX H-G): SAM slices, SOM projections, and CAGR extrapolations are ALWAYS derived estimates, even when computed from live-sourced inputs.
 
 **TAM** (Total Addressable Market) — total spend if everyone with the
 job bought from us.

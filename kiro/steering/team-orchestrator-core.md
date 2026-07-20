@@ -155,7 +155,7 @@ Every role activation is governed by this contract. In single-agent Cowork mode 
 | `market_researcher` | None | `docs/foundation/market-research.md` |
 | `cto` | `docs/foundation/market-research.md` | `docs/foundation/tech-strategy.md` |
 | `product_manager` | `docs/foundation/tech-strategy.md` | `docs/foundation/prd.md` |
-| `architect` | `docs/foundation/prd.md` | `docs/foundation/architecture.md` + ≥1 ADR in `docs/adrs/` |
+| `architect` | `docs/foundation/prd.md` | `docs/foundation/architecture.md` + ≥1 ADR in `docs/adrs/` + **each ADR row written to `kiro/memory/decisions.md`** (FIX H-A — MANDATORY before GATE 2) |
 | `database_architect` | `docs/foundation/architecture.md` | `docs/foundation/db-schema.md` OR `docs/phase-N/db-architecture.md` |
 | `cloud_architect` | `docs/foundation/architecture.md` | `docs/foundation/cloud-architecture.md` |
 | `finops_architect` | `docs/foundation/cloud-architecture.md` | `docs/foundation/finops.md` |
@@ -356,17 +356,27 @@ SM-PLAN    → Sprint planning ONLY (runs AFTER SM-GATE returns GREEN).
                SOC2=yes     → any story in devops/* lane → load operations/compliance-tracking skill
                Log: `[COMPLIANCE-AUTO-LABEL: GDPR=yes → +[be/pii] on 3 stories | HIPAA=no]`
 
-             IAM SPRINT BUDGET PRE-WARNING (Fix 33A) — after reading security-posture.md Section 3:
+             IAM SPRINT BUDGET PRE-WARNING (Fix 33A + FIX H-H) — after reading security-posture.md Section 3:
                If ANY of the following signals are present in PRD or TRD:
                  auth / identity / IAM / SSO / OAuth / SAML / SCIM / RBAC / MFA / session management / JWT
-               → BEFORE creating stories, emit this pre-warning:
+               → BEFORE creating stories, do TWO things:
+               1. Emit this pre-warning in the response (so it's visible to the user):
                ⚠️ IAM BUDGET WARNING: Identity/auth scope detected. Auth stories routinely run 1.5–2× initial estimates.
                  Recommended actions:
                  1. Add +40% capacity buffer to every story with label [security/*] or [be/auth].
                  2. Break auth stories to ≤3 points each — no combined "auth + business logic" stories.
                  3. Create a dedicated sprint for IAM if scope includes SSO + MFA + RBAC simultaneously.
                  4. Flag any 3rd-party IdP integration (Okta, Auth0, AWS Cognito) as HIGH risk — add 1 spike story.
-               Log: `[IAM-BUDGET-WARN: signals=[auth,RBAC] → +40% buffer applied to N security/* stories | spike=yes/no]`
+               2. **WRITE THE WARNING INTO docs/sprint-N/sprint-plan.md** (FIX H-H — MANDATORY):
+                  Insert an "## IAM Budget Pre-Warning (Fix 33A)" section in sprint-plan.md with:
+                  - Identified IAM stories + raw point total
+                  - Effective burn estimate (raw × 1.5 → raw × 2)
+                  - Remaining capacity calculation
+                  - Specific recommendation (defer which story if IAM slips past day N)
+                  - Machine-readable tag: `[IAM-WARNING: raw=Npts | effective=N–Npts | monitor <story-ids> daily]`
+                  RULE: sprint-plan.md MUST contain the IAM Budget Pre-Warning section if IAM signals were detected.
+                  SM-GATE BLOCKS if IAM signals exist in PRD/TRD but sprint-plan.md has no IAM warning section.
+               Log: `[IAM-BUDGET-WARN: signals=[auth,RBAC] → +40% buffer applied to N security/* stories | spike=yes/no | written to sprint-plan.md]`
                If NO auth signals → skip silently.
 
              E2E-REQUIRED FLAGGING (Fix 32K) — after reading testing-strategy.md Section 5:
@@ -467,6 +477,7 @@ Skill: `.kiro/skills/scrum_master/prebuild_documentation_gate.md`
 - [ ] Acceptance criteria use concrete values (no "fast", "intuitive")
 - [ ] All ADRs have at least one rejected alternative documented
 - [ ] All ADRs include Domain + Scope fields (Fix 25P): `Domain: <label e.g. be/auth>` and `Scope: global | component | service`. Binding rule: ADRs with Scope=global constrain all stories. Scope=component/service constrain only matching stories.
+- [ ] **Every accepted ADR is logged in `kiro/memory/decisions.md`** (FIX H-A): Row format: `| ADR-NNN | Sprint N | <one-line decision> | <rationale> | <alternatives rejected> |`. GATE 2 BLOCKS if decisions.md is empty when ≥1 ADR exists in docs/adrs/.
 - [ ] API contracts are concrete enough for FE+BE to build in parallel
 - [ ] Schema DDL covers every entity in the PRD
 - [ ] Security threat model covers every trust boundary

@@ -15,11 +15,95 @@ inclusion: manual
 - **TRACKER_MODE (FIX C)**: Detect at SM-PLAN start. jira-mcp=MCP calls. txt=write docs/sprint-N/jira/<ID>.txt. Never skip.
 - **Discipline reports (FIX E)**: SM-RETRO generates docs/reports/sprint-N-discipline.md + appends docs/reports/discipline-dashboard.md.
 - **Memory writes (FIX F)**: flow.md on every gate change, checkpoint.md after every story/sprint, project_map.md at phase end.
+- **PHASE COMPLETION PROTOCOL (FIX H-B/C/F)**: At end of THINK, DESIGN/SM-GATE, SM-PLAN, and scaffold — write flow.md + checkpoint.md + git commit. See PHASE COMPLETION PROTOCOL section below.
 ---
 # Team Orchestrator — Sprint & Phase Gates (Fix 19 split)
 # Loads at: Sprint end (GATE 4 trigger) and Phase end (GATE 5 trigger)
 # Contains: GATE 4 (memory write + SM-RETRO), GATE 5 (phase-end reports), MODE 1 SELF-CHECK, PHASE PARALLELISM RULES
 # See also: team-orchestrator-core.md (session start), team-orchestrator-rules.md (security, non-negotiables)
+
+---
+
+### PHASE COMPLETION PROTOCOL (FIX H-B + FIX H-C + FIX H-F)
+
+**These 3 steps fire at the end of EVERY major phase transition. No exceptions.**
+Each event below has its own trigger — all 3 steps are mandatory for each.
+
+#### Trigger A — THINK PHASE COMPLETE (market_researcher + cto both done)
+```
+Step 1 — FLOW WRITE:
+  Write to kiro/memory/flow.md:
+  | <YYYY-MM-DD HH:MM> | THINK phase complete | ✅ DONE | market-research.md, tech-strategy.md produced |
+  Log: [FLOW: THINK phase complete | kiro/memory/flow.md updated]
+
+Step 2 — CHECKPOINT WRITE:
+  Append to kiro/memory/checkpoint.md:
+  | <YYYY-MM-DD HH:MM> | THINK phase complete | COMPLETE | docs/foundation/market-research.md, docs/foundation/tech-strategy.md | docs/foundation/market-research.md |
+  Log: [CHECKPOINT: THINK phase logged | kiro/memory/checkpoint.md updated]
+
+Step 3 — GIT COMMIT:
+  git add docs/foundation/market-research.md docs/foundation/tech-strategy.md
+  git commit -m "docs: complete THINK phase — market research + tech strategy [Phase N]"
+  Log: [GIT: THINK phase committed | phase=N]
+```
+
+#### Trigger B — SM-GATE GREEN (all DESIGN artifacts verified)
+```
+Step 1 — FLOW WRITE:
+  Write to kiro/memory/flow.md:
+  | <YYYY-MM-DD HH:MM> | SM-GATE GREEN | ✅ DONE | PRD ✅ TRD ✅ ADRs ✅ schemas ✅ security-posture ✅ testing-strategy ✅ |
+  Log: [FLOW: SM-GATE GREEN | kiro/memory/flow.md updated]
+
+Step 2 — CHECKPOINT WRITE:
+  Append to kiro/memory/checkpoint.md:
+  | <YYYY-MM-DD HH:MM> | DESIGN phase complete — SM-GATE GREEN | COMPLETE | docs/foundation/prd.md, architecture.md, db-schema.md, security-posture.md, testing-strategy.md | docs/foundation/prd.md |
+  Log: [CHECKPOINT: DESIGN phase logged | kiro/memory/checkpoint.md updated]
+
+Step 3 — GIT COMMIT:
+  git add docs/foundation/ docs/adrs/ kiro/memory/decisions.md
+  git commit -m "docs: complete DESIGN phase — PRD, TRD, ADRs, schemas, security, testing [Phase N]"
+  Log: [GIT: DESIGN phase committed | phase=N]
+```
+
+#### Trigger C — SM-PLAN COMPLETE (sprint plan + all story cards written)
+```
+Step 1 — FLOW WRITE:
+  Write to kiro/memory/flow.md:
+  | <YYYY-MM-DD HH:MM> | SM-PLAN Sprint N complete | ✅ DONE | sprint-plan.md + N story cards + TRACKER_MODE=<mode> |
+  Log: [FLOW: SM-PLAN Sprint N complete | kiro/memory/flow.md updated]
+
+Step 2 — CHECKPOINT WRITE:
+  Append to kiro/memory/checkpoint.md:
+  | <YYYY-MM-DD HH:MM> | Sprint N plan locked | COMPLETE | docs/sprint-N/sprint-plan.md, docs/sprint-N/stories/ | docs/sprint-N/sprint-plan.md |
+  Log: [CHECKPOINT: Sprint N plan logged | kiro/memory/checkpoint.md updated]
+
+Step 3 — GIT COMMIT:
+  git add docs/sprint-N/ kiro/memory/flow.md kiro/memory/checkpoint.md
+  git commit -m "docs: sprint N plan — N stories, N pts, TRACKER_MODE=<mode> [Sprint N]"
+  Log: [GIT: Sprint N plan committed | sprint=N]
+```
+
+#### Trigger D — PROJECT SCAFFOLD COMPLETE (monorepo + service stubs created)
+```
+Step 1 — FLOW WRITE:
+  Write to kiro/memory/flow.md:
+  | <YYYY-MM-DD HH:MM> | Project scaffold complete | ✅ DONE | DEVELOP phase started |
+  Log: [FLOW: scaffold complete | DEVELOP phase started]
+
+Step 2 — CHECKPOINT WRITE:
+  Append to kiro/memory/checkpoint.md:
+  | <YYYY-MM-DD HH:MM> | Project scaffold created | COMPLETE | services/, apps/, packages/, infra/ | services/api/src/app.module.ts |
+  Log: [CHECKPOINT: scaffold logged | kiro/memory/checkpoint.md updated]
+
+Step 3 — GIT COMMIT:
+  git add services/ apps/ packages/ infra/ scripts/ <root config files>
+  git commit -m "feat: project scaffold — <stack summary> [Sprint N]"
+  Log: [GIT: scaffold committed | sprint=N]
+```
+
+**RULE:** Never combine phase commits. One phase transition = one commit. Never skip any step even if the diff is small.
+
+---
 
 ### SM-PLAN — SPRINT PLANNING (Fix 47B — per sprint)
 **Trigger:** User confirms "Proceed to Sprint N+1?" (YES) — before any story is assigned or work begins.
@@ -33,8 +117,11 @@ TRY: $TRACKER.listProjects() or $TRACKER.getProject()
   → If succeeds (Jira MCP connected): TRACKER_MODE=jira-mcp
       → Use $TRACKER.createStory() / transitionIssue() / addComment() as per core.md
   → If fails / tool unavailable: TRACKER_MODE=txt
-      → Create directory: docs/sprint-N/jira/
-      → For EACH story card written in docs/sprint-N/stories/<ID>.md, ALSO write
+      → Create directory: docs/sprint-N/jira/ IMMEDIATELY (do not wait for story cards)
+      → After ALL story cards are written, create ALL stub files as a BATCH:
+         For EVERY story in the sprint, write docs/sprint-N/jira/<STORY-ID>.txt
+      → Do NOT create stubs one-by-one as stories are written. Batch at SM-PLAN end.
+      → RULE: docs/sprint-N/jira/ must exist and have N stub files before DEVELOP starts.
          docs/sprint-N/jira/<STORY-ID>.txt with this template:
 ```
 ```

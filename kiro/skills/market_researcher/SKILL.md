@@ -36,6 +36,10 @@ CURRENT_YEAR=$(date "+%Y")
    - Format: `[Source: <URL or publication> | Retrieved: $CURRENT_DATE]`
 3. Flag any figure that cannot be verified with a live web search:
    - `⚠️ TRAINING DATA — unverified as of $CURRENT_DATE. Verify before using in business decisions.`
+4. **Flag derived/computed estimates** (FIX H-G): any figure produced by combining, overlapping, or computing across multiple sources — even if all inputs came from live web searches — must carry:
+   - `⚠️ TRAINING DATA — derived estimate, unverified as of $CURRENT_DATE`
+   - Plus a `Derived from: <source A> × <source B>` note explaining the computation
+   - RULE: A derived figure is NOT the same as a sourced figure, even if both inputs are live-sourced. Investor decks, SAM slices, SOM projections, and CAGR extrapolations from overlapping market reports are ALL derived estimates.
 4. **Never hardcode a year.** Always derive from shell. If shell is unavailable, state:
    - `[DATE: shell unavailable — using session context date: <date from context>]`
 5. Competitor data older than 6 months = stale. Flag with:
