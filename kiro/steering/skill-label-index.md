@@ -715,7 +715,7 @@ All filenames here use explicit `<role>/filename` format to avoid path ambiguity
 | devops_engineer | devops/k8s | devops_engineer/iac_terraform_patterns.md |
 | data_engineer | data/pipeline | data_engineer/dbt_transformation_patterns.md (already in Section 1) |
 | ml_engineer | be/ml | ml_engineer/ml_serving_and_embeddings.md (already in Section 1) |
-| technical_writer | cross-domain | technical_writer/documentation_standards.md + technical_writer/runbook_template.md (Fix 26C: cross-domain stories with doc/runbook titles load these) |
+| technical_writer | cross-domain | technical_writer/plain_language.md + technical_writer/troubleshooting_guide_authoring.md (Fix 26C: cross-domain stories with doc/runbook titles load these) |
 | scrum_master | docs/leadership | scrum_master/sprint_artifacts.md ← pptx/pdf/xlsx Anthropic document skills for sprint outputs |
 | scrum_master | docs/sprint | scrum_master/sprint_artifacts.md + scrum_master/velocity_capacity_modeling.md |
 | qa_engineer | testing/web | qa_engineer/web_app_testing.md (LOAD-TYPE: CHECKLIST) ← browser-based testing via claude-in-chrome |

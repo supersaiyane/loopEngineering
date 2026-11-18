@@ -20,10 +20,10 @@ inclusion: manual
 | ALL agents — Mode 3 (bugfix/refactor) | shared/debugging_methodology.md, shared/refactoring_safely.md | Mode 3 only |
 | devops_engineer — any activation | devops_engineer/twelve_factor_app.md | Every devops story |
 | security_engineer — any activation | security_engineer/secure_sdlc_devsecops.md | Every security story |
-| architect — THINK/DESIGN phase | architect/system_design_workshop.md | GATE2-TRIGGER or arch/* label |
-| cto — THINK phase | cto/technology_radar.md | THINK-PHASE-TRIGGER (Fix 47B) |
-| scrum_master — SM-PLAN | scrum_master/sprint_planning_facilitation.md | SM-PLAN-TRIGGER (Fix 47B) |
-| technical_writer — GATE 5 | technical_writer/documentation_sprint.md | GATE5-TRIGGER (Fix 47B) |
+| architect — THINK/DESIGN phase | architect/trd_template.md | GATE2-TRIGGER or arch/* label |
+| cto — THINK phase | cto/tech_stack_selection.md | THINK-PHASE-TRIGGER (Fix 47B) |
+| scrum_master — SM-PLAN | scrum_master/sprint_planning.md | SM-PLAN-TRIGGER (Fix 47B) |
+| technical_writer — GATE 5 | technical_writer/developer_handoff_kit.md | GATE5-TRIGGER (Fix 47B) |
 
 **Rule:** Universal defaults load BEFORE label-specific skills. They cannot be skipped by absence of labels.
 Log: `[ROLE-DEFAULTS: <role> | universal=<N files> | label-specific=<N files>]`
@@ -126,7 +126,7 @@ Scope for DEVELOP activations is NARROWER than DESIGN pass. Do NOT re-run full S
 
 | Activity | Load These Skills (all matched) | On-demand |
 |----------|---------------------------------|-----------|
-| Reviewing security-critical story implementation (executor, auth, PII handler, secrets) | shared/security_baseline.md, shared/code_review_checklist.md | secrets_management.md (if vault/env var check needed) |
+| Reviewing security-critical story implementation (executor, auth, PII handler, secrets) | security_engineer/secure_sdlc_devsecops.md, shared/code_review_excellence.md | secrets_management.md (if vault/env var check needed) |
 | Checking if implementation matches DESIGN decision | [no skill file] — compare code to ADR directly. If deviation: flag + add new ADR. | — |
 | New trust boundary discovered during DEVELOP | threat_modeling_stride_pasta.md (FULL LOAD — new boundary = mini-STRIDE required) | — |
 

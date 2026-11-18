@@ -35,6 +35,11 @@ if [[ -z "$PROJECT_NAME" ]]; then
   exit 1
 fi
 
+if [[ ! "$PROJECT_NAME" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+  echo "Error: invalid project name. Use letters, numbers, dots, underscores or hyphens; start with a letter or number." >&2
+  exit 1
+fi
+
 TARGET="$PARENT_DIR/$PROJECT_NAME"
 
 # ── Preflight ──────────────────────────────────────────────────────────────────
@@ -47,11 +52,9 @@ echo "  Framework : $FRAMEWORK_DIR"
 echo "  Project   : $TARGET"
 echo ""
 
-if [[ -d "$TARGET" ]]; then
-  echo "⚠️  Directory already exists: $TARGET"
-  read -r -p "   Continue and overwrite framework files? [y/N] " confirm
-  [[ "${confirm,,}" == "y" ]] || { echo "Aborted."; exit 0; }
-  echo ""
+if [[ -e "$TARGET" || -L "$TARGET" ]]; then
+  echo "Error: target already exists: $TARGET. Choose a new project directory." >&2
+  exit 1
 fi
 
 # ── 1. Create directory skeleton ───────────────────────────────────────────────
@@ -66,6 +69,7 @@ echo "2/8  Copying framework (hooks / steering / skills / adapters / scripts)...
 cp -r "$FRAMEWORK_DIR/kiro/hooks/."    "$TARGET/.kiro/hooks/"
 cp -r "$FRAMEWORK_DIR/kiro/steering/." "$TARGET/.kiro/steering/"
 cp -r "$FRAMEWORK_DIR/kiro/skills/."   "$TARGET/.kiro/skills/"
+cp "$FRAMEWORK_DIR/kiro/framework-contract.json" "$TARGET/.kiro/framework-contract.json"
 
 if [[ -d "$FRAMEWORK_DIR/kiro/adapters" ]] && [[ -n "$(ls -A "$FRAMEWORK_DIR/kiro/adapters")" ]]; then
   cp -r "$FRAMEWORK_DIR/kiro/adapters/." "$TARGET/.kiro/adapters/"
@@ -73,7 +77,9 @@ fi
 
 # Copy framework scripts (bootstrap + pxpipe launcher)
 if [[ -d "$FRAMEWORK_DIR/scripts" ]]; then
-  cp -r "$FRAMEWORK_DIR/scripts/." "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/bootstrap-project.sh" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/start-kiro-pxpipe.sh" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/validate-framework.py" "$TARGET/scripts/"
   chmod +x "$TARGET/scripts/"*.sh 2>/dev/null || true
   echo "     ✅ scripts copied ($(ls "$TARGET/scripts/"*.sh 2>/dev/null | wc -l | tr -d ' ') shell scripts)"
 else
@@ -298,37 +304,13 @@ Multi-tenant: [yes/no + model — e.g., "yes, tenant per subdomain, RBAC per org
 
 ---
 
-## WHAT HAPPENS NEXT (three-phase flow)
+## WHAT HAPPENS NEXT
 
-PHASE 1 — THINK (automatic, ~2 exchanges)
-  Kiro asks 7 discovery questions (platform, scale, complexity, deployment,
-  revenue, design, security). Answer them. Score is calculated, Mode recommended.
-  Reply: "Proceed with this plan" to confirm Mode 1 (Full Army).
+For each new build, present all seven discovery questions and wait for answers.
+Score the answers and recommend a mode, then offer Kiro model selection. After
+the user chooses a model, proceed to design and development.
+See kiro/steering/execution-contract.md for the canonical modes and score bands.
 
-PHASE 2 — DESIGN (automatic after Proceed, no more questions)
-  If scope touches auth/payments/compliance → bad-loop gate fires once.
-    Answer: "greenfield / from scratch / I approve" → gate clears → DESIGN starts.
-  Agents fire in sequence — NO picker dialog, NO "Build a Feature" prompt:
-    market_researcher → docs/foundation/market-research.md
-    cto              → docs/foundation/tech-strategy.md
-    product_manager  → docs/foundation/prd.md
-    architect        → docs/foundation/architecture.md + docs/adrs/
-    database_architect → docs/foundation/db-schema.md
-    cloud_architect  → docs/foundation/cloud-architecture.md
-    finops_architect → docs/foundation/finops.md
-    security_engineer → docs/foundation/security-posture.md
-    scrum_master [SM-GATE] → VERDICT: GREEN or RED
-
-PHASE 3 — DEVELOP (triggered by you after SM-GATE GREEN)
-  Type: "start sprint 1"
-  SM-PLAN → story cards → engineering sprint → GATE 5 → SM-RETRO → repeat.
-
----
-
-## IF YOU SEE "Build a Feature / Fix a Bug / Quick Plan"
-  Do NOT click it. Type: "skip this, start market_researcher now"
-  This dialog is Kiro's native spec picker — the hook blocks it but
-  if it appears, dismissing it and re-prompting starts the agent chain.
 TRIGGER_EOF
 
 echo "     ✅ trigger-prompt.md written"
@@ -378,17 +360,17 @@ else
   echo "╔══════════════════════════════════════════════════════════════╗"
   echo "║  ⚠️   Bootstrap complete with $ERRORS error(s)               "
   echo "╚══════════════════════════════════════════════════════════════╝"
+  echo "Bootstrap verification failed; inspect the missing files before retrying." >&2
+  exit 1
 fi
 
-# ── 9. Git init + initial commit (FIX A) ──────────────────────────────────────
+# ── 9. Initialize Git without committing ──────────────────────────────────────
 echo "9/9  Initializing git repository..."
 (
   cd "$TARGET"
   git init -q
-  git add -A
-  git commit -q -m "chore: bootstrap Loop Engineering v9.5 — $PROJECT_NAME"
 )
-echo "     ✅ git repository initialized + initial commit"
+echo "     ✅ git repository initialized; review files before committing"
 
 echo ""
 echo "  Location  : $TARGET"
@@ -402,14 +384,7 @@ echo "    1. Edit trigger-prompt.md — fill in your product description + signa
 echo "    2. Open $TARGET in Kiro — hook loads automatically from .kiro/hooks/"
 echo "    3. Paste trigger-prompt.md into Kiro and send"
 echo ""
-echo "  Three-phase flow:"
-echo "    THINK  → Hook asks 7 discovery questions → answer them → Mode confirmed"
-echo "    DESIGN → Say 'Proceed' → market_researcher fires immediately (no picker)"
-echo "             → cto → product_manager → architect → ... → SM-GATE"
-echo "    DEVELOP→ Say 'start sprint 1' → engineering pipeline begins"
-echo ""
-echo "  If 'Build a Feature' picker appears, type:"
-echo "    skip this, start market_researcher now"
+echo "  See kiro/steering/execution-contract.md for modes and workflow."
 echo ""
 echo "  Tip: docs/foundation/ docs/sprint-1/ docs/graph/ are ready for agent output."
 echo ""

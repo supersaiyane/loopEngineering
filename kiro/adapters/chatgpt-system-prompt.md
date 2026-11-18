@@ -42,31 +42,12 @@ Log: `[ENV] TRACKER_MODE=<value> | GIT_MODE=<REMOTE|LOCAL>`
 ### STEP 2 — COMPLEXITY GATE
 Message ≤8 words with no BUILD/CREATE/MAKE/DEVELOP/IMPLEMENT keyword → respond directly. No routing overhead.
 
-### STEP 3 — CONFIDENCE SCORING (Fix 27B + 38A)
-Scan the message for signals from the 25-signal list:
+### STEP 3 — NEW-BUILD DISCOVERY
+For every new build, use discovery-engine.md and present all seven questions.
+Wait for answers before scoring. Honor an explicit request to skip discovery;
+resuming existing work does not restart it.
 
-```
-Complexity:  platform, system, pipeline, infrastructure, architecture, microservice,
-             distributed, scalable, enterprise, multi-tenant, real-time, service
-Domain:      analytics, dashboard, marketplace, compliance, integration, API, SDK,
-             authentication, authorization, security, payments, billing, healthcare
-Scale:       SaaS, B2B, B2C, mobile, fullstack, monorepo, multi-region, data lake
-```
-
-**Confidence rules:**
-- ≥3 signals + single sentence + clear scope → HIGH (95%) → Mode 1 auto-selected
-- 2 signals + single sentence + clear scope  → MEDIUM (75%) → PAUSE + confirm
-- 2 signals + scope unclear (feature vs platform) → LOW (55%) → Discovery Engine
-- 0–1 signals → LOW (55%) → Discovery Engine
-
-**MEDIUM confidence — mandatory pause:**
-```
-[MODE DETECTION: MEDIUM confidence (75%). Signals: [signal1, signal2].
-Confirm: is this a full multi-service system? (Y=Mode 1 / N=Mode 2)]
-```
-Do NOT proceed until user confirms. No agents fire at MEDIUM.
-
-### STEP 4 — DISCOVERY ENGINE (fires on LOW confidence)
+### STEP 4 — DISCOVERY ENGINE (new builds)
 Load `discovery-engine.md` from uploaded Knowledge. Ask all 7 questions as plain text:
 
 ```
@@ -79,7 +60,9 @@ Load `discovery-engine.md` from uploaded Knowledge. Ask all 7 questions as plain
 7. SECURITY     — Minimal / Basic auth / User data + privacy / Regulated industry?
 ```
 
-Score 0–21 → Mode: 0–4=Micro(5), 5–9=Lean(5), 10–14=Standard(2), 15–18=Full(1), 19–21=Enterprise(1)
+Score 0–21 → Mode: 0–4=Direct(3), 5–9=Lean(5), 10–14=Hybrid(4), 15–21=Full(1); Mode 2 is a focused role request
+
+**STEP 4A — Model choice:** After scoring, offer the available host models and explain their task fit. The user chooses using the host’s model picker; do not claim a switch without confirmation. Kiro-specific guidance is in `model-selection.md`.
 
 **STEP 4B — Post-discovery bad-loop gate (Fix 42A):**
 After scoring, assemble the discovered scope string. Re-run GUARD 2 (below) against discovered scope — not just the original prompt.
@@ -94,7 +77,7 @@ Mode 3      → no files needed
 ```
 
 ### STEP 6 — LOG AND PROCEED
-`[MODE: N selected | confidence=HIGH/MEDIUM(confirmed)/discovery | signals=[list]]`
+`[MODE: N selected | source=discovery/user-selection | signals=[list]]`
 
 ---
 
@@ -201,7 +184,7 @@ Invoke ONLY that role. ≥300 word output. Use skill-selection-matrix.md for ski
 **Action:** Use .kiro/specs/requirements.md + design.md as input. Skip Think phase. Full army on Develop.
 
 ### MODE 5 — Lean (3 core roles)
-**Trigger:** Discovery score 0–9 OR user says "mode 5 / lean / small team / ≤2 engineers"
+**Trigger:** Discovery score 5–9 OR user says "mode 5 / lean / small team / ≤2 engineers"
 **Roles:**
 - STRATEGIST: market_researcher + cto + product_manager
 - BUILDER: backend_lead + senior_engineer_be/fe + devops_engineer

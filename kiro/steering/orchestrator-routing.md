@@ -112,7 +112,7 @@ IF first request of a new build task (BUILD/CREATE/MAKE/DEVELOP/IMPLEMENT + APP/
   VERIFY it is in context before the 7 scoping questions run.
   If absent → STOP. "Discovery engine not loaded. Cannot score task complexity without it.
                Load kiro/steering/discovery-engine.md before mode selection."
-  Exception: explicit "mode N" or bypass keywords → skip this load (discovery is bypassed by user intent).
+  Exception: an explicit request to skip discovery or an existing resumed task may bypass it.
 ```
 
 Load order: discovery-engine.md (new builds only) → team-orchestrator-core.md + team-orchestrator-rules.md → skill-selection-matrix.md → loop-engine.md (at DEVELOP) → team-orchestrator-sprint.md (at sprint end).
@@ -124,19 +124,19 @@ All must be in context before their respective phases begin. No exceptions.
 #
 # THINK PHASE (Mode 1, Mode 2, Mode 4 — any phase with discovery/design work):
 #   AUTO-ACTIVATE: cto [THINK-PHASE-TRIGGER]
-#   Skills: kiro/skills/cto/prd_template.md, kiro/skills/cto/technology_radar.md
+#   Skills: kiro/skills/cto/prd_template.md, kiro/skills/cto/tech_stack_selection.md
 #   Why: CTO must frame the product vision and tech strategy BEFORE design begins.
 #        Waiting for a cto/* label means it never fires.
 #
 # GATE 2 (THINK complete → DESIGN begins) OR any story containing arch decision:
 #   AUTO-ACTIVATE: architect [GATE2-TRIGGER]
-#   Skills: kiro/skills/architect/trd_template.md, kiro/skills/architect/system_design_workshop.md
+#   Skills: kiro/skills/architect/trd_template.md, kiro/skills/architect/trd_template.md
 #   Why: ARCHITECT is the default voice on system structure. Label-gating it means
 #        structural decisions get made by senior_engineer_be without review.
 #
 # SM-PLAN (sprint planning — Sprint N+1 kickoff after "Proceed to Sprint N+1?" YES):
 #   AUTO-ACTIVATE: scrum_master [SM-PLAN-TRIGGER]
-#   Skills: kiro/skills/scrum_master/sprint_planning_facilitation.md,
+#   Skills: kiro/skills/scrum_master/sprint_planning.md,
 #           kiro/skills/scrum_master/sprint_artifacts.md
 #   Why: Sprint planning ALWAYS needs SM. Requiring docs/* label to activate it is wrong.
 #
@@ -146,45 +146,28 @@ All must be in context before their respective phases begin. No exceptions.
 #
 # GATE 5 (phase end — after all sprints in a phase complete):
 #   AUTO-ACTIVATE: technical_writer [GATE5-TRIGGER]
-#   Skills: kiro/skills/technical_writer/documentation_sprint.md,
+#   Skills: kiro/skills/technical_writer/developer_handoff_kit.md,
 #           kiro/skills/scrum_master/sprint_artifacts.md
 #   Why: Docs must be updated at every phase boundary. docs/* label is not reliable enough.
 # ─────────────────────────────────────────────────────────────────────────────
 
 ---
 
-## MANDATORY: DISCOVERY-FIRST (before mode selection, before ANY work)
+## Routing and discovery
 
-**CRITICAL RULE:** On the FIRST request of any new development task (BUILD/CREATE/MAKE/DEVELOP/IMPLEMENT + APP/TOOL/SYSTEM/etc.), the **Discovery Engine** (`discovery-engine.md`) runs FIRST.
-
-**Execution order:**
-1. Discovery Engine asks 7 scoping questions
-2. Score answers → determine complexity tier
-3. Recommend mode + agent subset
-4. User confirms (or overrides)
-5. THEN orchestrator-routing activates the confirmed mode
-
-**Discovery Engine takes priority over this file's mode detection logic.** This file only fires AFTER discovery completes and mode is confirmed.
-
-**Bypasses (skip discovery, go direct to mode):**
-- User says "mode N" explicitly → skip discovery, use that mode with full agent set
-- User says "just build it" / "skip questions" → Mode 3 (Direct Execution)
-- Request is NOT a build (bug fix, refactor, question) → Mode 3 directly
-
----
-
-## ROUTING: 4 Modes (reference for execution after selection)
+The canonical mode definitions and score bands are in `execution-contract.md`.
+For each new build, present all seven discovery questions, wait for answers,
+score them, recommend a mode, then offer model selection before design. An
+explicit request to skip discovery is honored. Existing work does not restart
+discovery. A host spec may be used after discovery when selected by the user.
 
 ### EXPLICIT MODE OVERRIDE
-**Trigger:** Prompt contains "mode 1", "mode 2", "mode 3", or "mode 4" (case-insensitive).
-**Action:** Skip mode selection prompt. Activate the specified mode directly.
-**Priority:** Explicit override > mode selection prompt.
-Examples: "mode 1: build a chess app" → Full Army. "mode 4: create a dashboard" → Hybrid.
+A user may explicitly choose any mode from 1 to 5. Respect later corrections.
 
 ### MODE 1: Full Army Pipeline
 **Trigger:** Prompt contains BUILD/CREATE/MAKE/DEVELOP/IMPLEMENT combined with
 APP/TOOL/SYSTEM/PRODUCT/SERVICE/FEATURE/UI/API/DASHBOARD/BOT/AGENT/WEBSITE/PIPELINE
-**Confidence gate (Fix 27B):** Mode 1 auto-inference requires HIGH confidence (≥90%) OR user confirmation. See hook STEP 3 confidence scoring. Never commit to Mode 1 on MEDIUM/LOW confidence without user Y/n.
+Score 15–21 recommends Mode 1; this is a heuristic, not a calibrated probability.
 
 **Action:** Invoke `team-orchestrator-core.md` + `team-orchestrator-rules.md` constitution (Fix 19 split). 
 **IMPORTANT:** Load `team-orchestrator-core.md` + `team-orchestrator-rules.md` into context FIRST (both are manual-inclusion — see MANDATORY LOADS above).
@@ -245,7 +228,7 @@ Run full Think → Design → Develop chain.
 
 ### MODE 4: Hybrid (Spec + Army)
 **Trigger:** Prompt contains BUILD/CREATE/MAKE/DEVELOP/IMPLEMENT + APP/TOOL/SYSTEM/... AND user explicitly requests "mode 4" OR "hybrid".
-Also activates when Kiro spec workflow is running AND Mode 1 would normally trigger.
+Also recommended for a discovery score of 10–14.
 
 **Mode 4 Lite vs Standard (Fix 12D):**
 - **Mode 4 Lite** — project has ≤5 user stories OR single sprint planned → minimum coverage ≥60%
@@ -344,9 +327,8 @@ If user does not reply: HOLD. Do not proceed without acknowledgement.
 ## PRIORITY: Mode Override > Mode 4 (with .kiro/specs/) > Mode 1 > Mode 2 > Mode 5 > Mode 3
 
 If user says "mode N" explicitly → that mode wins, no detection needed.
-Mode 4 wins over Mode 1 ONLY when `.kiro/specs/` directory already exists from a prior spec workflow run.
-If `.kiro/specs/` is absent → Mode 1 wins.
-Mode 5 is for explicitly small-team or lean requests only.
+The user’s explicit mode choice and execution contract take precedence over an existing directory.
+Mode 5 is also recommended for discovery scores 5–9.
 Mode 2 is for ISOLATED role requests only.
 
 ---

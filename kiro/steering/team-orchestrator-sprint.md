@@ -145,7 +145,7 @@ Log: `[TRACKER-DETECT: TRACKER_MODE=<jira-mcp|txt> | Sprint N]`
 **RULE:** TRACKER_MODE is set once at step 0. Never re-detect mid-sprint. All story-close events use the same mode.
 
 1. `scrum_master` [SM-PLAN mode]:
-   - Load kiro/skills/scrum_master/sprint_planning_facilitation.md
+   - Load kiro/skills/scrum_master/sprint_planning.md
    - Load kiro/skills/scrum_master/sprint_artifacts.md
    - Review team velocity (from last retro) + available capacity
    - Pull candidate stories from $TRACKER backlog
@@ -155,7 +155,7 @@ Log: `[TRACKER-DETECT: TRACKER_MODE=<jira-mcp|txt> | Sprint N]`
    - Seed sprint-plan.md for Sprint N+1
 2. `architect` [GATE2-TRIGGER — Fix 47B]:
    - If any story in Sprint N+1 involves NEW services, NEW modules, or crosses component boundaries →
-     load kiro/skills/architect/system_design_workshop.md for those stories
+     load kiro/skills/architect/trd_template.md for those stories
    - Otherwise: skip (architecture already established)
 
 ---
@@ -494,7 +494,7 @@ When GATE 5 passes:
 1. Produce all 6 phase-end reports (QA, Security, Mapping, Discipline, Jira, Git)
 2. `scrum_master` marks phase as DONE in roadmap
 3. `technical_writer` [GATE5-TRIGGER — Fix 47B] — AUTO-ACTIVATES at GATE 5 regardless of docs/* labels:
-   - Load kiro/skills/technical_writer/documentation_sprint.md
+   - Load kiro/skills/technical_writer/developer_handoff_kit.md
    - Update README, API reference, architecture overview for everything shipped this phase
    - Load kiro/skills/scrum_master/sprint_artifacts.md → produce:
      - `docs/sprint-N/review-deck.pptx` — one slide per story shipped this phase

@@ -112,17 +112,20 @@ explicit reason: the old context may be an image, not text.
 
 ## GUARD 4 — PRE-CODE ARTIFACT GATE (GAP-48B)
 
-**When:** Any session where a write to `services/`, `infra/`, `packages/`, `apps/`, or any production code directory is about to happen.
+**When:** A full sprint workflow is about to write production code. Direct Mode 3
+work uses proportionate documentation; an explicitly selected lean workflow uses
+the artifacts its agreed plan requires.
 **Why:** In single-agent Cowork mode, there is no enforced DESIGN→DEVELOP handoff. Code gets written before PRD, sprint-plan, and story cards exist — producing untracked, unvalidated work with no audit trail and no gate compliance.
 
 **Trigger condition:**
-Any prompt that would result in writing files to `services/`, `infra/`, `packages/`, `apps/`, or any directory containing production source code. Applies even to scaffolding, stub directories, and placeholder files.
+In a full sprint workflow, a proposed write to `services/`, `infra/`, `packages/`,
+`apps/`, or another production source directory triggers this check.
 
 **Verification checklist — ALL 3 must be TRUE before the first code write:**
 
 | # | Artifact | Expected path | Pass condition |
 |---|----------|---------------|---------------|
-| 1 | PRD | `docs/prd.md` OR `docs/foundation/prd.md` | File exists AND contains Personas section + Feature list + Hard Constraints |
+| 1 | PRD or host requirements | `docs/prd.md`, `docs/foundation/prd.md`, or the selected host spec's requirements file | Contains applicable personas, features, and hard constraints |
 | 2 | Sprint plan | `docs/sprint-N/sprint-plan.md` | File exists AND has story list, point sizing, IAM budget check |
 | 3 | Story card | `docs/sprint-N/stories/<STORY-ID>.md` | File exists for the specific story being implemented right now |
 
@@ -139,7 +142,7 @@ Shall I run the THINK→DESIGN phase now to produce missing artifacts?
 ```
 
 **Hard rules:**
-- Do NOT write any code — not even scaffolding, stubs, `main.go`, `index.ts`, empty `__init__.py`, directory structures — until all 3 artifacts exist.
+- For full sprint work, create and check the applicable artifacts before production code. File existence alone is not sufficient to validate content.
 - If user explicitly overrides ("skip the docs, just write the code") → acknowledge the override, write one line: `[GUARD-4: OVERRIDDEN BY USER — process debt logged]`, then proceed. Do not silently comply.
 - This guard fires BEFORE loop-engine.md is loaded. If it blocks, loop-engine.md is not loaded.
 

@@ -1,0 +1,29 @@
+{
+  "required_files": [
+    "kiro/steering/execution-contract.md",
+    "kiro/steering/model-selection.md",
+    "kiro/steering/discovery-engine.md",
+    "kiro/steering/orchestrator-routing.md",
+    "kiro/steering/team-orchestrator-core.md",
+    "kiro/steering/team-orchestrator-rules.md",
+    "kiro/steering/skill-selection-matrix.md",
+    "kiro/steering/loop-engine.md",
+    "kiro/steering/session-guards.md",
+    "kiro/adapters/chatgpt-system-prompt.md",
+    "kiro/adapters/claude-system-prompt.md"
+  ],
+  "required_roles": [
+    "architect", "backend_lead", "cloud_architect", "cto", "data_engineer",
+    "data_scientist", "database_architect", "devops_engineer", "finops_architect",
+    "frontend_lead", "market_researcher", "ml_engineer", "mobile_engineer",
+    "product_manager", "qa_engineer", "scrum_master", "security_engineer",
+    "senior_engineer_be", "senior_engineer_fe", "sre_engineer", "technical_writer",
+    "website_creator", "shared"
+  ],
+  "score_bands": [
+    {"min": 0, "max": 4, "mode": 3},
+    {"min": 5, "max": 9, "mode": 5},
+    {"min": 10, "max": 14, "mode": 4},
+    {"min": 15, "max": 21, "mode": 1}
+  ]
+}

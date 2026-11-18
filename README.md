@@ -3,14 +3,11 @@
 <div align="center">
 
 [![GitHub](https://img.shields.io/badge/GitHub-supersaiyane%2FloopEngineering-181717?style=for-the-badge&logo=github)](https://github.com/supersaiyane/loopEngineering)
-![Status](https://img.shields.io/badge/status-production--ready-brightgreen?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-experimental-orange?style=for-the-badge)
 ![Phase](https://img.shields.io/badge/phase%201-complete%20%E2%9C%85-brightgreen?style=for-the-badge)
 ![Dry Runs](https://img.shields.io/badge/dry%20runs-v11-blue?style=for-the-badge)
-![Ship Confidence](https://img.shields.io/badge/ship%20confidence-9.5%2F10-success?style=for-the-badge)
 ![Fixes](https://img.shields.io/badge/fixes%20implemented-68%20%E2%9C%85-orange?style=for-the-badge)
 ![Roles](https://img.shields.io/badge/agent%20roles-22-purple?style=for-the-badge)
-![Skill Files](https://img.shields.io/badge/skill%20files-173%20wired-informational?style=for-the-badge)
-![pxpipe](https://img.shields.io/badge/pxpipe-token%20compression%20%E2%88%9260%25-ff6b35?style=for-the-badge)
 ![White Paper](https://img.shields.io/badge/white%20paper-v5%20published-blueviolet?style=for-the-badge)
 
 </div>
@@ -46,7 +43,7 @@
 
 ## 🤔 What Is This Project?
 
-> **The context:** By mid-2026, frontier AI coding agents score ~88% on SWE-bench benchmarks but fail in **70–95% of production deployments**. Only 14% of enterprise AI pilots ever reach org-wide scale. The gap is not model capability — it's process architecture. No production-validated framework for sustained, multi-session LLM coding agents existed in the literature. Loop Engineering is the first.
+> **Status:** This is an experimental process framework. Internal dry runs are documented, but independent validation and controlled comparisons are still planned.
 
 **Loop Engineering** is a system of rules, files, and protocols that tells the **Kiro AI IDE** how to behave like a structured engineering team — instead of just answering prompts one at a time.
 
@@ -89,67 +86,27 @@ The production reliability crisis in agentic AI systems is real and documented. 
 
 The `.kiro/` folder (or `kiro/` in this repo) is where Kiro looks for its configuration. This project fills that folder with a structured orchestration system.
 
-```
-You type a prompt
-       ↓
-Kiro reads the .kiro/hooks/ file first  ← this is the entry point
-       ↓
-Hook decides what kind of task it is
-       ↓
-Hook loads the right steering files
-       ↓
-Steering files activate the right agents with the right skill files
-       ↓
-Agents do the work → quality gates run → code merges
-```
+For a new build, the hook asks the assistant to run discovery. After the user
+answers all seven questions, the assistant recommends a mode and offers model
+selection before design begins. Actual hook execution and model selection depend
+on the host; the model picker controls the selected model.
 
 ---
 
 ## 🏗️ System Architecture
 
+```mermaid
+flowchart TD
+    A["New build request"] --> B["Seven discovery questions"]
+    B --> C["Score and mode recommendation"]
+    C --> D["Model choice"]
+    D --> E["Design and development"]
+    E --> F["Verification and memory"]
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    YOUR PROMPT                          │
-└─────────────────────┬───────────────────────────────────┘
-                      │
-                      ▼
-┌─────────────────────────────────────────────────────────┐
-│         HOOK  (elite-team-orchestrator.json)            │
-│  ≤60 lines · thin router · reads ENV, classifies task   │
-│                                                         │
-│  STEP 0: Is this trivial? → Mode 3 (direct answer)     │
-│  STEP 1: Detect environment (Jira/Linear/markdown)      │
-│  STEP 2: BUILD or MAINTAIN?                             │
-│  STEP 3: Confidence scoring → Mode 1/2/3/4/5            │
-│  STEP 4: Low confidence? → Discovery Engine             │
-│  STEP 5: Load steering files                            │
-│  STEP 6: Activate agents                                │
-└─────────────────────┬───────────────────────────────────┘
-                      │
-          ┌───────────┼───────────┐
-          ▼           ▼           ▼
-   ┌──────────┐ ┌──────────┐ ┌──────────┐
-   │STEERING  │ │  SKILL   │ │  GUARDS  │
-   │  FILES   │ │  FILES   │ │& GATES   │
-   │(14 files)│ │(173 wired│ │(GATE S1  │
-   │          │ │ 22 roles)│ │ GATE S2) │
-   └──────────┘ └──────────┘ └──────────┘
-          │           │           │
-          └───────────┼───────────┘
-                      ▼
-          ┌─────────────────────┐
-          │   AGENT EXECUTION   │
-          │  PLAN→DO→VERIFY     │
-          │     →DECIDE         │
-          └──────────┬──────────┘
-                     │
-                     ▼
-          ┌─────────────────────┐
-          │   SM-RETRO + MEMORY │
-          │  lessons.md updates │
-          │  checkpoint.md      │
-          └─────────────────────┘
-```
+
+The hook and steering files provide instructions; the skills provide specialist
+guidance; memory files record project context. Technical checks run only when
+invoked by an actual host or CI job. See the [execution contract](kiro/steering/execution-contract.md).
 
 ---
 
@@ -160,23 +117,20 @@ The system picks one of 5 modes based on how complex your request is.
 | Mode | Name | When Used | Agents Activated |
 |------|------|-----------|-----------------|
 | **Mode 1** | 🏰 Full Army | Large platform, enterprise, multi-service | All 22 roles |
-| **Mode 2** | 🎯 Targeted | Single service, clear scope | 3–8 matched roles |
+| **Mode 2** | 🎯 Single Role | A focused specialist task or artifact | One relevant role |
 | **Mode 3** | ⚡ Direct | Bug fix, trivial task, quick question | 1 role or none |
-| **Mode 4** | 🔬 Research | Technical evaluation, spike, ADR | CTO + Architect + Researcher |
+| **Mode 4** | 🔬 Hybrid | A host spec workflow followed by structured development | Roles matched to scope |
 | **Mode 5** | 🌱 Lean | MVP, startup, solo dev, small team | 3 core roles (lite) |
 
-### How the Mode is Chosen
+### How the mode is chosen
 
-```
-Your prompt → signal scan (25 keywords) → confidence score
+Discovery is a heuristic: scores 0–4 recommend Mode 3, 5–9 Mode 5, 10–14
+Mode 4, and 15–21 Mode 1. Mode 2 handles a focused specialist request. The
+user's explicit choice takes precedence. See the [execution contract](kiro/steering/execution-contract.md).
 
-≥3 signals + single sentence + clear scope  →  HIGH (95%)  →  Mode 1 auto
-2 signals  + single sentence + clear scope  →  MEDIUM (75%) →  PAUSE + confirm
-2 signals  + scope unclear                  →  LOW (55%)   →  Discovery Engine
-0–1 signals                                 →  LOW (55%)   →  Discovery Engine
-```
-
-> **MEDIUM confidence:** The system **stops and asks you** — "Is this a full platform (Mode 1) or a single microservice (Mode 2)?" It never guesses wrong when the stakes are high.
+Roles are responsibilities applied by an assistant. They are not independent
+agents or reviews unless the host actually runs separate agents. Prompt-based
+gates are guidance; their enforcement depends on the host and configuration.
 
 ---
 
@@ -184,32 +138,32 @@ Your prompt → signal scan (25 keywords) → confidence score
 
 Each role has its own `SKILL.md` and a library of specialist skill files.
 
-| # | Role | What They Do | Skill Files |
-|---|------|-------------|-------------|
-| 1 | 🧠 **CTO** | Tech strategy, stack selection, build-vs-buy decisions | 10 |
-| 2 | 📐 **Architect** | System design, ADRs, threat modeling | 13 |
-| 3 | 🗄️ **Database Architect** | Schema design, query optimization, migrations | 8 |
-| 4 | ☁️ **Cloud Architect** | AWS/GCP/Azure infrastructure, VPC, IAM | 10 |
-| 5 | 💰 **FinOps Architect** | Cloud cost optimization, budget alerts | 5 |
-| 6 | 🔒 **Security Engineer** | OWASP, CVE scanning, pentesting, compliance | 12 |
-| 7 | 🎯 **Product Manager** | PRD, user stories, acceptance criteria | 6 |
-| 8 | 🔄 **Scrum Master** | Sprint planning, gates, retrospectives | 5 |
-| 9 | 🖥️ **Backend Lead** | API design, microservices, database patterns | 14 |
-| 10 | 🎨 **Frontend Lead** | Component architecture, design systems | 10 |
-| 11 | ⚙️ **Senior Engineer BE** | Backend implementation, code quality | 8 |
-| 12 | 🖌️ **Senior Engineer FE** | Frontend implementation, accessibility | 8 |
-| 13 | 📱 **Mobile Engineer** | iOS/Android, React Native, App Store rules | 7 |
-| 14 | 🚀 **DevOps Engineer** | CI/CD pipelines, Docker, Kubernetes | 9 |
-| 15 | 🛡️ **SRE Engineer** | Reliability, SLOs, incident response | 8 |
-| 16 | 🤖 **ML Engineer** | Model serving, embeddings, ML pipelines | 9 |
-| 17 | 📊 **Data Engineer** | Kafka, Spark, dbt, data pipelines | 7 |
-| 18 | 🔬 **Data Scientist** | A/B testing, cohort analysis, EDA | 6 |
-| 19 | 🧪 **QA Engineer** | Test strategy, automation, coverage | 8 |
-| 20 | ✍️ **Technical Writer** | Documentation, runbooks, app flow docs | 6 |
-| 21 | 📣 **Market Researcher** | Competitor analysis, market positioning | 4 |
-| 22 | 🌐 **Website Creator** | Landing pages, SEO, web content | 6 |
+| # | Role | What They Do |
+|---|------|-------------|
+| 1 | 🧠 **CTO** | Tech strategy, stack selection, build-vs-buy decisions |
+| 2 | 📐 **Architect** | System design, ADRs, threat modeling |
+| 3 | 🗄️ **Database Architect** | Schema design, query optimization, migrations |
+| 4 | ☁️ **Cloud Architect** | AWS/GCP/Azure infrastructure, VPC, IAM |
+| 5 | 💰 **FinOps Architect** | Cloud cost optimization, budget alerts |
+| 6 | 🔒 **Security Engineer** | OWASP, CVE scanning, pentesting, compliance |
+| 7 | 🎯 **Product Manager** | PRD, user stories, acceptance criteria |
+| 8 | 🔄 **Scrum Master** | Sprint planning, gates, retrospectives |
+| 9 | 🖥️ **Backend Lead** | API design, microservices, database patterns |
+| 10 | 🎨 **Frontend Lead** | Component architecture, design systems |
+| 11 | ⚙️ **Senior Engineer BE** | Backend implementation, code quality |
+| 12 | 🖌️ **Senior Engineer FE** | Frontend implementation, accessibility |
+| 13 | 📱 **Mobile Engineer** | iOS/Android, React Native, App Store rules |
+| 14 | 🚀 **DevOps Engineer** | CI/CD pipelines, Docker, Kubernetes |
+| 15 | 🛡️ **SRE Engineer** | Reliability, SLOs, incident response |
+| 16 | 🤖 **ML Engineer** | Model serving, embeddings, ML pipelines |
+| 17 | 📊 **Data Engineer** | Kafka, Spark, dbt, data pipelines |
+| 18 | 🔬 **Data Scientist** | A/B testing, cohort analysis, EDA |
+| 19 | 🧪 **QA Engineer** | Test strategy, automation, coverage |
+| 20 | ✍️ **Technical Writer** | Documentation, runbooks, app flow docs |
+| 21 | 📣 **Market Researcher** | Competitor analysis, market positioning |
+| 22 | 🌐 **Website Creator** | Landing pages, SEO, web content |
 
-> **173 total skill files** across all roles, fully wired (Fix 47A-D) — each one is a focused protocol for a specific engineering task.
+> The role directories contain focused guidance. Counts and path references should be verified against the current checkout.
 
 ---
 
@@ -237,7 +191,7 @@ If a rung is disqualified (e.g., a CVE vulnerability in a package), agents must 
 
 ### 🔍 The Discovery Engine
 
-When your request is ambiguous (low confidence), instead of guessing wrong, the system asks 7 structured questions:
+For each new build, the system presents seven structured discovery questions:
 
 ```
 1. PLATFORM     — Web / Mobile / Desktop / CLI / Library?
@@ -253,9 +207,9 @@ Score 0–21 → maps to a mode:
 
 | Score | Tier | Mode |
 |-------|------|------|
-| 0–4 | Micro | Mode 5 (Lean) |
+| 0–4 | Minimal | Mode 3 (Direct) |
 | 5–9 | Lean | Mode 5 (Lean) |
-| 10–14 | Standard | Mode 2 (Targeted) |
+| 10–14 | Standard | Mode 4 (Hybrid) |
 | 15–18 | Full | Mode 1 (Full Army) |
 | 19–21 | Enterprise | Mode 1 (Full Army + extras) |
 
@@ -336,7 +290,7 @@ loopEngineering/
 │   │   ├── ponytail.md                  ← 7-rung ladder enforcement
 │   │   ├── session-guards.md            ← GUARD 1 + GUARD 2 + GUARD 3 (pxpipe) + GUARD 4
 │   │   ├── skill-selection-matrix.md    ← Story label → skill file mapping (119 rows, Fix 47C/D)
-│   │   ├── skill-label-index.md         ← 173 skill files indexed across 22 roles (Fix 47A)
+│   │   ├── skill-label-index.md         ← role and skill lookup index
 │   │   ├── loop-engine.md               ← PLAN→DO→VERIFY→DECIDE loop spec
 │   │   ├── context-memory-discipline.md ← Token budgets + degradation tiers
 │   │   ├── memory-management.md         ← Cross-session memory protocols
@@ -350,7 +304,7 @@ loopEngineering/
 │   │   ├── project_map.md          ← Module-level map of the whole system
 │   │   └── flow.md                 ← End-to-end system flow reference
 │   │
-│   ├── 📂 skills/                  ← 22 agent roles, 173 wired skill files
+│   ├── 📂 skills/                  ← 22 specialist role directories and shared skills
 │   │   ├── cto/                    ← CTO skill library (10 files)
 │   │   ├── architect/              ← Architect skills + product_graph_update.md (Fix 46A)
 │   │   ├── security_engineer/      ← Security skills (24 files)
@@ -408,13 +362,13 @@ loopEngineering/
 | `ponytail.md` | **Always** | 7-rung ladder — loaded before any agent fires |
 | `session-guards.md` | **Always** | GUARD 1 (constraint drift) + GUARD 2 (bad loop) + GUARD 3 (pxpipe image context) |
 | `skill-selection-matrix.md` | On demand | Maps story labels → exact skill files to load |
-| `skill-label-index.md` | On demand | Filename index for all 173 skill files across 22 roles |
+| `skill-label-index.md` | On demand | Filename index for specialist skills |
 | `loop-engine.md` | On demand | PLAN→DO→VERIFY→DECIDE loop specification |
 | `context-memory-discipline.md` | On demand | Token budgets, degradation tiers (PEAK→CRITICAL) |
 | `memory-management.md` | On demand | How to write, promote, and expire lessons |
 | `phase-reporting.md` | On demand | Report format templates for each sprint phase |
 
-> **Always loaded** = present in every session, even Mode 3 (trivial). Everything else loads on demand.
+> Loading behavior depends on the host and configuration; verify which guidance is actually included.
 
 ---
 
@@ -505,11 +459,11 @@ Loop Engineering uses a **three-phase model** (THINK → DESIGN → DEVELOP) tha
 
 | Phase | Owner | What happens |
 |-------|-------|-------------|
-| **THINK phase** | Kiro native | Type your build prompt → Kiro asks "Build a Feature?" → discovery questions, market context, constraints captured |
-| **DESIGN phase** | Kiro native | Kiro generates `requirements.md` + `design.md` in `.kiro/specs/` — PRD, TRD, ADRs, schema produced |
+| **THINK phase** | User and assistant | Ask all seven discovery questions, score the answers, recommend a mode, and offer model selection |
+| **DESIGN phase** | User-selected workflow | Use an existing/native spec or Loop Engineering design artifacts |
 | **DEVELOP phase** | Loop Engineering | Say "start sprint 1" → hook activates: GUARD 4, sprint planning, story cards, role contracts, gates, SM-RETRO |
 
-The hook stays silent during the THINK and DESIGN phases — it activates automatically when specs exist and development begins.
+The prompt hook provides process guidance. Its behavior depends on the Kiro version and must be verified in the host.
 
 #### Step 1 — Bootstrap a new project (recommended)
 
@@ -522,12 +476,16 @@ cd ~/MyTechExploration/loopEngineering
 
 This creates `~/Projects/MyProjectName/` with everything pre-wired:
 - `.kiro/hooks/` — `elite-team-orchestrator.json` (Kiro-native THREE-PHASE hook)
-- `.kiro/steering/` — all 14 steering files
-- `.kiro/skills/` — all 173 skill files across 22 roles
+- `.kiro/steering/` — steering files
+- `.kiro/skills/` — skill guidance across the roles
 - `.kiro/memory/` — fresh checkpoint.md, decisions.md, lessons.md, flow.md, project_map.md
 - `kiro → .kiro` symlink created automatically
-- `git init` + initial commit run automatically (FIX A)
+- `git init` runs automatically; review and commit the files yourself
 - `trigger-prompt.md` — fill-in template ready to paste into Kiro
+
+Project names must start with a letter or number and contain only letters,
+numbers, dots, underscores, and hyphens. The bootstrap refuses to overwrite
+an existing path.
 
 #### Step 2 — Or set up manually (existing project)
 
@@ -546,7 +504,7 @@ ls .kiro/memory/      # → checkpoint.md, lessons.md, decisions.md, flow.md, pr
 
 #### Step 3 — Open in Kiro and run the spec phase
 
-Open your project in Kiro and type your build prompt. When Kiro asks "Build a Feature?" — select it. Let Kiro generate the spec. This is the correct behaviour.
+Open your project in Kiro and describe the new build. Answer all seven discovery questions, review the recommended mode, and choose a model. Then proceed with the selected design workflow. For the CLI, use `kiro-cli chat --list-models --format json` to inspect available models and `/model` to select one. In the IDE, use its model picker. See [model selection](kiro/steering/model-selection.md).
 
 ```
 i want to build "MedVault — Multi-tenant pharmacy adherence platform"
@@ -563,7 +521,7 @@ start sprint 1
 
 The hook activates and runs:
 1. Reads `checkpoint.md` + `lessons.md` + `decisions.md`
-2. GUARD 4 — verifies `prd.md` + sprint plan + story card exist before any code is written
+2. For a full sprint, check the PRD/spec, sprint plan and story card; prompt-based checks depend on the host
 3. Loads `team-orchestrator-core.md` + role contract table
 4. SM-PLAN → story cards → role-based implementation → GATE 5 → SM-RETRO
 
@@ -735,7 +693,24 @@ kiro/adapters/
 └── chatgpt-setup-guide.md     ← Detailed ChatGPT setup walkthrough
 ```
 
-> Both system prompts are synced to **FIX A–G · Dry Run v11 · 9.5/10 ship confidence · 68 fixes implemented.**
+> Adapter behavior should be checked against the execution contract and the current host.
+
+---
+
+## Local framework checks
+
+Run these commands from the repository root, without network access:
+
+```bash
+python3 scripts/validate-framework.py
+python3 -m unittest discover -s tests -v
+```
+
+These checks validate a defined set of files, routing mappings, hook configuration,
+and bootstrap behavior. They do not prove a Kiro session loads a hook or that a
+model follows it; verify the discovery and model-selection flow in both hosts.
+See the [evaluation protocol](docs/research/evaluation-protocol.md) for the
+proposed broader measurements.
 
 ---
 
@@ -744,7 +719,7 @@ kiro/adapters/
 > **What it is:** A local proxy that intercepts every API call from Kiro/Claude and converts bulky old context (system prompt, tool results, history) into PNG images before they leave your machine. Image tokens are billed by pixel area — not by content. Dense code/JSON runs at ~1 char/token as text, but ~3.1 chars/image-token, so you pay ~3x less per character of context.
 
 **Measured results on our workload:**
-- ~59–70% lower end-to-end token bill on dense coding sessions
+- Potential token savings vary by workload and require independent measurement
 - Gist recall: **98/98** — decisions, values, paths, names survive perfectly
 - Verbatim recall: **13/15** — ~13% silent misread on exact hex strings (addressed by GUARD 3)
 - Effective context window: **~3x larger** — same 1M window, old turns take ⅓ the tokens
@@ -759,13 +734,17 @@ Our hook fires on every prompt, sending the full orchestrator + 22 agent descrip
 npm install -g pxpipe-proxy
 ```
 
+Review the package and select a version appropriate for your environment before
+installing. The launcher runs the installed `pxpipe-proxy` binary; it does not
+download a package automatically. The repository does not pin a package version.
+
 **Step 2 — Launch every session:**
 ```bash
 cd loopEngineering
 ./scripts/start-kiro-pxpipe.sh
 ```
 
-The script starts the proxy, waits for it to be ready, then launches Kiro or Claude automatically. Dashboard at `http://127.0.0.1:47821` — shows live token savings per request with a kill switch.
+The script starts the proxy in the foreground. Open Kiro or Claude separately using the environment variable shown in the terminal. Dashboard at `http://127.0.0.1:47821` — shows live token savings per request with a kill switch.
 
 **Step 3 — Validate (first sprint only):**
 Check `~/.pxpipe/events.jsonl` after one sprint to see your actual compression ratio.
@@ -798,7 +777,7 @@ Full analysis in [`pxpipe-research.md`](pxpipe-research.md), including:
 
 This system was built across **68 fix cycles** (FIX A–G from live MedVault Sprint 1 testing) over multiple sessions. **Phase 1 is complete as of 2026-07-19.**
 
-![Fixes](https://img.shields.io/badge/fix%20cycles-FIX%20A--G-blue) ![Phase](https://img.shields.io/badge/phase%201-complete-brightgreen) ![Skills](https://img.shields.io/badge/skill%20files%20wired-173-informational)
+![Fixes](https://img.shields.io/badge/fix%20cycles-FIX%20A--G-blue) ![Phase](https://img.shields.io/badge/phase%201-complete-brightgreen)
 
 ### By Type
 
@@ -926,7 +905,7 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 | Degradation tier system (PEAK → CRITICAL) | ✅ Implemented in CLAUDE.md + session-guards.md |
 | Session continuity (resume vector + checkpoint) | ✅ Active across all sessions |
 | Gist/exact-string recall bifurcation finding | ✅ Measured, documented, mitigated via GUARD 3 |
-| Compression data (59–70% on code-heavy sessions) | ✅ Measured across 68+ fix-cycle sessions |
+| Compression | Internal observations; independently reproducible measurement remains planned |
 | Three-tier guard architecture | ✅ In session-guards.md |
 | White paper v5 (problem-first, 34 pages) | ✅ DOCX + PDF published |
 | GOAT analysis | ✅ Honest gap + strength inventory |
@@ -943,7 +922,7 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 | **Fix 44A** | ✅ Done | Mode 5 advisory for security/RBAC stories wired into session-guards.md + orchestrator-routing.md. |
 | **Competitor comparison section** | ✅ Done | `docs/research/competitor-comparison.md` — MemGPT, LangMem, LangGraph, Cognition Devin. Fix 45C. |
 | **Fix 46A — Product Knowledge Graph** | ✅ Done | Two-agent flow: SE emits graph-patch YAML per story; ARCHITECT merges at GATE 5. D3 HTML viz at `docs/product-graph.html`. |
-| **Fix 47A-D — Skill Activation Audit** | ✅ Done | 37→119 label rows, phase auto-triggers, universal role defaults, ~60 keyword fallback patterns. 173 skill files now wired. |
+| **Fix 47A-D — Skill Activation Audit** | ✅ Done | 37→119 label rows, phase auto-triggers, universal role defaults, ~60 keyword fallback patterns. Historical audit count; current wiring requires validation. |
 | **R1 — External Validator Outreach** | ✅ Drafted | HN + Reddit + LinkedIn + Discord posts at `docs/Audits/external-validator-outreach.md`. Ready to post. |
 | **FIX A–G — Live MedVault Sprint 1 Testing** | ✅ Done | 7 gaps found + fixed: git init, story commits, Jira two-mode, per-story graph, discipline reports, memory writes, date-stamping. |
 
@@ -1009,19 +988,21 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 | **SM-RETRO** | Sprint retrospective — run at the end of every sprint, updates lessons.md. |
 | **Comprehension Debt** | When agents approve code without actually reading it. The gate catches this. |
 | **Bad Loop** | When an agent proposes changing scope it was never asked to change (e.g., "let me also refactor auth while I'm here"). |
-| **Confidence Score** | A 0–100% signal from the 25-keyword scan that determines which mode to use. |
-| **Discovery Engine** | 7-question wizard that scores your request and recommends the right mode when confidence is low. |
+| **Complexity Score** | A 0–21 heuristic based on the seven discovery answers. |
+| **Discovery Engine** | Seven questions for new builds; the answers inform a mode recommendation. |
 | **Stage 1-Fail** | A lesson that's been documented but not yet investigated or verified — the weakest lesson state. |
 | **gate_fired_at** | The sprint when a bad-loop gate actually fired. Used for accurate lesson age calculations. |
 | **Cross-Tenant Test** | A test that proves user A from company A cannot access user B's data from company B. Required at GATE S2 for RBAC stories. |
 | **NON-NEG** | Non-Negotiable — a rule that cannot be overridden by any agent, prompt, or circumstance. |
 | **Dry Run** | A simulated full pipeline run used to find gaps before real-world use. |
-| **pxpipe** | A local proxy that compresses dense context (system prompt, tool results, old history) to PNG images — saves ~59-70% on token cost for code-heavy sessions. |
+| **pxpipe** | A local proxy that compresses dense context (system prompt, tool results, old history) to PNG images — may reduce token use; savings depend on workload and must be measured. |
 | **Silent confabulation** | When an agent confidently returns a wrong value from imaged history with no error signal. GUARD 3 prevents this by requiring re-fetch from source for exact strings. |
 
 ---
 
-## 🚦 Current System Status
+## 🚦 Historical System Status (2026-07-19)
+
+This snapshot records historical project claims and is not a current production-readiness assessment.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -1029,16 +1010,16 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 ├─────────────────────────────────────────────────────────┤
 │  Phase 0 complete              ✅ Foundation             │
 │  Phase 1 complete              ✅ 2026-07-19             │
-│  Dry Run v11                   ✅ 9.5/10                │
+│  Dry Run v11                   ⚠️ internal score                │
 │  Fix 44G pxpipe integration    ✅ GUARD 3 + script      │
 │  Fix 44A Mode 5 advisory       ✅ Done                  │
 │  Fix 45A open-source artifacts ✅ LICENSE + CONTRIBUTING│
 │  Fix 45B compression methodology ✅ docs/research/       │
 │  Fix 45C competitor comparison ✅ docs/research/         │
 │  Fix 46A product knowledge graph ✅ D3 viz + YAML       │
-│  Fix 47A-D skill coverage      ✅ 173 files wired       │
+│  Fix 47A-D skill coverage      ⚠️ verify file paths       │
 │  R1 outreach                   ✅ Drafted · Ready to post│
-│  pxpipe token compression      ✅ ~59-70% savings       │
+│  pxpipe token compression      ⚠️ measure locally       │
 │  White paper v5                ✅ 34pp · DOCX + PDF     │
 │  GAP-48A/B/C/D resolved        ✅ 61/61 implemented     │
 │  Hook v4 Kiro-native           ✅ THREE-PHASE MODEL     │
