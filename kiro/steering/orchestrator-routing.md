@@ -23,14 +23,18 @@ Run both detections in a single step and log one line.
 
 ### STEP 1 — DETECT_TRACKER (Fix 1)
 
+For sprint work, `sprint-tracking-contract.md` takes precedence over the
+historical automatic fallback table below: use Jira when available and local
+tracking otherwise; local records are never represented as real Jira issues.
+
 ```
 Check in order:
 1. Is Jira MCP connected and responding?   → TRACKER_MODE=jira
 2. Is Linear MCP connected?                → TRACKER_MODE=linear
 3. Is GitHub Projects MCP connected?       → TRACKER_MODE=github
 4. Is Asana MCP connected?                 → TRACKER_MODE=asana
-5. None of the above                       → TRACKER_MODE=markdown
-   Create /docs/phase-N/sprint-plan.md and /docs/phase-N/loop-states/ as fallback
+5. None of the above                       → use local tracking and label it pending Jira sync
+   Use `sprint_gate.py init-local`; local records are not Jira issues.
 ```
 
 **$TRACKER TRANSLATION TABLE** (applies for the entire session regardless of mode):
@@ -281,7 +285,7 @@ Checker in lean mode = QUALITY role (fresh context invocation — not the same c
 > **Cross-reference:** LEAN LOOP SPEC is a simplification of the full 4-section spec in `kiro/steering/loop-engine.md` (used by Modes 1/4; also loaded by Mode 5 DEVELOP phase per Step 4).
 
 **Lean discipline profile (simplification of Fixes 1–9):**
-- Fix 1: $TRACKER still applies — TRACKER_MODE=markdown is the default in lean mode
+- Fix 1: for sprint-based lean work, use local tracking if Jira is unavailable and label it pending sync.
 - Fix 2: SM modes collapse → STRATEGIST gates (no separate SM-GATE / SM-PLAN calls)
 - Fix 4: loop-engine.md still loads before BUILDER activates
 - Fix 7: use LEAN LOOP SPEC (above) — not full 4-section spec

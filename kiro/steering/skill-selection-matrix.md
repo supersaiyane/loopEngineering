@@ -194,7 +194,7 @@ Note: SM activates in ONE mode per call (Fix 2). Mode determines which skills lo
 | Architecture for a service | clean_architecture.md, dependency_injection_patterns.md | others |
 | Adding observability | observability_instrumentation.md | others |
 | Implementing non-trivial story (algorithm choice, library selection, pattern decision) | [no skill file] — write entry in docs/phase-N/impl-decisions.md during DO step. Template in team-orchestrator-core.md Fix 15A (Fix 19 split). Mark entry [PROMOTE] if decision is reusable across projects OR deviates from a standard pattern. SM-RETRO GATE 4 will promote [PROMOTE] entries to ADR or lessons.md (Fix 22E). | all |
-| After writing code for any story (Fix 46A) | shared/graph_patch_emit.md | others — load only when code changes are structural (new class/service/api) |
+| After completing work for any story (Fix 46A) | shared/graph_patch_emit.md | others — record an empty patch for non-structural work |
 
 ### senior_engineer_fe
 | Activity | Load These Skills | Skip |
@@ -206,7 +206,7 @@ Note: SM activates in ONE mode per call (Fix 2). Mode determines which skills lo
 | Refactoring | shared/refactoring_safely.md | others |
 | Feature flags | shared/feature_flags_safely.md | others |
 | React performance | react_performance_patterns.md | others |
-| After writing code for any story (Fix 46A) | shared/graph_patch_emit.md | others — load only when code changes are structural (new component/api/module) |
+| After completing work for any story (Fix 46A) | shared/graph_patch_emit.md | others — record an empty patch for non-structural work |
 | PWA implementation | progressive_web_app.md | others |
 | Frontend monitoring | frontend_observability.md | others |
 

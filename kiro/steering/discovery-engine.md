@@ -73,6 +73,20 @@ Do not start the native spec workflow or create design artifacts first.
 ## STEP 2: Score Responses → Determine Complexity Tier
 
 Each answer maps to a weight (0–3). Sum all weights to get a **Complexity Score**.
+Never choose answers to reach a requested score. A web frontend, its API and
+database are one web platform; they do not by themselves establish multiple
+platforms. Do not infer regulated compliance, high availability or branded
+design merely from the word enterprise. Record user answers separately from
+unconfirmed assumptions. If the user explicitly skips discovery, retain unknowns
+and a possible score range; do not present inferred values as user answers.
+The user's explicit workflow mode is a separate choice from the calculated score.
+
+Run `python3 scripts/discovery_score.py --input ANSWERS.json` after recording
+the answers. The input is a JSON object with the seven question keys and the
+canonical values in the script's WEIGHTS table; omit unanswered keys or set
+them to null. To record an explicitly selected mode, add `--mode 1` (or 3, 4,
+5). Unknowns yield a range rather than a claimed score. Check the source of
+each answer: the calculator cannot determine whether the user supplied it.
 
 ### Scoring Matrix
 
@@ -172,8 +186,10 @@ Use the selected mode while it remains appropriate; follow user corrections and 
 
 ## STEP 4A: Model selection after discovery
 
-After presenting the score and recommended mode, offer model selection before
-starting design or development. Follow `kiro/steering/model-selection.md`.
+After presenting the score and recommended mode, explicitly read
+`kiro/steering/model-selection.md`, then offer model selection before starting
+design or development. If available models cannot be read, ask for the picker
+list rather than guessing model names, rates or availability.
 In CLI, discover options with `kiro-cli chat --list-models --format json` when
 available and already authenticated; in IDE use the visible model picker or ask
 for its options. Do not initiate login automatically. When the list cannot be

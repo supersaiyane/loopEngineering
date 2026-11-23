@@ -33,13 +33,52 @@ All team capabilities live under `.kiro/`. Skills at `.kiro/skills/<role>/`. Ski
 
 ## $TRACKER ABSTRACTION (Fix 1) — READ THIS BEFORE ANY TRACKER CALL
 
+For sprint execution, `sprint-tracking-contract.md` is authoritative over the
+historical routing and fallback descriptions below. Local files do not create
+Jira issues; use local tracking when Jira is unavailable and report pending sync.
+
 Every `jira.*` call in this file is a `$TRACKER.*` call.
 TRACKER_MODE is detected at session start by `orchestrator-routing.md` (DETECT_TRACKER protocol).
 The translation table in `orchestrator-routing.md` maps every $TRACKER call to the correct implementation.
 
 **Rule:** Never call `jira.*` directly. The system routes automatically based on TRACKER_MODE.
-If TRACKER_MODE=markdown, all tracker state lives in `/docs/phase-N/` files.
-The behavior described below is identical regardless of TRACKER_MODE — only the implementation differs.
+For sprint work, local records are not Jira issues. Use the sprint tracking
+contract for paths and verification.
+
+## Executable handoffs for sprint work
+
+Read `kiro/steering/project-delivery-evidence.md` for foundation ordering,
+system design, diagrams, schemas, security, CI and sprint reporting.
+
+The coordinator creates a project-specific JSON task plan with task IDs,
+assigned roles, dependencies and concrete output paths. Initialize it using
+`python3 scripts/team_flow.py init <plan-path>` before delegation. Use
+`start <task-id> --role <assigned-role>` and pass the printed upstream artifact
+paths to the selected specialist. After checking its actual outputs, use
+`complete <task-id> --role <assigned-role> --summary '<handoff>' --skill <path>`.
+Each new task must declare `required_skills`, including its role skill and the
+applicable activity skills selected from the matrix; completion blocks if any
+are not listed with `--skill`. Existing plans without this field remain
+compatible but do not have this check. For a QA
+task, declare a `verification` output pointing to a `sprint_gate.py run-check`
+evidence JSON; completion requires its successful command and commit fields.
+Preserve `.loop/team-flow.json` as the local handoff record. If a dependency or
+output changes, stop and reconcile rather than pretending the handoff passed.
+This local ledger checks declared files and dependencies; it does not launch
+agents, authenticate roles, prove the adequacy of a test or prevent editing the
+record. Only claim independent agents when the host actually launched them.
+Include `--skill <project-relative-path>` for each skill the role reports using;
+repeat the flag as needed. The ledger hashes the files but cannot prove they were
+read or used, so inspect host tool traces and describe these as claims.
+During long handoffs run `python3 scripts/team_flow.py status --stale-after-minutes 15`.
+Elapsed wall time is not a host heartbeat and does not by itself prove a stall.
+If the host reports a timeout or an attempt is actually blocked, record it with
+`block TASK --role ROLE --reason 'observed cause'`; this does not cancel the host
+agent. Inspect the host and preserve partial output before retrying. Only after
+confirming the earlier attempt has stopped, use `retry TASK --role ROLE --reason
+'evidence of termination' --confirmed-stopped`, then start the task again. Never
+start a second writer while the earlier attempt may still be active.
+Follow the sprint tracking contract separately; this ledger does not replace it.
 
 ---
 
@@ -375,7 +414,7 @@ SM-PLAN    → Sprint planning ONLY (runs AFTER SM-GATE returns GREEN).
                   - Specific recommendation (defer which story if IAM slips past day N)
                   - Machine-readable tag: `[IAM-WARNING: raw=Npts | effective=N–Npts | monitor <story-ids> daily]`
                   RULE: sprint-plan.md MUST contain the IAM Budget Pre-Warning section if IAM signals were detected.
-                  SM-GATE BLOCKS if IAM signals exist in PRD/TRD but sprint-plan.md has no IAM warning section.
+                  After SM-PLAN, the sprint readiness review BLOCKS development if IAM signals exist in PRD/TRD but sprint-plan.md has no IAM warning section. The earlier SM-GATE does not require a sprint plan that has not yet been created.
                Log: `[IAM-BUDGET-WARN: signals=[auth,RBAC] → +40% buffer applied to N security/* stories | spike=yes/no | written to sprint-plan.md]`
                If NO auth signals → skip silently.
 
@@ -448,18 +487,18 @@ BLOCKING RULE: SM-RETRO does not produce the retro doc until all 5 rows are popu
 
 ---
 
-**Gate 2 execution order — STRICT (two separate agent calls):**
+**Gate 2 execution order — STRICT:**
 1. Invoke `scrum_master` in SM-GATE mode → wait for VERDICT
 2. If GREEN only → invoke `scrum_master` in SM-PLAN mode → produce roadmap + tracker items
-3. SM-GATE and SM-PLAN must NEVER appear in the same agent response
+3. Review the resulting sprint plan and story readiness before development; return missing items to their owners. This post-plan review must not require a second SM-PLAN to begin.
+4. SM-GATE and SM-PLAN must NEVER appear in the same agent response
 
-**SM-GATE CHECKLIST ADDITION (Fix 10B — loop spec quality bar):**
-Add these items to the GATE 2 checklist:
+**POST-PLAN STORY READINESS CHECK (Fix 10B — loop spec quality bar):**
+Before the first implementation line of each story, confirm:
 - [ ] Every story has a loop spec authored (GOAL / VERIFIER / CRITERIA / STOP WHEN)
 - [ ] Loop spec CRITERIA are derived from the story's skill outputs (not written from scratch)
 - [ ] Loop spec VERIFIER is an automated command (not an opinion)
-If any story is missing its loop spec → SM-GATE returns RED. The backend_lead or frontend_lead
-for that story is named as responsible.
+If a story is missing its loop spec → block that story's development and name the backend_lead or frontend_lead responsible. Do not require story loop specs during the earlier foundation gate, before stories have been planned.
 
 **SM-GATE CHECKLIST ADDITION (Fix 15A — impl-decisions review):**
 - [ ] `impl-decisions.md` from prior sprint reviewed? (N/A for Sprint 1 of a phase)
@@ -483,11 +522,9 @@ Skill: `.kiro/skills/scrum_master/prebuild_documentation_gate.md`
 - [ ] Security threat model covers every trust boundary
 - [ ] STRIDE-BRIDGE (Fix 26D): After architect STRIDE, SM-PLAN extracts mitigations → adds ≤2 criteria per affected story loop spec. Log: `[STRIDE-BRIDGE: N mitigations → N criteria added]`
 - [ ] Gantt v1 is acyclic, role-tagged, skill-tagged
-- [ ] Sprint plan has velocity baseline + risk-adjusted capacity
+- [ ] Foundation roadmap states available capacity assumptions or records them as unknown; the post-plan readiness review checks the sprint plan's velocity baseline and risk-adjusted capacity.
 - [ ] Definition of Done defined per story, per sprint, per release
-- [ ] Every story has a loop spec (GOAL / VERIFIER / CRITERIA / STOP WHEN) ← Fix 10B
-- [ ] Loop spec VERIFIER is an automated command, not an opinion ← Fix 10B
-- [ ] Loop spec CRITERIA derived from skill outputs of that story's role ← Fix 10B
+- [ ] Post-plan story readiness checks each story's loop spec, automated verifier and skill-derived criteria before implementation (Fix 10B); these artifacts are not required before SM-PLAN creates stories.
 
 **If ANY item RED:** SM-GATE blocks. Names the role responsible. Does not proceed.
 **If ALL GREEN:** SM-GATE announces `"VERDICT: GREEN — DESIGN approved."` Then SM-PLAN fires (separate call).
@@ -553,10 +590,10 @@ Before Jira creation, `scrum_master` produces `/docs/foundation/roadmap.md` — 
 
 **→ CREATE JIRA ARTIFACTS via Jira MCP:**
 
-**Step 1 — Project + Epics:**
+**Step 1 — Project + Epics:** Use an existing user-selected project. Create a
+new project or epics only if the user explicitly authorizes those actions.
 ```
-jira.createProject(name=<product>, key=<ABBREV>, type="scrum")
-For each workstream: jira.createEpic(project=key, name=<epic>, goal=<outcome-statement>)
+If explicitly authorized: create epics for workstreams in the selected project.
 ```
 
 **Step 2 — Stories (one per US-NNN, fully written):**
@@ -714,7 +751,7 @@ Update Jira: `jira.transitionIssue(id, "Done")` + add comment with PR URL after 
 ## STORY LABEL TAXONOMY (Fix 23A)
 
 Every sprint story MUST carry ≥1 label from this list. Labels are the input for dynamic skill resolution (Fix 23C).
-SM-PLAN assigns labels at story creation. SM-PLAN SELF-BLOCKS if any story has zero labels (Fix 24C). SM-GATE confirms post-hoc via sprint plan review.
+SM-PLAN assigns labels at story creation. SM-PLAN SELF-BLOCKS if any story has zero labels (Fix 24C). The post-plan readiness review confirms the labels before development.
 Format in $TRACKER / markdown: `labels: [be/api, be/resilience]`  (array, 1–4 labels per story)
 Rule: primary lane label REQUIRED; cross-cutting labels optional if clearly applicable.
 

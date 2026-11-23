@@ -11,8 +11,8 @@ inclusion: manual
 - **Design system gate (Fix 25B)**: BLOCKS Sprint 1 start. web→design_system.md, mobile→design_system_mobile.md.
 - **SM-RETRO**: velocity + DoD + lessons write (5-step protocol) + impl-decisions.md + ADR promotions.
 - **CHECKPOINT write**: Type=SPRINT. Last SPRINT row = session resume point. [Fix 25O/26A]
-- **STORY DONE PROTOCOL (FIX B+C+D+F)**: After every qa_engineer PASS → git commit → knowledge graph HTML → checkpoint.md write → tracker close. ALL 4 mandatory.
-- **TRACKER_MODE (FIX C)**: Detect at SM-PLAN start. jira-mcp=MCP calls. txt=write docs/sprint-N/jira/<ID>.txt. Never skip.
+- **STORY DONE PROTOCOL (FIX B+C+D+F)**: After every evidenced QA pass → story Git commit → story graph patch (empty changes when non-structural) → checkpoint write → tracker close; merge patches into the single graph at sprint/phase closure. Do not claim completion when any required evidence is missing.
+- **TRACKER_MODE (FIX C)**: Detect at SM-PLAN start. Use actual Jira when configured, otherwise the local JSON tracker via `sprint_gate.py`; local records remain pending until a real import is verified.
 - **Discipline reports (FIX E)**: SM-RETRO generates docs/reports/sprint-N-discipline.md + appends docs/reports/discipline-dashboard.md.
 - **Memory writes (FIX F)**: flow.md on every gate change, checkpoint.md after every story/sprint, project_map.md at phase end.
 - **PHASE COMPLETION PROTOCOL (FIX H-B/C/F)**: At end of THINK, DESIGN/SM-GATE, SM-PLAN, and scaffold — write flow.md + checkpoint.md + git commit. See PHASE COMPLETION PROTOCOL section below.
@@ -110,13 +110,21 @@ Step 3 — GIT COMMIT:
 **AUTO-ACTIVATE: scrum_master [SM-PLAN-TRIGGER]** — fires regardless of story labels.
 **Actions in order:**
 
-#### STEP 0 — TRACKER_MODE DETECTION (FIX C)
+#### STEP 0 — TRACKER AND GIT EVIDENCE
+Use real Jira when available; if Jira is unavailable, use local tracker records
+and mark them pending synchronization. Local records are not Jira issues.
+Use `kiro/steering/sprint-tracking-contract.md` for the canonical procedure.
+The commands below must be executed, not merely printed. If the gate fails, report
+the blocker and do not call the sprint ready or a story done. Prompt instructions
+do not prevent the host from bypassing these commands.
+
+Historical two-mode notes (superseded by the contract above):
 Before creating any stories, detect tracker mode ONCE and hold for entire sprint:
 ```
 TRY: $TRACKER.listProjects() or $TRACKER.getProject()
   → If succeeds (Jira MCP connected): TRACKER_MODE=jira-mcp
       → Use $TRACKER.createStory() / transitionIssue() / addComment() as per core.md
-  → If fails / tool unavailable: TRACKER_MODE=txt
+  → If fails / tool unavailable: TRACKER_MODE=txt; report that Jira is not synced.
       → Create directory: docs/sprint-N/jira/ IMMEDIATELY (do not wait for story cards)
       → After ALL story cards are written, create ALL stub files as a BATCH:
          For EVERY story in the sprint, write docs/sprint-N/jira/<STORY-ID>.txt
@@ -166,9 +174,12 @@ Log: `[TRACKER-DETECT: TRACKER_MODE=<jira-mcp|txt> | Sprint N]`
 **ALL 4 steps are MANDATORY. Log each. Story is NOT closed until all 4 complete.**
 
 #### Step 1 — Git Commit (FIX B)
-Immediately after GATE3 PASS:
+Immediately after GATE3 PASS, review the changed files and stage only the files
+belonging to this story, preserving unrelated user changes:
 ```bash
-git add -A
+git status --short
+git add -- <reviewed-story-paths>
+git diff --cached --stat
 git commit -m "<type>(<scope>): <description> — story <STORY-ID> [Sprint N]"
 ```
 - `type`: `feat` | `fix` | `test` | `refactor` | `docs` | `chore`
@@ -180,54 +191,13 @@ Log: `[GIT: committed | story=<STORY-ID> | type=<type> | sprint=N]`
 
 **RULE:** Never batch multiple stories into one commit. One story = one commit minimum.
 
-#### Step 2 — Per-Story Knowledge Graph (FIX D)
-After git commit, write `docs/graph/knowledge-graph-sprint-N-story-<STORY-ID>.html` — self-contained D3 v7 force-directed graph showing everything this story touched.
-
-**Node requirements:**
-- Include every service / module / table / API endpoint / UI component created OR modified by this story
-- Node schema: `{ id, type, label, file_path, story_id, sprint }`
-- Node types (with color): `service`=#4299e1 · `api`=#63b3ed · `datastore`=#48bb78 · `ui_component`=#ed8936 · `security_policy`=#e53e3e · `external`=#a0aec0
-
-**Edge requirements:**
-- Edge schema: `{ source, target, label }`
-- Edge labels: `calls` | `reads` | `writes` | `authenticates` | `validates` | `emits`
-
-**HTML structure (D3 v7, fully self-contained):**
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Knowledge Graph — Sprint N · Story <STORY-ID></title>
-  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-  <style>
-    body { margin: 0; background: #1a1a2e; color: #eee; font-family: sans-serif; }
-    #graph { width: 100vw; height: 100vh; }
-    .tooltip { position: absolute; background: #2d2d4e; padding: 8px 12px; border-radius: 4px; font-size: 12px; pointer-events: none; }
-    .legend { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); padding: 8px; border-radius: 4px; }
-  </style>
-</head>
-<body>
-<div id="header" style="padding:8px 16px;background:#2d2d4e">
-  <strong>Sprint N · Story <STORY-ID></strong> — <span id="counts">nodes=N · edges=N</span>
-</div>
-<svg id="graph"></svg>
-<div class="legend"><!-- color legend for node types --></div>
-<div class="tooltip" id="tooltip" style="display:none"></div>
-<script>
-  const nodes = [ /* { id, type, label, file_path } */ ];
-  const links = [ /* { source, target, label } */ ];
-  /* D3 v7 forceSimulation + zoom + drag + tooltip on mouseover */
-  /* Arrow markers for directed edges */
-  /* node click → highlight connected nodes */
-</script>
-</body>
-</html>
-```
-
-Log: `[GRAPH-STORY: docs/graph/knowledge-graph-sprint-N-story-<STORY-ID>.html | nodes=N | edges=N]`
-
-**RULE:** Do NOT skip even for simple stories. A story with 2 files = a graph with ≥2 nodes.
+#### Step 2 — Story graph patch
+For every story, write and retain
+`docs/graph/graph-patch-sprintN-<STORY-ID>.yaml` using
+`kiro/skills/shared/graph_patch_emit.md`. Each patch records actual components,
+relationships, status and source paths. For a non-structural story, use empty
+change lists and record the work and reason in the patch. Do not create a
+separate story HTML graph.
 
 #### Step 3 — Checkpoint Write (FIX F)
 After knowledge graph is written, append to `kiro/memory/checkpoint.md`:
@@ -239,9 +209,14 @@ Log: `[CHECKPOINT: story <STORY-ID> logged | kiro/memory/checkpoint.md updated]`
 #### Step 4 — Tracker Close (FIX C)
 Route based on TRACKER_MODE detected at SM-PLAN step 0:
 - `TRACKER_MODE=jira-mcp` → `jira.transitionIssue(id, "Done")` + `jira.addComment(id, "QA PASSED: coverage=X% · git=<sha> · graph=✅")`
-- `TRACKER_MODE=txt` → update `docs/sprint-N/jira/<STORY-ID>.txt`: set `STATUS: Done`, add `COMPLETED_AT: <ISO>`, append `QA_NOTES: coverage=X% · git=<sha>`
+- Local tracker → `python3 scripts/sprint_gate.py update-local N STORY-ID --status Done --note '<verified evidence>'`; record the actual commit and measured coverage only if available. Local records are not Jira issues.
 
-Log: `[TRACKER-CLOSE: story <STORY-ID> | mode=<jira-mcp|txt> | status=Done]`
+Log: `[TRACKER-CLOSE: story <STORY-ID> | mode=<jira-mcp|local> | status=Done]`
+
+Run `python3 scripts/sprint_gate.py check-story N STORY-ID --mode jira` (or
+`--mode local` when using local tracking). Report a failure as BLOCKED;
+do not mark the story or sprint complete until the actual tracker status and a
+reachable story commit are verified. The checker does not verify QA results.
 
 ---
 
@@ -484,8 +459,8 @@ IF QA or Security report has RED items:
 
 GATE 5 BLOCKS Phase N+1 until:
   - QA Report: ALL GREEN
-  - Security Report: ALL GREEN (zero HIGH/CRITICAL)
-  - All reopened stories re-closed in Jira
+  - Security Report: all declared targets scanned with a current database and no known findings under the project's stated policy; report every finding and unknown.
+  - All reopened stories re-closed in the actual tracker; local pending sync must not be described as Jira.
 ```
 
 **Step 4 — Phase Closure:**
@@ -500,43 +475,15 @@ When GATE 5 passes:
      - `docs/sprint-N/review-deck.pptx` — one slide per story shipped this phase
      - `docs/sprint-N/retro-report.pdf` — SM-RETRO summary for async stakeholders
    - Log: `[TW-GATE5: docs updated | review-deck.pptx ✅ | retro-report.pdf ✅]`
-4. `architect` [GRAPH-MERGE — Fix 46A + GAP-48C] — AUTO-ACTIVATES at GATE 5 after TW docs:
-   - Load kiro/skills/architect/product_graph_update.md
-   - Collect all `docs/graph/graph-patch-sprint{N}*.yaml` files from this sprint
-   - If no patch files found → log `[GRAPH: no patches this sprint]` and SKIP (do not touch existing files)
-   - If patch files found — execute ALL 4 steps below in order. GATE 5 BLOCKS if any step fails:
-
-   **Step G1 — YAML merge:**
-   - Merge all patch YAML files into `docs/graph/product-graph.yaml`
-   - Add decision nodes for any architectural choices made this sprint (from impl-decisions.md)
-   - Verify merged YAML has valid structure (nodes + edges arrays, each node has id+type+label)
-   - Log: `[GRAPH-YAML: +N nodes | +N edges | product-graph.yaml updated]`
-
-   **Step G2 — HTML viz generation (MANDATORY — GAP-48C):**
-   - Read `product-graph.yaml` node/edge arrays from Step G1
-   - Generate `docs/graph/knowledge-graph-sprint{N}.html` — self-contained D3 v7 force-directed graph:
-     - All nodes color-coded by type (domain_entity / service / datastore / infrastructure / code_component / security_policy / compliance_policy)
-     - All edges with arrow markers and dash patterns (solid=data-flow, dashed=calls, dotted=compliance)
-     - Deferred/Sprint-N+1 nodes visually distinguished (lighter color or dashed border)
-     - Filter chips by node type
-     - Tooltip on hover showing node metadata
-     - Zoom + drag enabled
-     - Legend for node types + edge types
-     - Node/edge counts in header
-   - Log: `[GRAPH-HTML: knowledge-graph-sprint{N}.html generated | nodes=N | edges=N]`
-
-   **Step G3 — LIVE graph update:**
-   - Also regenerate `docs/graph/product-graph.html` (cumulative — all sprints to date)
-   - This is the always-current full knowledge graph. Sprint-specific HTML is for archival.
-   - Log: `[GRAPH-LIVE: product-graph.html updated | total nodes=N | total edges=N]`
-
-   **Step G4 — Cleanup + verification:**
-   - Delete processed patch YAML files (sprint-specific patches that have been merged)
-   - Verify both HTML files exist and are non-empty: `docs/graph/knowledge-graph-sprint{N}.html` + `docs/graph/product-graph.html`
-   - If either HTML is missing or empty after generation → EMIT ERROR and re-run Step G2/G3 before GATE 5 can close
-   - Log: `[GRAPH-MERGE: COMPLETE | sprint-html=✅ | live-html=✅ | patches-cleaned=N | GATE5-unblocked]`
-
-   **HARD RULE:** GATE 5 cannot close until `[GRAPH-MERGE: COMPLETE]` is logged. The HTML files are NOT optional. This was the root failure in GAP-48C — YAML was merged but HTML was silently skipped.
+4. `architect` [GRAPH-MERGE]:
+   - Load `kiro/skills/architect/product_graph_update.md` and run
+     `python3 scripts/product_graph.py merge N --require-complete` for all story patches.
+   - Verify `docs/graph/product-graph.yaml` and the single cumulative
+     `docs/graph/product-graph.html`. Inspect the story filters and source links.
+   - Preserve all story patches. Existing historical HTML files are user data;
+     do not delete or overwrite them. Do not generate new per-story or per-sprint HTML.
+   - Even if no structural change exists, merge the retained empty story patches.
+   - If merge or validation fails, report the blocker rather than claiming success.
 4b. `architect` [PROJECT-MAP-UPDATE — FIX F]:
    Update `kiro/memory/project_map.md` — add all new modules/services shipped this phase.
    For each new service/module/datastore not yet in the map:

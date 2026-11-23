@@ -9,13 +9,35 @@ the user to select a model or keep the current one before design begins. Model
 availability varies by Kiro surface, version, subscription, geography and
 organization policy. Never assert that an option is available without checking.
 
+## Required evidence and fallback
+
+- Before recommending models, explicitly read this file.
+- Do not name or recommend unconfirmed models as choices. If the IDE does not
+  expose its picker to the assistant, ask the user for the model picker list
+  and displayed credit multipliers, or offer to keep the current selection.
+  Wait for the list or selection before making a specific comparison.
+- Compare only confirmed options. Copy their displayed rates and experimental
+  labels exactly; an absent label does not establish a lifecycle status.
+  Check numerical cost rankings against the displayed multipliers.
+- Do not invent model capabilities, proven reliability, benchmarks, or
+  comparative performance. Mark unsupported claims as unknown and describe
+  recommendations as tentative. Do not claim a cost is small without the
+  user's budget and expected usage.
+- A model name and credit multiplier alone are not evidence that it is more
+  reliable than another, that it will save debugging time, or that a premium
+  is worthwhile. Do not make those claims without a verified source or the
+  user's own evaluation. If no such evidence is available, recommend keeping
+  the current model as a practical default and explain that fit is unverified.
+- Do not claim to see the IDE picker or switch the model unless the host
+  exposes that capability. Guide the user through the picker instead.
+
 ## Find the user's actual options
 
 1. In an authenticated Kiro CLI, use `kiro-cli chat --list-models --format json`
    if supported. If unavailable, ask the user to open `/model` and share the list.
 2. In the IDE, use the model picker or ask the user which options it shows.
    Do not start a login flow automatically. If the list cannot be obtained,
-   offer the current model and explain that the catalog below is illustrative.
+   offer to keep the current model without guessing the available catalog.
 3. Present only confirmed available options as selectable. Identify experimental
    and end-of-life choices where the picker or current official documentation
    identifies them. Offer **keep current model** and, if available, **Auto**.
@@ -26,26 +48,13 @@ organization policy. Never assert that an option is available without checking.
    CLI use `/model`. Starting a new CLI session can use `kiro-cli chat --model
    <model-id>`. Do not claim a change occurred without confirmation from Kiro.
 
-## Model family guide
+## Describe confirmed options
 
-The following are examples from Kiro's published catalog, checked 2026-11-18.
-They are not a list of models available to every account. Recheck the source
-and current picker before relying on names, availability, or credit rates.
-
-| Option or family | Useful for | Trade-off |
-|---|---|---|
-| Auto | General work when the user prefers Kiro to route the request. | Less direct control over the underlying model. |
-| Claude Opus / Fable | Complex architecture, difficult debugging, security reviews and sustained multi-file work. | Often higher credit use; access varies. |
-| Claude Sonnet | Balanced implementation, scoped debugging, review and documentation. | Cost and capability depend on version. |
-| Claude Haiku | Quick questions and simple, high-volume tasks. | Complex work may need a stronger model or additional review. |
-| GPT Sol | Long-running, difficult coding and terminal tasks. | Often higher credit use than smaller tiers. |
-| GPT Terra | Balanced multi-step development. | May be less suitable than a stronger model for the hardest tasks. |
-| GPT Luna | Fast, routine and high-volume work. | Lower-cost tier; validate complex output carefully. |
-| Kimi / GLM / MiniMax / Qwen | Alternative coding and long-context models where offered. | Availability and lifecycle vary; some models may be experimental. |
-
-Recommend a stronger available model for high-complexity architecture or
-security-sensitive work, and consider balanced or faster models for scoped work.
-Always let the user decide based on their quality, latency and credit priorities.
+Use current, verifiable model documentation or the user's own evaluation to
+describe what each confirmed option can do and its fit for the task. If such
+evidence is unavailable, say that capabilities and comparative fit are unknown;
+do not infer them from the model name, price, or an experimental label. Always
+let the user decide based on their quality, latency and credit priorities.
 
 Sources: [Kiro available models](https://kiro.dev/docs/models/available-models/),
 [Kiro models overview](https://kiro.dev/docs/models/), and

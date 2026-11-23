@@ -20,7 +20,7 @@ so the product knowledge graph stays current without the ARCHITECT reading every
 - [ ] Skip: test files, config tweaks, minor style changes, import reorganizations
 
 ### Step 2 — Emit the patch file
-Create: `docs/graph-patch-sprint{N}-{STORY-ID}.yaml`
+Create: `docs/graph/graph-patch-sprint{N}-{STORY-ID}.yaml`
 
 ```yaml
 story: PROJ-123          # $TRACKER story ID
@@ -65,20 +65,20 @@ api_endpoints_added:
     sprint: 3
     description: Issues new access token given valid refresh token.
 
-# decisions block: LEAVE EMPTY — only ARCHITECT fills this
+# decisions block: leave empty; the merge script rejects this legacy block.
 decisions: []
 ```
 
 ### Step 3 — Validate before committing
-- [ ] Every `id` is unique (check against existing `docs/product-graph.yaml` ids if available)
+- [ ] Every `id` is unique (check against existing `docs/graph/product-graph.yaml` ids if available)
 - [ ] Every `file` path is repo-relative and matches actual file created
-- [ ] `nodes_modified` only references ids that already exist in `docs/product-graph.yaml`
-- [ ] `decisions` block is empty (ARCHITECT-only)
-- [ ] File saved to `docs/graph-patch-sprint{N}-{STORY-ID}.yaml`
+- [ ] `nodes_modified` only references ids that already exist in `docs/graph/product-graph.yaml`
+- [ ] `decisions` block is empty; architect-reviewed decision nodes go in `nodes_added`
+- [ ] File saved to `docs/graph/graph-patch-sprint{N}-{STORY-ID}.yaml`
 
 ### Step 4 — Log it
 ```
-[GRAPH-PATCH: docs/graph-patch-sprint3-PROJ-123.yaml | nodes_added=2 | nodes_modified=1 | edges=2 | api=1]
+[GRAPH-PATCH: docs/graph/graph-patch-sprint3-PROJ-123.yaml | nodes_added=2 | nodes_modified=1 | edges=2 | api=1]
 ```
 
 ---
@@ -96,7 +96,8 @@ decisions: []
 
 ## Rules
 - One patch file per story. Never aggregate patches across stories.
-- Do NOT modify `docs/product-graph.yaml` directly. That is ARCHITECT territory.
+- Do NOT modify `docs/graph/product-graph.yaml` directly. The merge script writes it.
 - Do NOT emit patches for test files, migrations, or config-only changes.
-- If a story has no structural changes (pure bugfix, CSS tweak), omit the patch entirely and log:
-  `[GRAPH-PATCH: skipped — no structural changes in story PROJ-XXX]`
+- If a story has no structural changes (pure bugfix, CSS tweak), retain a patch
+  with `story`, `sprint`, empty change lists and a note describing the work and
+  why there is no structural change. This preserves the record for every story.

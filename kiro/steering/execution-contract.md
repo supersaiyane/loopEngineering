@@ -22,6 +22,10 @@ For the seven-question discovery score, recommend 0–4 → Mode 3, 5–9 → Mo
 10–14 → Mode 4, and 15–21 → Mode 1. Mode 2 is explicitly requested or selected
 for a focused role task, rather than determined by score. Recommendations do not
 override user direction. A score is a heuristic, not a calibrated confidence.
+Never infer answers merely to achieve a target score. A web UI, API and database
+are one web platform; unconfirmed inputs remain unknown. Use
+`scripts/discovery_score.py` to calculate supplied answers and an honest range
+for unknowns; an explicitly selected mode remains separate from that score.
 
 For every new build, present all seven questions in discovery-engine.md, even
 when the user has already provided some details. After the user responds, score

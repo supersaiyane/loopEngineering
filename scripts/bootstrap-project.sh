@@ -80,6 +80,19 @@ if [[ -d "$FRAMEWORK_DIR/scripts" ]]; then
   cp "$FRAMEWORK_DIR/scripts/bootstrap-project.sh" "$TARGET/scripts/"
   cp "$FRAMEWORK_DIR/scripts/start-kiro-pxpipe.sh" "$TARGET/scripts/"
   cp "$FRAMEWORK_DIR/scripts/validate-framework.py" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/sprint_gate.py" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/sprint_report.py" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/usage_report.py" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/security_scan.py" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/delivery_setup.py" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/design_audit.py" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/discovery_score.py" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/migration_setup.py" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/project_index.py" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/product_graph.py" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/product_graph_template.html" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/team_flow.py" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/prepare_kiro_agents.py" "$TARGET/scripts/"
   chmod +x "$TARGET/scripts/"*.sh 2>/dev/null || true
   echo "     ✅ scripts copied ($(ls "$TARGET/scripts/"*.sh 2>/dev/null | wc -l | tr -d ' ') shell scripts)"
 else
@@ -278,6 +291,7 @@ if [[ -L "$TARGET/kiro" ]]; then
   rm "$TARGET/kiro"
 fi
 ln -s .kiro "$TARGET/kiro"
+python3 "$TARGET/scripts/prepare_kiro_agents.py" --root "$TARGET"
 echo "     ✅ $TARGET/kiro → .kiro"
 
 # ── 7. Create trigger-prompt template ─────────────────────────────────────────
@@ -342,6 +356,20 @@ check "$TARGET/.kiro/memory/checkpoint.md"                     "memory: checkpoi
 check "$TARGET/kiro"                                           "symlink: kiro → .kiro"
 check "$TARGET/scripts/bootstrap-project.sh"                   "script: bootstrap-project.sh"
 check "$TARGET/scripts/start-kiro-pxpipe.sh"                   "script: start-kiro-pxpipe.sh"
+check "$TARGET/scripts/sprint_gate.py"                        "script: sprint_gate.py"
+check "$TARGET/scripts/sprint_report.py"                      "script: sprint_report.py"
+check "$TARGET/scripts/usage_report.py"                       "script: usage_report.py"
+check "$TARGET/scripts/security_scan.py"                      "script: security_scan.py"
+check "$TARGET/scripts/delivery_setup.py"                     "script: delivery_setup.py"
+check "$TARGET/scripts/design_audit.py"                       "script: design_audit.py"
+check "$TARGET/scripts/discovery_score.py"                    "script: discovery_score.py"
+check "$TARGET/scripts/migration_setup.py"                    "script: migration_setup.py"
+check "$TARGET/scripts/project_index.py"                      "script: project_index.py"
+check "$TARGET/scripts/product_graph.py"                      "script: product_graph.py"
+check "$TARGET/scripts/product_graph_template.html"           "template: product_graph_template.html"
+check "$TARGET/scripts/team_flow.py"                          "script: team_flow.py"
+check "$TARGET/scripts/prepare_kiro_agents.py"                "script: prepare_kiro_agents.py"
+check "$TARGET/.kiro/agents/loop-coordinator.json"            "agent: loop coordinator"
 check "$TARGET/docs/reports/baseline.md"                       "report: discipline baseline"
 check "$TARGET/docs/reports/discipline-dashboard.md"           "report: discipline dashboard"
 

@@ -36,6 +36,15 @@ class FrameworkContractTests(unittest.TestCase):
         self.assertIn("Present all seven questions", doc)
         self.assertIn("kiro-cli chat --list-models", doc)
 
+    def test_model_recommendations_use_only_confirmed_options(self):
+        hook = json.loads((ROOT / "kiro/hooks/elite-team-orchestrator.json").read_text())
+        prompt = next(h["action"]["prompt"] for h in hook["hooks"] if h["name"] == "Orchestrator Router")
+        guide = (ROOT / "kiro/steering/model-selection.md").read_text()
+        self.assertIn("read model-selection.md", prompt)
+        self.assertIn("Do not name or recommend unconfirmed models", guide)
+        self.assertIn("Do not invent model capabilities", guide)
+        self.assertIn("ask the user for the model picker list", guide)
+
     def test_discovery_examples_use_score_ranges_consistently(self):
         doc = (ROOT / "kiro/steering/discovery-engine.md").read_text()
         self.assertIn("**8 → Lean → Mode 5**", doc)
@@ -132,6 +141,12 @@ class FrameworkContractTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             target = pathlib.Path(tmp) / "sample"
             self.assertFalse((target / "scripts/sheet_generator.py").exists())
+            self.assertTrue((target / "scripts/team_flow.py").is_file())
+            self.assertTrue((target / "scripts/sprint_report.py").is_file())
+            self.assertTrue((target / "scripts/security_scan.py").is_file())
+            self.assertTrue((target / "scripts/project_index.py").is_file())
+            self.assertTrue((target / "scripts/product_graph_template.html").is_file())
+            self.assertTrue((target / ".kiro/agents/loop-coordinator.json").is_file())
             validation = subprocess.run(["python3", str(target / "scripts/validate-framework.py")],
                                         text=True, capture_output=True)
             self.assertEqual(validation.returncode, 0, validation.stderr)
