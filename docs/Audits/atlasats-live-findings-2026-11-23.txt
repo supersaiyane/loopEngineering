@@ -277,16 +277,16 @@ Status key: COMPLETE = stated scope verified; PARTIAL = implementation exists bu
 | U12 | Security scans and reports | PARTIAL | Trivy dependency, secret and real disposable image scans; incomplete coverage blocks | Image still has findings; inventory, remediation, digest verification and hosted CI remain incomplete. |
 | U13 | Developer commands | PARTIAL | Opt-in Makefile provides configured commands and blocking preflight; tests | Commands and CI must be configured and verified for each chosen project stack. |
 | A01 | Specialist skill selection | PARTIAL | Role wrappers, claims and reconciled root read guidance; StemEducator PRD reports header-only reads | Host traces and fresh execution must verify meaningful reads; hashes do not prove use. |
-| A02 | Native delegation and handoffs | PARTIAL | Dependency-aware team_flow ledger with block/retry | Ledger does not launch or authenticate specialists; development handoffs need live verification. |
+| A02 | Native delegation and handoffs | PARTIAL | Native specialist calls observed; team_flow records dependencies, blocks and retries | Ledger does not authenticate specialists; development handoffs need live verification. |
 | A03 | Tracker fallback and Git evidence | PARTIAL | Local JSON history, export, commit and verification gates | Real Jira import/sync, native history and completed live sprint unverified. |
 | A04 | Graph accuracy and traceability | PARTIAL | Patch hashes, source/edge validation and story completeness check | Meaningful coverage and source accuracy require live review. |
 | A05 | Memory, hooks and context | PARTIAL | Bootstrap profiles, hook and checkpoint guidance; historical bounded checks | Comprehensive resume, hook compliance, reference use and cost attribution unverified. |
 | A06 | Enterprise development verification | PENDING | Offline and disposable tests provide bounded evidence | Live two-sprint, deployed security and enterprise readiness are not established. |
 | A07 | Interruptions and recovery | PARTIAL | team_flow records blocking and confirmed-stop retries | No host heartbeat/cancellation; historical stalls and live recovery remain unverified. |
-| F01 | Discovery score reliability | PARTIAL | Deterministic explicit-answer scorer and tests | Fresh host execution and provenance of answers not verified. |
+| F01 | Discovery score reliability | PARTIAL | Scorer and tests; fresh Kiro runs recorded 10 for RecruitmentProbe and 20 for StemEducator | Answer provenance and broader host behavior still require review. |
 | F02 | Foundation and sprint gate order | PARTIAL | Instructions separate foundation gate from post-plan checks | Host compliance requires fresh live verification. |
 | F03 | DevOps and image scans | PARTIAL | Scoped Compose build and Trivy scan executed in disposable fixture | Remaining image findings, project coverage and actual CI unresolved. |
-| F04 | Foundation and sprint planning | PARTIAL | Root gate ordering corrected | Live recheck paused under root-only scope. |
+| F04 | Foundation and sprint planning | PARTIAL | Root gate ordering corrected; user-run StemEducator foundation is in progress | A completed live foundation gate and sprint planning have not been observed. |
 | F05 | Two-sprint verification | PENDING | RecruitmentProbe discovery observed; StemEducator is now user-run and under read-only review | No two completed sprints or independent closure verification established. |
 | F06 | Offline framework checks | COMPLETE | 89 tests passed; offline contract validation and git diff --check passed | These checks do not establish live host or external integrations. |
 | F07 | Framework commit and push | COMPLETE | Framework commit bfff860fdd58ce2dd6ff8ea210489f229d514b91 pushed and verified on origin | Unrelated pre-existing changes and test-project files remain outside the commit. |
