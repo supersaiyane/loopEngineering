@@ -236,7 +236,7 @@ Root fixes: sprint reports now include local tracker events, task claims/artifac
 
 Real disposable fixture: /private/tmp/loop-root-audit.qADsiF (temporary local evidence, not a product project). Docker Compose built and ran a Python image. Trivy 0.74.0 used DB UpdatedAt 2026-11-23T01:05:17Z: initial image scan blocked on 263 findings (56 HIGH); after upgrading available Debian packages and rebuilding, the rescan blocked on 227 findings (52 HIGH). Both JSON/Markdown reports are retained in the fixture; counts are scanner results, not unique CVEs or proof of full inventory coverage. These findings are in the disposable base image, not an assessment of any user's deployed image. No clean image, production remediation or GitHub Actions run is claimed.
 
-A disposable postgres:17-bookworm container and generated Alembic scaffold were used against separate platform_probe and tenant_probe databases. Both completed upgrade, downgrade and re-upgrade of a synthetic revision; revision 001 and the two catalog columns were checked. The temporary container was stopped. This does not test an automated tenant rollout, concurrent migrations, failure recovery, full schema parity, actual product data or production isolation. Git remote branch read access succeeded; commit/push results are recorded separately when verified.
+A disposable postgres:17-bookworm container and generated Alembic scaffold were used against separate platform_probe and tenant_probe databases. Both completed upgrade, downgrade and re-upgrade of a synthetic revision; revision 001 and the two catalog columns were checked. The temporary container was stopped. This does not test an automated tenant rollout, concurrent migrations, failure recovery, full schema parity, actual product data or production isolation. The reviewed framework commit bfff860fdd58ce2dd6ff8ea210489f229d514b91 was pushed to origin/improve/framework-reliability and verified with git ls-remote. A follow-up audit-only commit records this result.
 
 FINAL STATUS TABLE — ROOT FRAMEWORK — last checked 2026-11-23
 
@@ -270,6 +270,6 @@ Status key: COMPLETE = stated scope verified; PARTIAL = implementation exists bu
 | F04 | Foundation and sprint planning | PARTIAL | Root gate ordering corrected | Live recheck paused under root-only scope. |
 | F05 | Two-sprint verification | PENDING | Historical observations retained as evidence only | Further test-project or task changes are explicitly prohibited. |
 | F06 | Offline framework checks | COMPLETE | 89 tests passed; offline contract validation and git diff --check passed | These checks do not establish live host or external integrations. |
-| F07 | Framework commit and push | PENDING | Branch and remote read verified; intended files under review | Commit and push outcome must be checked. |
+| F07 | Framework commit and push | COMPLETE | Framework commit bfff860fdd58ce2dd6ff8ea210489f229d514b91 pushed and verified on origin | Unrelated pre-existing changes and test-project files remain outside the commit. |
 | F08 | Docker runtime access | COMPLETE | Docker version, Compose build/run and disposable PostgreSQL succeeded | This verifies current local access only; no deployment or clean image implied. |
 | F09 | Real Jira import or sync | PENDING | Local fallback and export exist | An explicitly authorized Jira connection/project and real readback are needed. |
