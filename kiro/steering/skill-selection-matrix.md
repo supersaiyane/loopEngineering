@@ -4,9 +4,9 @@ inclusion: manual
 
 # Skill Selection Matrix — Targeted Skill Loading
 
-**Purpose:** Load ALL activity-relevant skill files, but compress each immediately to a 5-line takeaway. This gives full expertise coverage at lower context cost than loading a few full files.
+**Purpose:** Select activity-relevant skills and retain concise takeaways to manage context. Selection and summaries do not themselves prove complete expertise or application.
 
-**Rule:** When a role activates, the orchestrator selects skills based on the ACTIVITY being performed. Load every file in the matching matrix row. Compress each to a 5-line takeaway immediately after reading. Work from summaries. Re-load full content on-demand only for the one file needed during a specific protocol-heavy substep (e.g., OWASP checklist, WCAG audit).
+**Rule:** When a role activates, the orchestrator selects skills based on the ACTIVITY being performed. Read the actionable content of the matching files and universal defaults; a header-only read is partial, not completion. Compress each to a 5-line takeaway after reading. Work from summaries and re-load content when a protocol-heavy substep needs it. If a file cannot be fully read, record the limitation and request the missing review before relying on it. The host's actual trace, not a self-report or hash, is the evidence of a read.
 
 ---
 
@@ -345,11 +345,11 @@ Note: SM activates in ONE mode per call (Fix 2). Mode determines which skills lo
 ## USAGE RULES
 
 1. **First activation of a role in a project:** Load the "Full" set (typically 3-5 core skills)
-2. **Subsequent activations:** Load ONLY skills relevant to the specific task. Second-pass (on-demand) files trigger when: (a) loop verifier scores the first-pass artifact < 7/10 on any skill-linked criterion, (b) user explicitly requests deeper analysis, (c) orchestrator identifies a named gap that maps to a specific second-pass file, or (d) SM-GATE returns RED on a criterion a second-pass file would address. Second-pass files count toward the per-activation budget. Max after second pass: ≤ 5 files total.
-3. **Gate activities:** Load ONLY gate-specific skills (e.g., S1 = supply_chain + vulnerability)
+2. **Subsequent activations:** Load skills relevant to the specific task and universal defaults. Second-pass (on-demand) files trigger when: (a) loop verifier scores the first-pass artifact < 7/10 on any skill-linked criterion, (b) user explicitly requests deeper analysis, (c) orchestrator identifies a named gap that maps to a specific second-pass file, or (d) SM-GATE returns RED on a criterion a second-pass file would address. Record any relevant files deferred for resource limits and their required review; do not claim full coverage.
+3. **Gate activities:** Load gate-specific skills (e.g., S1 = supply_chain + vulnerability) and applicable universal defaults.
 4. **If unsure which skills apply:** Load the role's top 4 by filename relevance to the task description
-4b. **Ambiguous activity match (2+ rows match the same task description):** Load the union of matched rows' skill files, deduplicated. No cap — compress all. If union exceeds 10 files, rank by keyword overlap and take top 10. Log: `[ACTIVITY MATCH: ambiguous — matched [row-A, row-B], loaded [file1, file2, ...], Σ~Ntok compressed]`.
-5. **Never load all 20 files** for security_engineer — pick the 2-3 that match the activity
+4b. **Ambiguous activity match (2+ rows match the same task description):** Deduplicate the union of matched rows and load the relevant files. If resource limits prevent reading them all, prioritize by task and risk, record the omitted files and arrange any needed review. Log the matched rows, files read, omissions and compressed context estimate.
+5. **Security review:** Select files according to the actual activity and risk rather than loading the entire role library by default; record any relevant omissions.
 6. **Token budget (compressed):** Soft cap: total compressed skill context ≤ 2,000 tokens per role activation (~8-12 summaries). NO hard cap on file count. Log: `[SKILLS: role=X | activity=Y | files=A,B,C,D | Σ~Ntok compressed]`
 
 ---

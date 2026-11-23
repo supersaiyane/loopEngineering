@@ -96,7 +96,7 @@ DEVELOP  Build        Agile sprints, Jira, code, tests, commits, CI/CD.
 
 ## ROLE REGISTRY
 
-All 19 roles. Skills path is `.kiro/skills/<role>/`. Before producing any artifact, consult `.kiro/steering/skill-selection-matrix.md` to load ONLY the 2-4 relevant skill files for the current activity. Skills define depth, format, and quality bar — they are not optional, but loading must be targeted.
+Skills path is `.kiro/skills/<role>/`. Before producing an artifact, select the applicable files using `.kiro/steering/skill-selection-matrix.md`, including universal defaults. Read their actionable content, not just headers, and record any partial or unavailable reads as a blocker or limitation. Skills define depth, format, and quality bar; the host must actually perform the reads, and a path or hash alone is not proof of use.
 
 | Role | Skills Path | Phase | Primary Artifact | Upstream Inputs |
 |---|---|---|---|---|
