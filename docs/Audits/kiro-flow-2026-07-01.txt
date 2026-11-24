@@ -1,6 +1,7 @@
 
-CURRENT FRAMEWORK FLOW — updated 2026-11-24
-==========================================
+KIRO AGENTIC ENGINEERING SYSTEM — CURRENT COMPLETE FLOW
+Root framework overview · updated 2026-11-24
+=======================================================
 
 This section describes the root Loop Engineering framework on
 improve/framework-reliability. The July 1 diagram and its fix list below are
@@ -10,36 +11,70 @@ docs/Audits/atlasats-live-findings-2026-11-23.txt. Canonical mode rules live in
 kiro/steering/execution-contract.md; the coordinator and host must actually
 execute each delegated task and check. User and host instructions take priority.
 
-                         USER REQUEST
-                              |
-                 +------------v-------------+
-                 | Project snapshot + host  |
-                 | permissions / context    |
-                 +------------+-------------+
-                              |
-                  +-----------v-----------+
-                  | New build or resume?  |
-                  +----+--------------+---+
-                       |              |
-                  new build      existing work
-                       |              |
-          Seven discovery questions  Resume context;
-          and supplied answers       do not restart discovery
-                       |              |
-          Score known answers;       |
-          report unknown/range        |
-          Recommend mode + model      |
-          User chooses or overrides   |
-                       |              |
-                       +------+-------+
-                              |
-                    +---------v----------+
-                    | Select work mode   |
-                    +--+---+---+---+----+
-                       |   |   |   |   |
-              Mode 1 Full  |   |   |   Mode 5 Lean
-                    Mode 2 focused |   Mode 4 Hybrid
-                         Mode 3 direct
+ CURRENT FLOW (intended routing; actual host execution must be verified)
+
+  USER REQUEST -> open the project snapshot in the host -> loop-coordinator
+                         |                                  |
+                         |                       check host permissions,
+                         |                       project context and memory
+                         v
+              +--------------------------+
+              | New build or resume?     |
+              +------------+-------------+
+                           |
+         +-----------------+-------------------+
+         |                                     |
+     NEW BUILD                            EXISTING WORK
+     Seven discovery questions             Resume relevant context;
+     unless the user skips;               do not restart discovery.
+     score known answers, report
+     unknowns, recommend mode/model.
+         |                                     |
+         +-----------------+-------------------+
+                           v
+              USER CHOOSES / OVERRIDES MODE
+                           |
+     +-----------+---------+---------+-----------+-----------+
+     |           |                   |           |           |
+  1 FULL     2 FOCUSED            3 DIRECT   4 HYBRID     5 LEAN
+  full       matching             answer or  selected     strategist,
+  project    specialist           small task host spec    builder, quality
+  sequence   and skills                      then build   responsibilities
+     |           |                   |           |           |
+     v           +-------------------+-----------+-----------+
+  THINK                                               |
+  market researcher -> CTO -> strategy review         |
+     |                                                |
+     v                                                |
+  DESIGN                                              |
+  product manager -> architect -> database, cloud,   |
+  FinOps and security design where applicable         |
+     |                                                |
+     v                                                |
+  scrum master -> foundation review -> sprint plan    |
+     |                                                |
+     +----------------------+-------------------------+
+                            v
+  SELECT RELEVANT CORE + OPTIONAL SPECIALISTS AND SKILLS
+  Platform: backend, frontend, database, QA, DevOps, SRE, etc.
+  Data: analytics, data quality, governance, BI, streaming, platform.
+  AI: AI engineering, RAG, evaluation, safety, MLOps, LLMOps, etc.
+  Product: design, learning, privacy, accessibility and other specialists.
+  Select by task and handoff; the 28 optional roles do not all run.
+                            |
+                            v
+  PLAN -> DO -> CHECK -> ACT / FIX OR ESCALATE
+  Assign dependencies and outputs; implement; review and run actual checks.
+  Host-supported delegation and prompt-based gates require evidence.
+                            |
+                            v
+  RECORD THE RESULT WHEN APPLICABLE
+  Reviewed story commit -> verification evidence -> tracker status
+  -> story/sprint checks -> graph patches and one cumulative graph
+  -> reports, lessons and checkpoint -> next task / sprint / release review
+
+  Jira: use an authorized real connection and verify readback, or identify
+  local tracker records as local. Release decisions require separate review.
 
 Modes and discovery recommendations
 -----------------------------------
@@ -164,7 +199,7 @@ The following v6 flow, pending-fix labels, token figures and confidence
 percentages are retained for history only and are not current measurements.
 
 ╔══════════════════════════════════════════════════════════════════════════════════════════╗
-║              KIRO AGENTIC ENGINEERING SYSTEM — COMPLETE FLOW (Fixes 1–26F)              ║
+║       HISTORICAL KIRO FLOW — JULY 2026 SNAPSHOT (Fixes 1–26F; NOT CURRENT)             ║
 ║                           ASCII Flowchart  |  v6  |  2026-07-01                         ║
 ╚══════════════════════════════════════════════════════════════════════════════════════════╝
 
