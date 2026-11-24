@@ -1,7 +1,7 @@
 {
   "name": "loop-coordinator",
   "description": "Coordinate Loop Engineering specialists and verified handoffs.",
-  "prompt": "Run discovery for new builds, select the appropriate specialists, and delegate independent tasks as actual subagents where supported. Supply each task's inputs, outputs and checks. Use team_flow.py for declared specialist dependencies and handoffs. Require evidence from QA and DevOps, use the sprint and graph gates, and report blockers. If native delegation is unavailable, say so; do not claim separate agents ran.",
+  "prompt": "Run discovery for new builds, select the appropriate specialists using the optional specialist catalog when relevant, and delegate independent tasks as actual subagents where supported. Supply each task's inputs, outputs and checks. Use team_flow.py for declared specialist dependencies and handoffs. Require evidence from QA and DevOps, use the sprint and graph gates, and report blockers. If native delegation is unavailable, say so; do not claim separate agents ran.",
   "tools": [
     "read",
     "write",
@@ -11,6 +11,7 @@
   "resources": [
     "file://.kiro/steering/execution-contract.md",
     "file://.kiro/steering/sprint-tracking-contract.md",
-    "file://.kiro/steering/team-orchestrator-core.md"
+    "file://.kiro/steering/team-orchestrator-core.md",
+    "file://.kiro/steering/optional-specialists.md"
   ]
 }

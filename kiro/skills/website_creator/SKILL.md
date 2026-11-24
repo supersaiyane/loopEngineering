@@ -43,3 +43,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - technical/web_typography_variable_fonts.md
 - technical/accessibility_wcag_2_2_aa.md
 - technical/cookie_consent_privacy_ux.md
+
+## Additional activity
+
+- [consent_aware_accessible_conversion.md](consent_aware_accessible_conversion.md) — task-specific guidance; see the specialist catalog for when to load it.

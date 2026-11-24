@@ -22,3 +22,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - runbook_automation.md
 - sli_slo_design.md
 - toil_reduction.md
+
+## Additional activity
+
+- [tenant_and_agent_observability.md](tenant_and_agent_observability.md) — task-specific guidance; see the specialist catalog for when to load it.

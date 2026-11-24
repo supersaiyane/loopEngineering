@@ -147,9 +147,23 @@ class FrameworkContractTests(unittest.TestCase):
             self.assertTrue((target / "scripts/project_index.py").is_file())
             self.assertTrue((target / "scripts/product_graph_template.html").is_file())
             self.assertTrue((target / ".kiro/agents/loop-coordinator.json").is_file())
+            catalog = json.loads((target / ".kiro/framework-contract.json").read_text())
+            for role in catalog.get("optional_roles", []):
+                alias = "loop-" + role.replace("_", "-")
+                with self.subTest(role=role):
+                    self.assertTrue((target / ".kiro/agents" / f"{alias}.json").is_file())
+                    self.assertTrue((target / ".kiro/skills" / alias / "SKILL.md").is_file())
+                    self.assertTrue((target / ".kiro/skills" / role / "SKILL.md").is_file())
             validation = subprocess.run(["python3", str(target / "scripts/validate-framework.py")],
                                         text=True, capture_output=True)
             self.assertEqual(validation.returncode, 0, validation.stderr)
+            if catalog.get("optional_roles"):
+                role = catalog["optional_roles"][0]
+                (target / ".kiro/agents" / f"loop-{role.replace('_', '-')}.json").unlink()
+                broken = subprocess.run(["python3", str(target / "scripts/validate-framework.py")],
+                                        text=True, capture_output=True)
+                self.assertNotEqual(broken.returncode, 0)
+                self.assertIn("missing optional role profile", broken.stderr)
             head = subprocess.run(["git", "-C", str(target), "rev-parse", "--verify", "HEAD"],
                                   capture_output=True)
             self.assertNotEqual(head.returncode, 0)

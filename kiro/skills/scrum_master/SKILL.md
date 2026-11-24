@@ -21,3 +21,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - sprint_planning.md
 - stakeholder_communication.md
 - velocity_capacity_modeling.md
+
+## Additional activity
+
+- [evidence_backed_sprint_closure.md](evidence_backed_sprint_closure.md) — task-specific guidance; see the specialist catalog for when to load it.

@@ -20,3 +20,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - funnel_analysis.md
 - feature_engineering.md
 - data_storytelling_visualization.md
+
+## Additional activity
+
+- [causal_forecasting_diagnostics.md](causal_forecasting_diagnostics.md) — task-specific guidance; see the specialist catalog for when to load it.

@@ -25,3 +25,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - ../shared/performance_profiling.md
 - ../shared/refactoring_safely.md
 - ../shared/tdd_red_green_refactor.md
+
+## Additional activity
+
+- [accessible_stateful_web_flows.md](accessible_stateful_web_flows.md) — task-specific guidance; see the specialist catalog for when to load it.

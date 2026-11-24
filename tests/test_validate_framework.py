@@ -107,3 +107,24 @@ class ValidatorTests(unittest.TestCase):
         result = self.run_validator()
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("missing role skill", result.stderr)
+
+    def test_missing_optional_role_is_reported(self):
+        path = self.root / "kiro/framework-contract.json"
+        data = json.loads(path.read_text())
+        data["optional_roles"] = ["data_analyst"]
+        path.write_text(json.dumps(data))
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("data_analyst/SKILL.md", result.stderr)
+
+    def test_optional_role_without_generated_profile_is_reported(self):
+        path = self.root / "kiro/framework-contract.json"
+        data = json.loads(path.read_text())
+        data["optional_roles"] = ["data_analyst"]
+        path.write_text(json.dumps(data))
+        skill = self.root / "kiro/skills/data_analyst/SKILL.md"
+        skill.parent.mkdir(parents=True)
+        skill.write_text('---\nname: Data Analyst\ndescription: Analyze data\n---\n')
+        result = self.run_validator()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("loop-data-analyst.json", result.stderr)

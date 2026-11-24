@@ -21,3 +21,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - platform_engineering_idp.md
 - secrets_management_cicd.md
 - twelve_factor_app.md
+
+## Additional activity
+
+- [delivery_supply_chain_evidence.md](delivery_supply_chain_evidence.md) — task-specific guidance; see the specialist catalog for when to load it.

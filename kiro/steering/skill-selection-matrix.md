@@ -4,6 +4,10 @@ inclusion: manual
 
 # Skill Selection Matrix — Targeted Skill Loading
 
+For the optional data, AI, design, privacy and platform specialists, and new
+activities of existing roles, use `kiro/steering/optional-specialists.md`. Select
+only the roles and activities relevant to the task or explicitly requested.
+
 **Purpose:** Select activity-relevant skills and retain concise takeaways to manage context. Selection and summaries do not themselves prove complete expertise or application.
 
 **Rule:** When a role activates, the orchestrator selects skills based on the ACTIVITY being performed. Read the actionable content of the matching files and universal defaults; a header-only read is partial, not completion. Compress each to a 5-line takeaway after reading. Work from summaries and re-load content when a protocol-heavy substep needs it. If a file cannot be fully read, record the limitation and request the missing review before relying on it. The host's actual trace, not a self-report or hash, is the evidence of a read.

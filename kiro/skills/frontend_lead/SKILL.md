@@ -23,3 +23,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - server_side_rendering_strategies.md
 - state_management_patterns.md
 - wcag_accessibility.md
+
+## Additional activity
+
+- [inclusive_low_resource_ux.md](inclusive_low_resource_ux.md) — task-specific guidance; see the specialist catalog for when to load it.

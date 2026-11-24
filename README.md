@@ -585,6 +585,27 @@ wrappers while preserving original role files. Choose `loop-coordinator` in a
 Kiro version that supports these profiles; actual subagent availability and
 permissions must be verified in that host.
 
+The framework includes 28 optional data, AI, product design, privacy and
+platform specialists in addition to its core roles. Their task triggers and
+focused skills are listed in the [optional specialist catalog](kiro/steering/optional-specialists.md).
+They are available in new bootstrapped projects, but should be selected only
+for relevant work or an explicit request; a profile is not evidence that an
+independent agent ran. The generator refuses conflicting existing profiles or
+wrappers instead of overwriting customizations. Existing projects have their own
+snapshots and need a reviewed, project-specific update before these additions
+appear; reload Kiro and verify discovery in the actual host. Do not assume a
+prompt or skill guarantees a particular action or access to a tool.
+
+To add a future specialist globally, create its `kiro/skills/<role>/SKILL.md`
+and focused activity files, add it to `optional_roles` in
+`kiro/framework-contract.json`, and add task triggers and role-qualified paths
+to the specialist catalog. Run `python3 scripts/prepare_kiro_agents.py --root .`
+and `python3 scripts/validate-framework.py`, then exercise a fresh disposable
+bootstrap and Kiro discovery. `required_roles` is for the core catalog; adding
+an optional role makes its profile available without requiring it on each task.
+The generator fails on conflicting custom files—review them rather than
+deleting or overwriting them automatically.
+
 #### Specialist handoffs
 
 For a multi-discipline sprint, create a plan such as `team-plan.json`:

@@ -260,7 +260,10 @@ The root orchestrator previously prescribed only 2–4 activity skills while the
 STEMEDUCATOR STEERING UPDATE — 2026-11-24
 The user explicitly authorized updating the two skill-guidance files in the running StemEducator project. Updated only .kiro/steering/team-orchestrator-core.md and .kiro/steering/skill-selection-matrix.md after confirming they matched the older framework baseline (including bootstrap-adjusted reference paths). Original files are preserved at /var/folders/ks/zfp69qcs5kv7_0g54jthfnlm0000gn/T/loop-stemeducator-steering-backup-fm3um44u. Both updated files match current root guidance with project-specific reference paths retained, and the project's offline framework contract validation passed. Existing agent contexts may still hold earlier text; a future host read and behavior check are required. No project Git commit, push, agent restart, or sprint completion is claimed.
 
-FINAL STATUS TABLE — ROOT FRAMEWORK — last checked 2026-11-23
+ROOT SPECIALIST CATALOG — 2026-11-24
+Added 28 optional specialist profiles and 81 focused activity guides, including the previously discussed design, learning, privacy and accessibility roles as well as data and AI roles. The coordinator and specialist catalog provide task-based routing; the generator and bootstrap install the profiles in newly bootstrapped projects, and offline validation checks the optional profiles and referenced skills. Ninety-five framework tests passed, including disposable bootstrap and negative validation cases. Kiro CLI agent listing and validation could not be checked live because the CLI reported that it was not logged in. Configuration is not evidence that a host invoked a role or read a skill. Existing projects keep their own snapshots; the independently running StemEducator project was not changed for this catalog.
+
+FINAL STATUS TABLE — ROOT FRAMEWORK — last checked 2026-11-24
 
 Status key: COMPLETE = stated scope verified; PARTIAL = implementation exists but full outcome is unfinished or unverified; BLOCKED = external dependency prevents progress; PENDING = not completed. Test-project artifacts are historical evidence only.
 
@@ -279,8 +282,8 @@ Status key: COMPLETE = stated scope verified; PARTIAL = implementation exists bu
 | U11 | Database schemas and migrations | PARTIAL | Alembic scaffold; SQLite automated test and disposable PostgreSQL revision/catalog check | Tenant orchestration, parity, concurrency, recovery and actual product schemas unverified. |
 | U12 | Security scans and reports | PARTIAL | Trivy dependency, secret and real disposable image scans; incomplete coverage blocks | Image still has findings; inventory, remediation, digest verification and hosted CI remain incomplete. |
 | U13 | Developer commands | PARTIAL | Opt-in Makefile provides configured commands and blocking preflight; tests | Commands and CI must be configured and verified for each chosen project stack. |
-| A01 | Specialist skill selection | PARTIAL | Root guidance reconciled and the two authorized StemEducator steering files updated; earlier PRD reported header-only reads | Host must re-read updated guidance; traces must verify meaningful skill reads. |
-| A02 | Native delegation and handoffs | PARTIAL | Native specialist calls observed; team_flow records dependencies, blocks and retries | Ledger does not authenticate specialists; development handoffs need live verification. |
+| A01 | Specialist skill selection | PARTIAL | Root guidance reconciled; optional catalog adds 81 activity guides and task-based routing; earlier StemEducator PRD reported header-only reads | Host must discover the profiles and re-read guidance; traces must verify meaningful skill reads. |
+| A02 | Native delegation and handoffs | PARTIAL | Native specialist calls observed historically; 28 new optional profiles pass offline checks; team_flow records dependencies, blocks and retries | Kiro CLI is not logged in; live discovery, invocation and development handoffs remain unverified. |
 | A03 | Tracker fallback and Git evidence | PARTIAL | Local JSON history, export, commit and verification gates | Real Jira import/sync, native history and completed live sprint unverified. |
 | A04 | Graph accuracy and traceability | PARTIAL | Patch hashes, source/edge validation and story completeness check | Meaningful coverage and source accuracy require live review. |
 | A05 | Memory, hooks and context | PARTIAL | Bootstrap profiles, hook and checkpoint guidance; historical bounded checks | Comprehensive resume, hook compliance, reference use and cost attribution unverified. |
@@ -291,7 +294,7 @@ Status key: COMPLETE = stated scope verified; PARTIAL = implementation exists bu
 | F03 | DevOps and image scans | PARTIAL | Scoped Compose build and Trivy scan executed in disposable fixture | Remaining image findings, project coverage and actual CI unresolved. |
 | F04 | Foundation and sprint planning | PARTIAL | Root gate ordering corrected; user-run StemEducator foundation is in progress | A completed live foundation gate and sprint planning have not been observed. |
 | F05 | Two-sprint verification | PENDING | RecruitmentProbe discovery observed; StemEducator is now user-run and under read-only review | No two completed sprints or independent closure verification established. |
-| F06 | Offline framework checks | COMPLETE | 89 tests passed; offline contract validation and git diff --check passed | These checks do not establish live host or external integrations. |
-| F07 | Framework commit and push | COMPLETE | Framework commit bfff860fdd58ce2dd6ff8ea210489f229d514b91 pushed and verified on origin | Unrelated pre-existing changes and test-project files remain outside the commit. |
+| F06 | Offline framework checks | COMPLETE | 95 tests passed; offline contract validation and git diff --check passed | These checks do not establish live host or external integrations. |
+| F07 | Framework commit and push | PARTIAL | Earlier framework commit bfff860fdd58ce2dd6ff8ea210489f229d514b91 was pushed and verified on origin | New specialist catalog changes still require focused commit and remote verification. |
 | F08 | Docker runtime access | COMPLETE | Docker version, Compose build/run and disposable PostgreSQL succeeded | This verifies current local access only; no deployment or clean image implied. |
 | F09 | Real Jira import or sync | PENDING | Local fallback and export exist | An explicitly authorized Jira connection/project and real readback are needed. |

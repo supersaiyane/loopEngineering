@@ -17,3 +17,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - commitments_savings_plans_strategy.md
 - cost_modeling_unit_economics.md
 - optimization_roadmap_quarterly.md
+
+## Additional activity
+
+- [tenant_ai_cost_attribution.md](tenant_ai_cost_attribution.md) — task-specific guidance; see the specialist catalog for when to load it.

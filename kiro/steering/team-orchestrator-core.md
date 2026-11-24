@@ -4,7 +4,7 @@ inclusion: manual
 
 
 ## ⚡ QUICK REFERENCE — Team Orchestrator Core (read this first)
-- **22 roles**: cto, architect, security_engineer, scrum_master, backend_lead, frontend_lead, senior_engineer_be/fe, mobile_engineer, data_engineer, data_scientist, ml_engineer, database_architect, devops_engineer, sre_engineer, qa_engineer, technical_writer, market_researcher.
+- **Core and optional specialists**: see the role registry and `kiro/steering/optional-specialists.md`. Select optional roles by task relevance or explicit request; their availability does not require every role to run.
 - **STRIDE-BRIDGE (Fix 26D + 31E)**: after architect STRIDE → SM-PLAN extracts mitigations → ≤2 criteria/story. Excess MUST become TECH-DEBT stories (Priority HIGH, labels: security-critical + tech-debt). Log: `[STRIDE-BRIDGE: N mitigations → N criteria]` + `[STRIDE-DEFERRED: N → TD stories created]`
 - **Co-maker pattern (Fix 26B + 30F)**: [data/eda] stories → PRIMARY=data_scientist, CHECKER=qa_engineer. SECONDARY is **lane-aware**: fe/* labels or dashboard/chart/visualization title → `senior_engineer_fe`; otherwise → `senior_engineer_be`. **DUAL LOOP SPEC required (Fix 29C)** — PRIMARY spec (ML deliverable) + SECONDARY spec (API or UI deliverable). Story DONE only when BOTH specs score ≥8.
 - **Label assignment**: 30 canonical labels / 8 lanes. Validate after assignment (Fix 28D): self-challenge per label.
@@ -185,7 +185,7 @@ Token count: ~[N]
 
 ## ROLE CONTRACT TABLE (GAP-48D)
 
-Every role activation is governed by this contract. In single-agent Cowork mode — where no separate agent invocation enforces handoff — the orchestrator MUST check PRECONDITIONS before activating a role and verify POSTCONDITIONS before handing off to the next role.
+Every role activation needs a task-specific contract. The table below applies to its listed core roles. For a role in `kiro/steering/optional-specialists.md`, derive inputs, dependencies, authorized tools, concrete outputs and checks from the requested task; do not require irrelevant foundation artifacts or force the role into unrelated projects. In single-agent mode, disclose that the role shares the coordinator's context. A documented contract cannot guarantee host compliance.
 
 **Enforcement rule:** If a PRECONDITION file is missing → emit `[CONTRACT BLOCK: role=<X> | missing precondition: <artifact>]` and halt. Do NOT proceed. Ask user whether to run the upstream role first or skip with debt logged.
 

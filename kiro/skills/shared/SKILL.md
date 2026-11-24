@@ -39,3 +39,11 @@ If a shared skill file is missing: log `[SKILL MISSING: kiro/skills/shared/<file
 2. **Prerequisite skills block** — `design_system_gate.md` must resolve GREEN before any UI story proceeds.
 3. **Compress after use** — after extracting principles, compress to 5-line takeaway. Do not hold the full file in context while producing the artifact.
 4. **Fallback** — if a specific shared skill file is missing, this SKILL.md provides the directory overview as context fallback.
+
+## Additional activity
+
+- [agent_handoff_evidence.md](agent_handoff_evidence.md) — task-specific guidance; see the specialist catalog for when to load it.
+
+## Additional activity
+
+- [agent_run_recovery.md](agent_run_recovery.md) — task-specific guidance; see the specialist catalog for when to load it.

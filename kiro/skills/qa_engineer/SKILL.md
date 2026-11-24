@@ -21,3 +21,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - property_based_testing.md
 - test_data_management.md
 - visual_regression_testing.md
+
+## Additional activity
+
+- [tenant_consent_acceptance_testing.md](tenant_consent_acceptance_testing.md) — task-specific guidance; see the specialist catalog for when to load it.

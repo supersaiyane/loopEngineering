@@ -20,3 +20,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - prd_authoring.md
 - rice_prioritization.md
 - user_story_authoring.md
+
+## Additional activity
+
+- [requirements_scenario_traceability.md](requirements_scenario_traceability.md) — task-specific guidance; see the specialist catalog for when to load it.

@@ -21,3 +21,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - tech_strategy_framework.md
 - technical_debt_strategy.md
 - technical_due_diligence.md
+
+## Additional activity
+
+- [decision_assumptions_tradeoffs.md](decision_assumptions_tradeoffs.md) — task-specific guidance; see the specialist catalog for when to load it.

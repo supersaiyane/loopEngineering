@@ -35,15 +35,35 @@ def validate(root):
     else:
         if contract.get("score_bands") != EXPECTED_BANDS:
             errors.append("score bands do not match the canonical mapping")
-        required_roles = contract.get("required_roles", [])
-        if not isinstance(required_roles, list):
-            errors.append("required_roles must be a list")
-        else:
-            for role in required_roles:
+        all_roles = []
+        for group in ("required_roles", "optional_roles"):
+            roles = contract.get(group, [])
+            if not isinstance(roles, list):
+                errors.append(f"{group} must be a list")
+                continue
+            for role in roles:
                 if not isinstance(role, str) or not re.fullmatch(r"[a-z][a-z0-9_]*", role):
                     errors.append(f"invalid role name: {role!r}")
-                elif not (root / "kiro/skills" / role / "SKILL.md").is_file():
-                    errors.append(f"missing role skill: {role}/SKILL.md")
+                else:
+                    if role in all_roles:
+                        errors.append(f"duplicate role: {role}")
+                    all_roles.append(role)
+                    if not (root / "kiro/skills" / role / "SKILL.md").is_file():
+                        errors.append(f"missing role skill: {role}/SKILL.md")
+                    if group == "optional_roles":
+                        alias = "loop-" + role.replace("_", "-")
+                        wrapper = root / "kiro/skills" / alias / "SKILL.md"
+                        profile = root / "kiro/agents" / f"{alias}.json"
+                        if not wrapper.is_file():
+                            errors.append(f"missing optional role wrapper: {alias}/SKILL.md")
+                        if not profile.is_file():
+                            errors.append(f"missing optional role profile: {alias}.json")
+                        else:
+                            agent = read_json(profile, errors)
+                            expected = f"skill://.kiro/skills/{alias}/SKILL.md"
+                            resources = agent.get("resources") if isinstance(agent, dict) else None
+                            if not isinstance(agent, dict) or agent.get("name") != alias or not isinstance(resources, list) or expected not in resources:
+                                errors.append(f"invalid optional role profile resources: {alias}.json")
         files = contract.get("required_files")
         if not isinstance(files, list) or not files:
             errors.append("required_files must be a nonempty list")

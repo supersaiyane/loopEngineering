@@ -25,3 +25,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - rate_limiting_algorithms.md
 - saga_pattern_distributed_transactions.md
 - websocket_realtime_patterns.md
+
+## Additional activity
+
+- [tenant_safe_integration_design.md](tenant_safe_integration_design.md) — task-specific guidance; see the specialist catalog for when to load it.

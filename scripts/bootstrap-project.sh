@@ -350,6 +350,7 @@ check "$TARGET/.kiro/steering/team-orchestrator-core.md"       "steering: team-o
 check "$TARGET/.kiro/steering/team-orchestrator-sprint.md"     "steering: team-orchestrator-sprint"
 check "$TARGET/.kiro/steering/session-guards.md"               "steering: session-guards"
 check "$TARGET/.kiro/steering/skill-selection-matrix.md"       "steering: skill-selection-matrix"
+check "$TARGET/.kiro/steering/optional-specialists.md"        "steering: optional specialists"
 check "$TARGET/.kiro/reference/ponytail-rung-disqualification-guide.md" "reference: ponytail guide"
 check "$TARGET/.kiro/memory/lessons.md"                        "memory: lessons"
 check "$TARGET/.kiro/memory/checkpoint.md"                     "memory: checkpoint"

@@ -32,3 +32,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - threat_modeling_stride_pasta.md
 - vulnerability_management_cve_patching.md
 - zero_trust_architecture.md
+
+## Additional activity
+
+- [agent_and_child_data_threat_review.md](agent_and_child_data_threat_review.md) — task-specific guidance; see the specialist catalog for when to load it.

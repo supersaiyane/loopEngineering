@@ -29,3 +29,8 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - prompt_optimization_dspy.md
 - semantic_caching.md
 - vector_search_rag_architecture.md
+
+## Additional activity
+
+- [ml_data_evaluation_operations.md](ml_data_evaluation_operations.md) — task-specific guidance; see the specialist catalog for when to load it.
+- [age_appropriate_ai_tutor_evaluation.md](age_appropriate_ai_tutor_evaluation.md) — evaluate educational assistants for their intended learner audience.

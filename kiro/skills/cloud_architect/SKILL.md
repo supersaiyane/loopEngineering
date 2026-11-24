@@ -22,3 +22,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - security_review_drives.md
 - vpc_network_topology.md
 - well_architected_framework.md
+
+## Additional activity
+
+- [residency_tenant_recovery.md](residency_tenant_recovery.md) — task-specific guidance; see the specialist catalog for when to load it.

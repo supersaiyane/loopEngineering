@@ -23,3 +23,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - sales_demo_deck.md
 - sdk_documentation.md
 - troubleshooting_guide_authoring.md
+
+## Additional activity
+
+- [living_design_traceability.md](living_design_traceability.md) — task-specific guidance; see the specialist catalog for when to load it.

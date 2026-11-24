@@ -20,3 +20,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - push_notifications_deep_links.md
 - mobile_performance_profiling.md
 - app_store_deployment.md
+
+## Additional activity
+
+- [mobile_activation_scope.md](mobile_activation_scope.md) — task-specific guidance; see the specialist catalog for when to load it.

@@ -176,7 +176,7 @@ Score 15–21 recommends Mode 1; this is a heuristic, not a calibrated probabili
 **Action:** Invoke `team-orchestrator-core.md` + `team-orchestrator-rules.md` constitution (Fix 19 split). 
 **IMPORTANT:** Load `team-orchestrator-core.md` + `team-orchestrator-rules.md` into context FIRST (both are manual-inclusion — see MANDATORY LOADS above).
 Run full Think → Design → Develop chain.
-- ALL roles fire (per team-orchestrator-core.md role registry)
+- Select the applicable core and optional roles for the work; do not activate every available specialist. See `kiro/steering/optional-specialists.md` for task-based routing and explicit deferrals.
 - Multi-phase: ≥2 phases, ≥2 sprints/phase, ≥3 tasks/sprint
 - 8 docs per phase in docs/phase-N/
 - Security/QA/DevOps tasks mandatory in sprint plan

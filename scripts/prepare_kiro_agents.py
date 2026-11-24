@@ -10,7 +10,15 @@ import sys
 def desired_files(root):
     kiro = root / "kiro"
     contract = json.loads((kiro / "framework-contract.json").read_text(encoding="utf-8"))
-    roles = contract["required_roles"]
+    required = contract["required_roles"]
+    optional = contract.get("optional_roles", [])
+    if not isinstance(required, list) or not isinstance(optional, list):
+        raise ValueError("required_roles and optional_roles must be lists")
+    roles = required + optional
+    if len(set(roles)) != len(roles):
+        raise ValueError("role names must be unique across the catalog")
+    if optional and not (kiro / "steering/optional-specialists.md").is_file():
+        raise ValueError("optional roles require the specialist routing catalog")
     result = {}
     for role in roles:
         if not re.fullmatch(r"[a-z][a-z0-9_]*", role):
@@ -38,13 +46,17 @@ def desired_files(root):
                  "resources": [f"skill://.kiro/skills/{alias}/SKILL.md", "skill://.kiro/skills/loop-shared/SKILL.md",
                                "file://.kiro/steering/skill-selection-matrix.md"]}
         result[kiro / "agents" / f"{alias}.json"] = json.dumps(agent, indent=2, ensure_ascii=False) + "\n"
+    selection = " using the optional specialist catalog when relevant" if optional else ""
+    resources = ["file://.kiro/steering/execution-contract.md", "file://.kiro/steering/sprint-tracking-contract.md", "file://.kiro/steering/team-orchestrator-core.md"]
+    if optional:
+        resources.append("file://.kiro/steering/optional-specialists.md")
     coordinator = {"name": "loop-coordinator", "description": "Coordinate Loop Engineering specialists and verified handoffs.",
-                   "prompt": "Run discovery for new builds, select the appropriate specialists, and delegate independent tasks "
+                   "prompt": "Run discovery for new builds, select the appropriate specialists" + selection + ", and delegate independent tasks "
                              "as actual subagents where supported. Supply each task's inputs, outputs and checks. "
                              "Use team_flow.py for declared specialist dependencies and handoffs. Require evidence from QA and DevOps, use the sprint and graph gates, and report blockers. "
                              "If native delegation is unavailable, say so; do not claim separate agents ran.",
                    "tools": ["read", "write", "shell", "subagent"],
-                   "resources": ["file://.kiro/steering/execution-contract.md", "file://.kiro/steering/sprint-tracking-contract.md", "file://.kiro/steering/team-orchestrator-core.md"]}
+                   "resources": resources}
     result[kiro / "agents" / "loop-coordinator.json"] = json.dumps(coordinator, indent=2) + "\n"
     return result
 

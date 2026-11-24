@@ -25,3 +25,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - ../shared/performance_profiling.md
 - ../shared/refactoring_safely.md
 - ../shared/tdd_red_green_refactor.md
+
+## Additional activity
+
+- [safe_api_session_implementation.md](safe_api_session_implementation.md) — task-specific guidance; see the specialist catalog for when to load it.

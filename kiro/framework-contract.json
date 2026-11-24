@@ -25,20 +25,84 @@
     "scripts/team_flow.py",
     "scripts/prepare_kiro_agents.py",
     "kiro/adapters/chatgpt-system-prompt.md",
-    "kiro/adapters/claude-system-prompt.md"
+    "kiro/adapters/claude-system-prompt.md",
+    "kiro/steering/optional-specialists.md"
   ],
   "required_roles": [
-    "architect", "backend_lead", "cloud_architect", "cto", "data_engineer",
-    "data_scientist", "database_architect", "devops_engineer", "finops_architect",
-    "frontend_lead", "market_researcher", "ml_engineer", "mobile_engineer",
-    "product_manager", "qa_engineer", "scrum_master", "security_engineer",
-    "senior_engineer_be", "senior_engineer_fe", "sre_engineer", "technical_writer",
-    "website_creator", "shared"
+    "architect",
+    "backend_lead",
+    "cloud_architect",
+    "cto",
+    "data_engineer",
+    "data_scientist",
+    "database_architect",
+    "devops_engineer",
+    "finops_architect",
+    "frontend_lead",
+    "market_researcher",
+    "ml_engineer",
+    "mobile_engineer",
+    "product_manager",
+    "qa_engineer",
+    "scrum_master",
+    "security_engineer",
+    "senior_engineer_be",
+    "senior_engineer_fe",
+    "sre_engineer",
+    "technical_writer",
+    "website_creator",
+    "shared"
   ],
   "score_bands": [
-    {"min": 0, "max": 4, "mode": 3},
-    {"min": 5, "max": 9, "mode": 5},
-    {"min": 10, "max": 14, "mode": 4},
-    {"min": 15, "max": 21, "mode": 1}
+    {
+      "min": 0,
+      "max": 4,
+      "mode": 3
+    },
+    {
+      "min": 5,
+      "max": 9,
+      "mode": 5
+    },
+    {
+      "min": 10,
+      "max": 14,
+      "mode": 4
+    },
+    {
+      "min": 15,
+      "max": 21,
+      "mode": 1
+    }
+  ],
+  "optional_roles": [
+    "analytics_engineer",
+    "data_analyst",
+    "data_quality_engineer",
+    "data_governance",
+    "bi_developer",
+    "streaming_engineer",
+    "data_platform_engineer",
+    "ai_engineer",
+    "agent_evaluator",
+    "ai_safety_engineer",
+    "ai_observability",
+    "rag_engineer",
+    "mlops_engineer",
+    "llmops_engineer",
+    "ai_governance",
+    "knowledge_engineer",
+    "multimodal_ai_engineer",
+    "fine_tuning_engineer",
+    "product_designer",
+    "learning_designer",
+    "privacy_engineer",
+    "accessibility_specialist",
+    "interactive_learning_engineer",
+    "performance_engineer",
+    "integration_engineer",
+    "platform_engineer",
+    "technical_researcher",
+    "business_analyst"
   ]
 }

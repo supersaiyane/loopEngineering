@@ -20,3 +20,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - data_pipeline_testing.md
 - cdc_change_data_capture.md
 - data_quality_great_expectations.md
+
+## Additional activity
+
+- [incremental_pipeline_recovery.md](incremental_pipeline_recovery.md) — task-specific guidance; see the specialist catalog for when to load it.

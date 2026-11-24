@@ -24,3 +24,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - project_structure_layout.md
 - service_mesh_architecture.md
 - stride_threat_modeling.md
+
+## Additional activity
+
+- [system_boundary_traceability.md](system_boundary_traceability.md) — task-specific guidance; see the specialist catalog for when to load it.

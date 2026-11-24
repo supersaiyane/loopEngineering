@@ -28,3 +28,7 @@ These skills are loaded selectively based on the current activity. See `.kiro/st
 - sharding_partitioning_strategies.md
 - time_series_schema_design.md
 - vector_database_design.md
+
+## Additional activity
+
+- [tenant_migration_parity.md](tenant_migration_parity.md) — task-specific guidance; see the specialist catalog for when to load it.

@@ -44,3 +44,7 @@ CURRENT_YEAR=$(date "+%Y")
    - `[DATE: shell unavailable — using session context date: <date from context>]`
 5. Competitor data older than 6 months = stale. Flag with:
    - `⚠️ STALE DATA — sourced from <period>, may not reflect current state.`
+
+## Additional activity
+
+- [source_freshness_assumptions.md](source_freshness_assumptions.md) — task-specific guidance; see the specialist catalog for when to load it.
