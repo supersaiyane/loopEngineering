@@ -139,6 +139,26 @@ Evidence, tools and upgrade boundaries
     and external integrations must be verified for the particular revision and
     environment. The audit status table records what is done versus unverified.
 
+Worked example: a platform with an AI feature
+--------------------------------------------
+  Request -> discovery / chosen mode -> market + product + architecture
+      |
+      +-> platform work: backend, frontend, database, QA and operations
+      +-> AI work: AI engineer; add RAG, data, MLOps or evaluation if needed
+      +-> cross-cutting: security, privacy, accessibility and learning as needed
+      |
+      v
+  Integrate -> review actual checks -> record evidence / tracker / graph
+      -> checkpoint -> next task or release review
+
+These are possible responsibilities, not automatic independent invocations.
+A coordinator can select only the subset relevant to a story; host traces and
+actual check results establish what happened. Two small live Kiro prompts
+selected the learning designer, but neither proves all roles or a live sprint.
+
+Read the matching overview diagram in README.md and the 28 optional role
+triggers and activity paths in kiro/steering/optional-specialists.md.
+
 ================ HISTORICAL SNAPSHOT BELOW — 2026-07-01 ================
 The following v6 flow, pending-fix labels, token figures and confidence
 percentages are retained for history only and are not current measurements.

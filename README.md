@@ -48,26 +48,26 @@
 Think of it as **a constitution for an AI development team.** When you type a prompt into Kiro, this system decides:
 
 - What kind of task is this? (bug fix, new feature, quick question?)
-- Which AI agents should work on it? (just one? a full team of 22?)
+- Which specialist roles fit the task? (one focused role or a broader team?)
 - What quality checks must pass before any code is merged?
 - How should agents remember past mistakes?
 
-Without this system, Kiro answers each prompt independently — like a contractor who shows up fresh every day with no memory of yesterday. **With this system**, Kiro behaves like a senior engineering org with sprint planning, code reviews, security gates, and institutional memory.
+The framework provides guidance for planning, reviews, security checks and project memory. The host must actually run the work and supply evidence; role profiles and prompt instructions do not guarantee independent agents or enforcement.
 
 ---
 
 ## 🎯 The Problem It Solves
 
-The production reliability crisis in agentic AI systems is real and documented. Frontier models are capable. The process architectures are not. Loop Engineering is the process layer that closes the gap.
+AI-assisted development can lose context, skip checks or leave decisions undocumented. Loop Engineering explores whether explicit process guidance and evidence can help; independent validation remains open.
 
-| Problem Without This System | How This System Fixes It |
+| Common problem | Framework approach |
 |-----------------------------|--------------------------|
-| Kiro re-invents solutions it already wrote | Memory system + lessons.md compounds knowledge across sessions |
-| Kiro launches 19 agents for a simple bug fix | Discovery engine scores your request and picks the right-sized team |
+| Kiro re-invents solutions it already wrote | Memory files provide a place to record and retrieve lessons; actual reads need verification |
+| Kiro launches 19 agents for a simple bug fix | Discovery recommends a mode; the coordinator selects relevant roles |
 | Agents write 200-line custom code when a library already exists | Ponytail guidance asks agents to consider existing options first |
 | A security flaw passes code review because coverage % looked fine | GATE S2 asks for explicit cross-tenant isolation tests on applicable stories |
 | One AI agent can unilaterally restructure your entire auth system | Bad-loop guidance asks for review of high-risk changes; host permissions provide the actual boundary |
-| Team forgets architectural decisions by sprint 3 | ADR (Architecture Decision Records) + steering files persist decisions |
+| Team forgets architectural decisions by sprint 3 | ADRs and steering files provide places to record decisions |
 | AI agents guess at which tools/skills to use | The matrix and specialist catalog map activities to relevant skills; actual reads require verification |
 
 ---
@@ -113,6 +113,8 @@ flowchart TD
     O -.-> M
     O -.-> AR
     O -.-> W
+    O -.-> AI["AI / RAG / data / safety skills when relevant"]
+    O -.-> UX["Design / learning / privacy / accessibility when relevant"]
     W --> V["Review and run applicable checks"]
     V --> Q{"Checks pass?"}
     Q -->|"No"| X["Record blocker; fix or escalate"] --> W
@@ -121,7 +123,9 @@ flowchart TD
 ```
 
 The coordinator selects relevant specialists at the stage their work needs them;
-the optional roles do not all run in sequence. In a sprint, the executable
+the optional roles do not all run in sequence. For example, a platform with an
+AI feature can use the normal product and architecture flow while AI, data,
+safety or learning specialists join at relevant handoffs. In a sprint, the executable
 workflow records a reviewed story commit before running its verification
 command. The hook and steering files provide guidance; technical checks and
 independent agents run only when invoked and permitted by the host. See the
@@ -213,7 +217,7 @@ If a rung is disqualified (e.g., a CVE vulnerability in a package), the guidance
 
 ### 🔍 The Discovery Engine
 
-For each new build, the system presents seven structured discovery questions:
+For a new build, the guidance asks seven structured discovery questions unless the user explicitly skips discovery:
 
 ```
 1. PLATFORM     — Web / Mobile / Desktop / CLI / Library?
@@ -247,9 +251,9 @@ The bad loop guard is prompt guidance asking agents to seek review of high-risk 
 Domain keywords:  auth / payments / billing / database / production / security
 High-risk verbs:  redesign / restructure / rewrite / replace / refactor / migrate
 
-auth + refactor  →  BLOCKED (requires human confirmation)
-deploy           →  BLOCKED (self-triggering, no verb needed)
-auth + implement →  ALLOWED (implement is not high-risk)
+auth + refactor  →  review requested for high-risk scope
+deploy           →  review requested for a release action
+auth + implement →  not a matching high-risk verb in this example
 ```
 
 ---
@@ -272,7 +276,7 @@ Stage 5 — CONSULT   → Read this entry BEFORE starting the next related task
 
 ### 📋 Comprehension Debt Gate
 
-At the end of every sprint, the Scrum Master runs a 4-question binary check (yes/no only):
+Sprint guidance asks the Scrum Master to run a 4-question binary check (yes/no only):
 
 ```
 □ Did every agent read the full diff before approving it?
@@ -281,94 +285,36 @@ At the end of every sprint, the Scrum Master runs a 4-question binary check (yes
 □ Were any "mostly working" or "looks fine" close conditions present?
 ```
 
-`0/4` failures = **CRITICAL** → Sprint is blocked. No new stories until debt is cleared.
+The rubric calls for escalation when comprehension evidence is missing. Check the actual run and host controls to establish whether it was applied.
 
 ---
 
 ## 📁 File Structure
 
-```
+```text
 loopEngineering/
-│
-├── 📄 README.md                    ← You are here
-├── 📄 CONTRIBUTING.md              ← Reproduction guide + citation format
-├── 📄 LICENSE                      ← MIT License (Fix 45A)
-├── 📄 index.html                   ← Showcase website (one-pager)
-├── 📄 context_index.md             ← Function-level index of the whole system
-├── 📄 project_map.md               ← Module-level map of the whole system
-├── 🔗 .kiro → kiro/                ← Symlink: Kiro reads from here
-│
-├── 📂 kiro/                        ← All orchestration files live here
-│   │
-│   ├── 📂 hooks/
-│   │   └── elite-team-orchestrator.json  ← Entry point (Kiro hook definition)
-│   │
-│   ├── 📂 steering/                ← The constitution (14 files)
-│   │   ├── orchestrator-routing.md      ← Mode routing + phase/event auto-triggers (Fix 47B)
-│   │   ├── team-orchestrator-core.md    ← Core execution rules + ADR decisions.md writes (FIX F)
-│   │   ├── team-orchestrator-sprint.md  ← Sprint lifecycle + STORY DONE PROTOCOL (FIX B/C/D/E/F)
-│   │   ├── team-orchestrator-rules.md   ← NON-NEGOTIABLES + GATE S1/S2
-│   │   ├── discovery-engine.md          ← 7-question discovery + scoring
-│   │   ├── ponytail.md                  ← 7-rung ladder enforcement
-│   │   ├── session-guards.md            ← GUARD 1 + GUARD 2 + GUARD 3 (pxpipe) + GUARD 4
-│   │   ├── skill-selection-matrix.md    ← Story label → skill file mapping (119 rows, Fix 47C/D)
-│   │   ├── skill-label-index.md         ← role and skill lookup index
-│   │   ├── loop-engine.md               ← PLAN→DO→VERIFY→DECIDE loop spec
-│   │   ├── context-memory-discipline.md ← Token budgets + degradation tiers
-│   │   ├── memory-management.md         ← Cross-session memory protocols
-│   │   ├── phase-reporting.md           ← Report templates per phase
-│   │   └── team-orchestrator.md         ← Legacy (superseded by split files)
-│   │
-│   ├── 📂 memory/                  ← Runtime state (live session files)
-│   │   ├── checkpoint.md           ← Session continuity (resume from here)
-│   │   ├── lessons.md              ← Cross-session learning log (5-stage graduation)
-│   │   ├── decisions.md            ← Architectural decisions (ADRs)
-│   │   ├── project_map.md          ← Module-level map of the whole system
-│   │   └── flow.md                 ← End-to-end system flow reference
-│   │
-│   ├── 📂 skills/                  ← core, optional and shared specialist guidance
-│   │   ├── cto/                    ← CTO skill library (10 files)
-│   │   ├── architect/              ← Architect skills + product_graph_update.md (Fix 46A)
-│   │   ├── security_engineer/      ← Security skills (24 files)
-│   │   ├── backend_lead/           ← Backend skills (14 files)
-│   │   ├── ... (18 more roles)
-│   │   └── shared/                 ← Cross-role shared skills + graph_patch_emit.md (Fix 46A)
-│   │
-│   └── 📂 adapters/                ← Platform adapter files
-│       ├── claude-system-prompt.md      ← Paste into Claude Project Instructions
-│       ├── claude-setup-guide.md        ← Detailed Claude setup walkthrough
-│       ├── chatgpt-system-prompt.md     ← Paste into ChatGPT Instructions
-│       └── chatgpt-setup-guide.md       ← Detailed ChatGPT setup walkthrough
-│
-├── 📂 scripts/                     ← Utility scripts
-│   ├── bootstrap-project.sh        ← One-command new project scaffolder (FIX A: git init)
-│   └── start-kiro-pxpipe.sh        ← Launch Kiro through pxpipe proxy
-│
-├── 📂 healthguard-pro/             ← Live demo project (MedVault Sprint 1 — FIX A–G validated)
-│   ├── services/                   ← Go microservices (auth, patient, billing, alerting, ML)
-│   ├── apps/                       ← Frontend apps (clinician dashboard, patient mobile)
-│   ├── infra/terraform/            ← IaC: us-east-1 + eu-west-1 modules
-│   ├── docs/                       ← PRD, TRD, 5 ADRs, sprint-1/, schemas, graph/
-│   └── kiro/memory/                ← Project-specific checkpoint + lessons
-│
-└── 📂 docs/                        ← Evidence, decisions, research artifacts
-    ├── graph/product-graph.yaml    ← Living product knowledge graph
-    ├── graph/product-graph.html    ← Standalone generated graph
-    ├── CLAUDE-working.md           ← Active fix register (68 fixes)
-    ├── CLAUDE-implemented.md       ← Full implementation history: Fix 1–FIX G
-    ├── Audits/                     ← 12 dry run files + system review audits
-    │   └── external-validator-outreach.md  ← R1: HN/Reddit/LinkedIn/Discord posts
-    ├── white-paper/
-    │   ├── loop-engineering-white-paper-v5.docx
-    │   └── loop-engineering-white-paper-v5.pdf  ← 34pp publication draft
-    └── research/                   ← R&D research files
-        ├── GOAT.md                          ← Honest gap + strength inventory
-        ├── competitor-comparison.md          ← Fix 45C: MemGPT, LangMem, Devin
-        ├── compression-fidelity-methodology.md  ← Fix 45B: exact test methodology
-        ├── gstack-research.md               ← gstack vs Loop Engineering analysis
-        ├── oneagent-search.md               ← 67TB logs/metrics/traces architecture
-        └── ponytail-rung-disqualification-guide.md  ← Dep disqualification protocol
+├── README.md                         Getting started and architecture
+├── index.html                        Framework website
+├── SECURITY.md                       Security and reporting guidance
+├── kiro/
+│   ├── framework-contract.json       Required and optional role registry
+│   ├── agents/                       Kiro-compatible agent profiles
+│   ├── hooks/                        Kiro prompt hook
+│   ├── steering/                     Routing, selection and process guidance
+│   ├── skills/                       Core, optional and shared role guidance
+│   ├── memory/                       Framework memory templates
+│   └── adapters/                     Other host guidance
+├── scripts/                          Bootstrap, upgrade and verification tools
+├── tests/                            Automated framework tests
+└── docs/
+    ├── Audits/                       Current evidence and historical flows
+    ├── release-checklist.md          Release evaluation checklist
+    ├── research/                     Research and reference material
+    └── white-paper/                  White paper draft
 ```
+
+An existing project gets its own snapshot. Updating this repository does not
+silently update that project's files; use the preview-first upgrade procedure below.
 
 ---
 
@@ -381,9 +327,11 @@ loopEngineering/
 | `team-orchestrator-sprint.md` | On demand | Sprint lifecycle: SM-PLAN → DEVELOP → SM-GATE → SM-RETRO |
 | `team-orchestrator-rules.md` | On demand | GATE S1 (security) + GATE S2 (PR review) checklists |
 | `discovery-engine.md` | On demand | 7 discovery questions → score → mode recommendation |
-| `ponytail.md` | **Always** | 7-rung ladder — loaded before any agent fires |
-| `session-guards.md` | **Always** | GUARD 1 (constraint drift) + GUARD 2 (bad loop) + GUARD 3 (pxpipe image context) |
-| `skill-selection-matrix.md` | On demand | Maps story labels → exact skill files to load |
+| `ponytail.md` | Configured always | 7-rung ladder for considering existing options |
+| `session-guards.md` | Configured always | GUARD 1 (constraint drift) + GUARD 2 (bad loop) + GUARD 3 (pxpipe image context) |
+| `skill-selection-matrix.md` | On demand | Maps activities to skill files and links the optional specialist catalog |
+| `optional-specialists.md` | On demand | Optional role triggers and role-qualified activity guides |
+| `execution-contract.md` | On demand | Canonical execution modes and discovery behavior |
 | `skill-label-index.md` | On demand | Filename index for specialist skills |
 | `loop-engine.md` | On demand | PLAN→DO→VERIFY→DECIDE loop specification |
 | `context-memory-discipline.md` | On demand | Token budgets, degradation tiers (PEAK→CRITICAL) |
@@ -396,9 +344,11 @@ loopEngineering/
 
 ## 🚪 Quality Gates & Guards
 
+Prompt-based gates and guards describe intended checks. Their execution depends on the host; permissions and independent tooling provide actual boundaries. Verify every relevant result.
+
 ### GATE S1 — Security Pre-Check (before DEVELOP)
 
-Runs **before** development starts. Blocks stories with security implications until reviewed.
+The guidance calls for security review before applicable development begins.
 
 ```
 □ OWASP Top 10 threat model completed
@@ -410,7 +360,7 @@ Runs **before** development starts. Blocks stories with security implications un
 
 ### GATE S2 — PR Review (before merge)
 
-Runs **before** any code merges to main.
+The guidance calls for review before applicable changes merge.
 
 ```
 □ SAST scan clean (e.g., gosec, semgrep)
@@ -426,39 +376,32 @@ Runs **before** any code merges to main.
 
 ### GUARD 1 — Constraint Drift
 
-Re-reads all binding constraints at **every session start**. Prevents the model from forgetting "we don't use Redis" by turn 47.
+Asks the assistant to review binding constraints at session start. Actual reads and compliance require host evidence.
 
 ### GUARD 2 — Bad Loop Detection
 
-Blocks agents from self-escalating scope without human approval. Fires on high-risk domain + verb combinations. See [Key Concepts](#-key-concepts-explained) above.
+Asks for review of high-risk scope changes. See [Key Concepts](#-key-concepts-explained); configure host permissions for actual blocking.
 
 ### GUARD 3 — pxpipe Image Context (Fix 44G)
 
-When the pxpipe token-compression proxy is active, old history turns are stored as PNG images. The model reads them at gist-level accuracy (decisions, paths, values = **98/98 lossless**) but NOT at byte-exact level — ~13% silent misread rate on exact strings.
-
-GUARD 3 tells every agent: never recall exact strings from image context — always re-fetch from the canonical source.
-
-```
-BLOCKED from image recall:  git SHAs · file:line refs · camelCase identifiers
-                             exact error codes · checkpoint timestamps
-
-SAFE from image recall:     decisions made · file names · architecture intent
-                             status summaries · counts and relative values
-```
+When pxpipe compresses earlier context into images, the guidance asks the
+assistant to re-check exact strings such as hashes and file paths against their
+canonical sources. Historical small-sample results are not a current accuracy
+or error-rate guarantee; verify the actual workload.
 
 See [Token Compression — pxpipe](#️-token-compression--pxpipe) for full setup.
 
 ### GUARD 4 — Pre-Code Artifact Gate (GAP-48B)
 
-Blocks code writes until process artifacts exist. Fires before any file is written to `services/`, `apps/`, `infra/`, or `packages/`.
+The guidance calls for these artifacts before applicable code work. It cannot independently block file writes; use host permissions and executable checks when enforcement is required.
 
 ```
 □ docs/prd.md (or .kiro/specs/requirements.md) exists?
 □ docs/sprint-N/sprint-plan.md exists?
 □ docs/sprint-N/stories/<STORY-ID>.md exists?
 
-ALL present → [GUARD-4: PRE-CODE-GATE PASS] → code may proceed
-ANY missing → [GUARD-4: BLOCKED] → create the missing artifact first
+ALL present → proceed after applicable review
+ANY missing → create or explicitly defer the missing artifact
 ```
 
 User may say "skip docs" to override — logged as process debt.
@@ -703,7 +646,7 @@ ln -s kiro .kiro    # Kiro reads .kiro/, this repo uses kiro/
 Verify:
 ```bash
 ls .kiro/hooks/       # → elite-team-orchestrator.json
-ls .kiro/steering/    # → 14 steering files
+ls .kiro/steering/    # → routing, specialist catalog and other guidance
 ls .kiro/memory/      # → checkpoint.md, lessons.md, decisions.md, flow.md, project_map.md
 ```
 
@@ -724,11 +667,9 @@ Once specs are ready, trigger Loop Engineering:
 start sprint 1
 ```
 
-The hook activates and runs:
-1. Reads `checkpoint.md` + `lessons.md` + `decisions.md`
-2. For a full sprint, check the PRD/spec, sprint plan and story card; prompt-based checks depend on the host
-3. Loads `team-orchestrator-core.md` + role contract table
-4. SM-PLAN → story cards → role-based implementation → GATE 5 → SM-RETRO
+The hook and steering guidance request relevant memory reads, sprint planning,
+role-based implementation and review. Verify the host trace and generated
+evidence to see which steps actually ran.
 
 #### 🚨 Troubleshooting
 
@@ -858,31 +799,12 @@ git checkout -b feature/AUTH-001-user-login
 ```
 Copy that and run it yourself. Think of ChatGPT as the brain, your terminal as the hands.
 
-#### Model recommendations
+#### Model and host capabilities
 
-| Task | Recommended model |
-|------|--------------------|
-| Full Mode 1 build (all phases) | GPT-4o |
-| Architecture + ADR reasoning | o3 or o1 |
-| Code generation (senior_engineer roles) | GPT-4o |
-| Market research + THINK phase | GPT-4o with web search |
-| Mode 3 quick fixes | GPT-4o mini (cost-efficient) |
-| Mode 5 lean / fast builds | GPT-4o mini |
-
----
-
-### 📊 Platform Comparison
-
-| | Kiro IDE | Claude Projects | ChatGPT Custom GPT |
-|---|---|---|---|
-| Hook auto-loads | ✅ (every prompt) | ✅ (Project Instructions) | ✅ (Instructions field) |
-| Steering files auto-loaded | ✅ (symlink) | ✅ (Knowledge upload) | ✅ (Knowledge upload) |
-| Runs code directly | ✅ | ❌ (describes code) | ✅ (Code Interpreter) |
-| File system access | ✅ | ❌ | ❌ |
-| Shareable with team | ✅ (git repo) | ❌ (personal project) | ✅ (GPT link) |
-| Best for | Primary dev work | Long-form builds | Teams / GPT preference |
-| Setup time | ~5 min | ~10 min | ~15 min |
-| Adapter file needed | ❌ (hook handles it) | ✅ `claude-system-prompt.md` | ✅ `chatgpt-system-prompt.md` |
+Available models, project features, tool access and pricing change over time.
+Choose a model in the actual host for the task and verify its current capabilities.
+Kiro, Claude and ChatGPT adapters provide instructions, but their behavior,
+file access, delegation and enforcement depend on each host and configuration.
 
 ---
 
@@ -984,6 +906,8 @@ This system was built across **68 fix cycles** (FIX A–G from live MedVault Spr
 
 ![Fixes](https://img.shields.io/badge/fix%20cycles-FIX%20A--G-blue) ![Phase](https://img.shields.io/badge/phase%201-complete-brightgreen)
 
+The register below is historical; check the [current audit and final status table](docs/Audits/atlasats-live-findings-2026-11-23.txt) for observed results and open work. References to gates, automatic actions and counts describe earlier intentions, not verified host guarantees.
+
 ### By Type
 
 | Type | Count | Description |
@@ -1034,7 +958,7 @@ This system was built across **68 fix cycles** (FIX A–G from live MedVault Spr
 
 ## 🧪 Dry Run History
 
-All pipeline verification runs are documented in `docs/`. Each dry run tests the full system against realistic scenarios.
+These historical dry runs record limited scenarios and self-assessments; they do not establish independent validation or complete end-to-end coverage.
 
 | Version | Date | Scenario | Confidence | Key Finding |
 |---------|------|----------|------------|-------------|
@@ -1068,7 +992,7 @@ Three research documents park findings from experiments and third-party tool ana
 
 ## 🔁 How to Reproduce
 
-The core claim: a process layer structurally independent of model capability reduces production failure rates in agentic AI. Here is how to test that yourself.
+The hypothesis is that explicit process guidance can improve outcomes in AI-assisted engineering. Controlled comparisons and independent replication are needed to evaluate it.
 
 **1. Clone:**
 ```bash
@@ -1079,12 +1003,12 @@ cd loopEngineering
 **2. Activate (Kiro IDE):**
 ```bash
 ln -s kiro .kiro
-# Open Kiro — hook auto-loads on first prompt
+# Open the project in Kiro and verify the configured hook and profiles
 ```
 
 **Claude Projects:** Paste `kiro/adapters/claude-system-prompt.md` as system prompt + attach 8 knowledge files (see `kiro/adapters/claude-setup-guide.md`).
 
-**3. Run on a real project for ≥5 sessions.** The 12 failure modes (F01–F12) surface within the first 3–5 sessions.
+**3. Run a scoped evaluation.** Record the host, model, task, permissions and actual checks; do not assume any particular failure modes will appear.
 
 **4. Record observations** — which failure modes appeared, at what frequency, before and after the framework. Open a GitHub Issue with your findings.
 
@@ -1177,21 +1101,21 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 
 | Term | What It Means |
 |------|---------------|
-| **Hook** | The entry point Kiro reads on every prompt. Like a traffic cop — routes requests, never does the work itself. |
+| **Hook** | A configured Kiro entry point that provides routing guidance when the host runs it. |
 | **Steering File** | A markdown file that shapes agent behavior. Think of it as a policy document the agents must follow. |
 | **Skill File** | A focused protocol for one specific task (e.g., `api_versioning.md`, `caching_strategies.md`). |
-| **Mode** | The execution tier — from Mode 5 (1 developer, lean) to Mode 1 (full 22-agent army). |
-| **GATE S1** | Security check that runs BEFORE development starts. |
-| **GATE S2** | PR review gate that runs BEFORE any code merges. |
-| **GUARD 1** | Constraint drift protection — re-reads binding constraints every session. |
-| **GUARD 2** | Bad loop protection — blocks agents from self-escalating dangerous scope changes. |
-| **GUARD 3** | pxpipe image context protection — prevents agents from recalling exact strings (SHAs, line numbers, identifiers) from compressed image history. |
+| **Mode** | A proportionate execution approach, from a direct response to a broader full-project flow. |
+| **GATE S1** | Guidance for security review before applicable development. |
+| **GATE S2** | Guidance for applicable quality and security review before merge. |
+| **GUARD 1** | Guidance to revisit relevant constraints at session start. |
+| **GUARD 2** | Guidance to seek review of high-risk scope changes. |
+| **GUARD 3** | Guidance to re-check exact strings against source files when using compressed context. |
 | **Ponytail** | A 7-rung guide for considering existing options before custom work. |
 | **RDR** | Rung Disqualification Record — written when a dep on a rung is disqualified (CVE, license, etc.). |
 | **ADR** | Architecture Decision Record — permanent doc explaining WHY an architectural choice was made. |
 | **SM** | Scrum Master — the role that runs sprint planning, gates, and retrospectives. |
 | **SM-RETRO** | Sprint retrospective — run at the end of every sprint, updates lessons.md. |
-| **Comprehension Debt** | When agents approve code without actually reading it. The gate catches this. |
+| **Comprehension Debt** | Risk that reviewers approve work they have not understood; verification must establish actual review. |
 | **Bad Loop** | When an agent proposes changing scope it was never asked to change (e.g., "let me also refactor auth while I'm here"). |
 | **Complexity Score** | A 0–21 heuristic based on the seven discovery answers. |
 | **Discovery Engine** | Seven questions for new builds; the answers inform a mode recommendation. |
