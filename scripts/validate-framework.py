@@ -36,6 +36,8 @@ def validate(root):
         if contract.get("score_bands") != EXPECTED_BANDS:
             errors.append("score bands do not match the canonical mapping")
         all_roles = []
+        if not isinstance(contract.get("required_roles"), list) or not contract["required_roles"]:
+            errors.append("required_roles must be a nonempty list")
         for group in ("required_roles", "optional_roles"):
             roles = contract.get(group, [])
             if not isinstance(roles, list):
@@ -50,20 +52,66 @@ def validate(root):
                     all_roles.append(role)
                     if not (root / "kiro/skills" / role / "SKILL.md").is_file():
                         errors.append(f"missing role skill: {role}/SKILL.md")
-                    if group == "optional_roles":
+                    if role:
                         alias = "loop-" + role.replace("_", "-")
                         wrapper = root / "kiro/skills" / alias / "SKILL.md"
                         profile = root / "kiro/agents" / f"{alias}.json"
                         if not wrapper.is_file():
-                            errors.append(f"missing optional role wrapper: {alias}/SKILL.md")
+                            errors.append(f"missing role wrapper: {alias}/SKILL.md")
+                        else:
+                            try:
+                                content = wrapper.read_text(encoding="utf-8")
+                            except (OSError, UnicodeError):
+                                content = ""
+                            expected_role = f".kiro/skills/{role}/SKILL.md"
+                            if (not re.match(r"\A---\s*\n", content)
+                                    or not re.search(rf"^name:\s*{re.escape(alias)}\s*$", content, re.MULTILINE)
+                                    or expected_role not in content):
+                                errors.append(f"invalid role wrapper: {alias}/SKILL.md")
+                        if role == "shared":
+                            continue
                         if not profile.is_file():
-                            errors.append(f"missing optional role profile: {alias}.json")
+                            label = "optional role" if group == "optional_roles" else "role"
+                            errors.append(f"missing {label} profile: {alias}.json")
                         else:
                             agent = read_json(profile, errors)
-                            expected = f"skill://.kiro/skills/{alias}/SKILL.md"
+                            expected = {f"skill://.kiro/skills/{alias}/SKILL.md",
+                                        f"file://.kiro/skills/{role}/SKILL.md",
+                                        "skill://.kiro/skills/loop-shared/SKILL.md",
+                                        "file://.kiro/steering/skill-selection-matrix.md"}
                             resources = agent.get("resources") if isinstance(agent, dict) else None
-                            if not isinstance(agent, dict) or agent.get("name") != alias or not isinstance(resources, list) or expected not in resources:
-                                errors.append(f"invalid optional role profile resources: {alias}.json")
+                            tools = agent.get("tools") if isinstance(agent, dict) else None
+                            prompt = agent.get("prompt") if isinstance(agent, dict) else None
+                            if (not isinstance(agent, dict) or agent.get("name") != alias
+                                    or not isinstance(resources, list) or not all(isinstance(item, str) for item in resources)
+                                    or not expected.issubset(resources)
+                                    or not isinstance(tools, list) or not all(isinstance(item, str) for item in tools)
+                                    or "read" not in tools
+                                    or not isinstance(prompt, str) or not prompt.strip()):
+                                errors.append(f"invalid role profile resources: {alias}.json")
+                            elif group == "optional_roles" and "file://.kiro/steering/optional-specialists.md" not in resources:
+                                errors.append(f"optional role profile does not load catalog: {alias}.json")
+        if all_roles:
+            path = root / "kiro/agents/loop-coordinator.json"
+            if not path.is_file():
+                errors.append("missing coordinator profile: loop-coordinator.json")
+            else:
+                coordinator = read_json(path, errors)
+                resources = coordinator.get("resources") if isinstance(coordinator, dict) else None
+                tools = coordinator.get("tools") if isinstance(coordinator, dict) else None
+                prompt = coordinator.get("prompt") if isinstance(coordinator, dict) else None
+                expected = {"file://.kiro/steering/execution-contract.md",
+                            "file://.kiro/steering/sprint-tracking-contract.md",
+                            "file://.kiro/steering/team-orchestrator-core.md"}
+                if (not isinstance(coordinator, dict) or coordinator.get("name") != "loop-coordinator"
+                        or not isinstance(resources, list) or not all(isinstance(item, str) for item in resources)
+                        or not expected.issubset(resources)
+                        or not isinstance(tools, list) or not all(isinstance(item, str) for item in tools)
+                        or not {"read", "subagent"}.issubset(tools)
+                        or not isinstance(prompt, str) or not prompt.strip()):
+                    errors.append("invalid coordinator profile: loop-coordinator.json")
+                elif contract.get("optional_roles") and "file://.kiro/steering/optional-specialists.md" not in resources:
+                    errors.append("coordinator does not load optional-specialists.md")
         files = contract.get("required_files")
         if not isinstance(files, list) or not files:
             errors.append("required_files must be a nonempty list")
@@ -115,6 +163,11 @@ def validate(root):
             for role, filename in set(re.findall(r"(?<![\w])([a-z][a-z0-9_]*)/([a-z][a-z0-9_]*\.md)", doc.read_text(encoding="utf-8"))):
                 if role in roles and not (skills / role / filename).is_file():
                     errors.append(f"missing skill reference in {doc.name}: {role}/{filename}")
+        catalog = steering / "optional-specialists.md"
+        if catalog.is_file():
+            for role, filename in set(re.findall(r"`([a-z][a-z0-9_]*)/([a-z][a-z0-9_]*\.md)`", catalog.read_text(encoding="utf-8"))):
+                if role not in roles or not (skills / role / filename).is_file():
+                    errors.append(f"missing catalog skill reference: {role}/{filename}")
     return errors
 
 

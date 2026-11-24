@@ -56,6 +56,34 @@ class NativeAgentTests(unittest.TestCase):
         self.assertIn(uri, coordinator["resources"])
         self.assertTrue((ROOT / "kiro/steering/optional-specialists.md").is_file())
 
+    def test_optional_profiles_load_their_task_routing_catalog_directly(self):
+        contract = json.loads((ROOT / "kiro/framework-contract.json").read_text())
+        for role in contract["optional_roles"]:
+            with self.subTest(role=role):
+                profile = json.loads((ROOT / "kiro/agents" / f"loop-{role.replace('_', '-')}.json").read_text())
+                self.assertIn("file://.kiro/steering/optional-specialists.md", profile["resources"])
+
+    def test_each_specialist_profile_loads_its_role_definition(self):
+        contract = json.loads((ROOT / "kiro/framework-contract.json").read_text())
+        for role in contract["required_roles"] + contract["optional_roles"]:
+            if role == "shared":
+                continue
+            with self.subTest(role=role):
+                profile = json.loads((ROOT / "kiro/agents" / f"loop-{role.replace('_', '-')}.json").read_text())
+                self.assertIn(f"file://.kiro/skills/{role}/SKILL.md", profile["resources"])
+
+    def test_mode_two_points_to_relevant_skills_without_a_conflicting_cap(self):
+        routing = (ROOT / "kiro/steering/orchestrator-routing.md").read_text()
+        mode_two = routing.split("### MODE 2:", 1)[1].split("### MODE 3:", 1)[0]
+        self.assertNotIn("(max 3)", mode_two)
+        self.assertIn("optional-specialists.md", mode_two)
+
+    def test_lean_mode_does_not_override_relevant_skill_reads(self):
+        routing = (ROOT / "kiro/steering/orchestrator-routing.md").read_text()
+        lean = routing.split("### MODE 5:", 1)[1].split("## PRIORITY:", 1)[0]
+        self.assertNotIn("≤3 files", lean)
+        self.assertIn("relevant", lean.lower())
+
     def test_optional_role_generates_a_selectable_profile_without_becoming_required(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

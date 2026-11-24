@@ -1,4 +1,5 @@
 import os
+from contextlib import closing
 from pathlib import Path
 import subprocess
 import sys
@@ -21,7 +22,7 @@ class MigrationSetupTests(unittest.TestCase):
                 run = subprocess.run([sys.executable, '-m', 'alembic', *action], cwd=root, env=env, capture_output=True, text=True)
                 self.assertEqual(run.returncode, 0, run.stderr)
             import sqlite3
-            with sqlite3.connect(root / 'test.db') as conn:
+            with closing(sqlite3.connect(root / 'test.db')) as conn:
                 self.assertEqual(conn.execute('select version_num from alembic_version').fetchone()[0], '001')
                 self.assertTrue(conn.execute("select name from sqlite_master where name='example'").fetchone())
 

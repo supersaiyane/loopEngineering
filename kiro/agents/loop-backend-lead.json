@@ -9,6 +9,7 @@
   ],
   "resources": [
     "skill://.kiro/skills/loop-backend-lead/SKILL.md",
+    "file://.kiro/skills/backend_lead/SKILL.md",
     "skill://.kiro/skills/loop-shared/SKILL.md",
     "file://.kiro/steering/skill-selection-matrix.md"
   ]

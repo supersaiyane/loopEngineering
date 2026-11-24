@@ -9,6 +9,7 @@
   ],
   "resources": [
     "skill://.kiro/skills/loop-data-scientist/SKILL.md",
+    "file://.kiro/skills/data_scientist/SKILL.md",
     "skill://.kiro/skills/loop-shared/SKILL.md",
     "file://.kiro/steering/skill-selection-matrix.md"
   ]

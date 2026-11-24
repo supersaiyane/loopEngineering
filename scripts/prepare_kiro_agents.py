@@ -43,8 +43,11 @@ def desired_files(root):
                            "Use the provided artifacts, verify outcomes with real evidence, and return a concise handoff with "
                            "files, checks, decisions, blockers and next role. Respect parent permissions. Never claim a check ran without evidence.",
                  "tools": ["read", "write", "shell"],
-                 "resources": [f"skill://.kiro/skills/{alias}/SKILL.md", "skill://.kiro/skills/loop-shared/SKILL.md",
+                 "resources": [f"skill://.kiro/skills/{alias}/SKILL.md", f"file://.kiro/skills/{role}/SKILL.md",
+                               "skill://.kiro/skills/loop-shared/SKILL.md",
                                "file://.kiro/steering/skill-selection-matrix.md"]}
+        if role in optional:
+            agent["resources"].append("file://.kiro/steering/optional-specialists.md")
         result[kiro / "agents" / f"{alias}.json"] = json.dumps(agent, indent=2, ensure_ascii=False) + "\n"
     selection = " using the optional specialist catalog when relevant" if optional else ""
     resources = ["file://.kiro/steering/execution-contract.md", "file://.kiro/steering/sprint-tracking-contract.md", "file://.kiro/steering/team-orchestrator-core.md"]

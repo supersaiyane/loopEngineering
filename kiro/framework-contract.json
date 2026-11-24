@@ -24,6 +24,7 @@
     "scripts/product_graph_template.html",
     "scripts/team_flow.py",
     "scripts/prepare_kiro_agents.py",
+    "scripts/framework_upgrade.py",
     "kiro/adapters/chatgpt-system-prompt.md",
     "kiro/adapters/claude-system-prompt.md",
     "kiro/steering/optional-specialists.md"

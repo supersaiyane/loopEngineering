@@ -4,11 +4,8 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-supersaiyane%2FloopEngineering-181717?style=for-the-badge&logo=github)](https://github.com/supersaiyane/loopEngineering)
 ![Status](https://img.shields.io/badge/status-experimental-orange?style=for-the-badge)
-![Phase](https://img.shields.io/badge/phase%201-complete%20%E2%9C%85-brightgreen?style=for-the-badge)
-![Dry Runs](https://img.shields.io/badge/dry%20runs-v11-blue?style=for-the-badge)
-![Fixes](https://img.shields.io/badge/fixes%20implemented-68%20%E2%9C%85-orange?style=for-the-badge)
-![Roles](https://img.shields.io/badge/agent%20roles-22-purple?style=for-the-badge)
-![White Paper](https://img.shields.io/badge/white%20paper-v5%20published-blueviolet?style=for-the-badge)
+![Roles](https://img.shields.io/badge/specialists-22%20core%20%2B%2028%20optional-purple?style=for-the-badge)
+![White Paper](https://img.shields.io/badge/white%20paper-v5%20draft-blueviolet?style=for-the-badge)
 
 </div>
 
@@ -26,7 +23,7 @@
 3. [How Kiro Works (Background)](#-how-kiro-works-background)
 4. [System Architecture](#-system-architecture)
 5. [The 5 Execution Modes](#-the-5-execution-modes)
-6. [The 22 Agent Roles](#-the-22-agent-roles)
+6. [Core and Optional Agent Roles](#-core-and-optional-agent-roles)
 7. [Key Concepts Explained](#-key-concepts-explained)
 8. [File Structure](#-file-structure)
 9. [Steering Files — What Each One Does](#-steering-files--what-each-one-does)
@@ -44,6 +41,7 @@
 ## 🤔 What Is This Project?
 
 > **Status:** This is an experimental process framework. Internal dry runs are documented, but independent validation and controlled comparisons are still planned.
+> Review the [security guidance](SECURITY.md) and [release checklist](docs/release-checklist.md) before using it for a release or sensitive project.
 
 **Loop Engineering** is a system of rules, files, and protocols that tells the **Kiro AI IDE** how to behave like a structured engineering team — instead of just answering prompts one at a time.
 
@@ -66,11 +64,11 @@ The production reliability crisis in agentic AI systems is real and documented. 
 |-----------------------------|--------------------------|
 | Kiro re-invents solutions it already wrote | Memory system + lessons.md compounds knowledge across sessions |
 | Kiro launches 19 agents for a simple bug fix | Discovery engine scores your request and picks the right-sized team |
-| Agents write 200-line custom code when a library already exists | Ponytail ladder enforces "use existing before building new" |
-| A security flaw passes code review because coverage % looked fine | GATE S2 forces explicit cross-tenant isolation tests on auth stories |
-| One AI agent can unilaterally restructure your entire auth system | Bad-loop guard requires human confirmation for high-risk operations |
+| Agents write 200-line custom code when a library already exists | Ponytail guidance asks agents to consider existing options first |
+| A security flaw passes code review because coverage % looked fine | GATE S2 asks for explicit cross-tenant isolation tests on applicable stories |
+| One AI agent can unilaterally restructure your entire auth system | Bad-loop guidance asks for review of high-risk changes; host permissions provide the actual boundary |
 | Team forgets architectural decisions by sprint 3 | ADR (Architecture Decision Records) + steering files persist decisions |
-| AI agents guess at which tools/skills to use | Skill selection matrix maps every story label to the exact skill files |
+| AI agents guess at which tools/skills to use | The matrix and specialist catalog map activities to relevant skills; actual reads require verification |
 
 ---
 
@@ -97,16 +95,38 @@ on the host; the model picker controls the selected model.
 
 ```mermaid
 flowchart TD
-    A["New build request"] --> B["Seven discovery questions"]
-    B --> C["Score and mode recommendation"]
-    C --> D["Model choice"]
-    D --> E["Design and development"]
-    E --> F["Verification and memory"]
+    A["User request"] --> B{"New build?"}
+    B -->|"Yes; unless explicitly skipped"| C["Seven discovery questions\nScore known answers; show unknowns"]
+    C --> D["Recommend mode; offer model choice"]
+    B -->|"Resume or existing task"| D
+    D --> E{"Selected mode"}
+    E -->|"1: Full"| M["Market researcher"]
+    M --> T["CTO strategy"] --> G["Strategy review / decision"]
+    G --> P["Product manager: PRD"] --> AR["Architect: design and ADRs"]
+    AR --> F["Database, cloud, FinOps and security design"]
+    F --> S["Scrum master: pre-build gate and sprint plan"]
+    E -->|"4: Hybrid"| H["Selected host spec"] --> S
+    E -->|"5: Lean"| L["Strategist, builder and quality roles"] --> W
+    E -->|"2: Focused or 3: Direct"| W["Perform the requested work"]
+    S --> W
+    E -.-> O["Select relevant optional specialists and activity skills"]
+    O -.-> M
+    O -.-> AR
+    O -.-> W
+    W --> V["Review and run applicable checks"]
+    V --> Q{"Checks pass?"}
+    Q -->|"No"| X["Record blocker; fix or escalate"] --> W
+    Q -->|"Yes"| R["Record evidence and handoffs; update tracker, graph and reports when applicable"]
+    R --> N["Next task, sprint or release review"]
 ```
 
-The hook and steering files provide instructions; the skills provide specialist
-guidance; memory files record project context. Technical checks run only when
-invoked by an actual host or CI job. See the [execution contract](kiro/steering/execution-contract.md).
+The coordinator selects relevant specialists at the stage their work needs them;
+the optional roles do not all run in sequence. In a sprint, the executable
+workflow records a reviewed story commit before running its verification
+command. The hook and steering files provide guidance; technical checks and
+independent agents run only when invoked and permitted by the host. See the
+[detailed current flow and historical diagram](docs/Audits/kiro-flow-2026-07-01.txt)
+and [execution contract](kiro/steering/execution-contract.md).
 
 ---
 
@@ -116,7 +136,7 @@ The system picks one of 5 modes based on how complex your request is.
 
 | Mode | Name | When Used | Agents Activated |
 |------|------|-----------|-----------------|
-| **Mode 1** | 🏰 Full Army | Large platform, enterprise, multi-service | All 22 roles |
+| **Mode 1** | 🏰 Full Army | Large platform, enterprise, multi-service | Applicable core and optional roles |
 | **Mode 2** | 🎯 Single Role | A focused specialist task or artifact | One relevant role |
 | **Mode 3** | ⚡ Direct | Bug fix, trivial task, quick question | 1 role or none |
 | **Mode 4** | 🔬 Hybrid | A host spec workflow followed by structured development | Roles matched to scope |
@@ -134,7 +154,7 @@ gates are guidance; their enforcement depends on the host and configuration.
 
 ---
 
-## 👥 The 22 Agent Roles
+## 👥 Core and Optional Agent Roles
 
 Each role has its own `SKILL.md` and a library of specialist skill files.
 
@@ -163,7 +183,9 @@ Each role has its own `SKILL.md` and a library of specialist skill files.
 | 21 | 📣 **Market Researcher** | Competitor analysis, market positioning |
 | 22 | 🌐 **Website Creator** | Landing pages, SEO, web content |
 
-> The role directories contain focused guidance. Counts and path references should be verified against the current checkout.
+In addition to these 22 core roles, 28 optional specialists cover data, AI,
+design, learning, privacy, accessibility and platform work. The coordinator
+selects them by task; see the [complete specialist and skill catalog](kiro/steering/optional-specialists.md).
 
 ---
 
@@ -173,7 +195,7 @@ Each role has its own `SKILL.md` and a library of specialist skill files.
 
 > **Problem:** AI agents love writing custom code. They'll build a 300-line auth system when `passport.js` already exists. This wastes time and creates maintenance debt.
 
-The Ponytail system enforces a **7-rung ladder** — agents must use the lowest possible rung before moving higher.
+The Ponytail guidance describes a **7-rung ladder** for considering existing options before custom work. Whether an agent follows it depends on the host and run.
 
 ```
 Rung 1 → Use the standard library (built-in language features)
@@ -185,7 +207,7 @@ Rung 6 → Fork an existing open-source project
 Rung 7 → Write custom code from scratch ← LAST RESORT ONLY
 ```
 
-If a rung is disqualified (e.g., a CVE vulnerability in a package), agents must write a **Rung Disqualification Record (RDR)** and check for a same-rung alternative before moving up. See [`docs/ponytail-rung-disqualification-guide.md`](docs/ponytail-rung-disqualification-guide.md).
+If a rung is disqualified (e.g., a CVE vulnerability in a package), the guidance calls for a **Rung Disqualification Record (RDR)** and a same-rung alternative check. See the [rung disqualification guide](docs/research/ponytail-rung-disqualification-guide.md).
 
 ---
 
@@ -219,7 +241,7 @@ Score 0–21 → maps to a mode:
 
 > **Problem:** AI agents can get excited and propose restructuring your entire database schema mid-sprint. This is dangerous.
 
-The bad loop guard blocks agents from self-declaring high-risk scope changes. It fires when **both** a domain keyword AND a high-risk verb appear together:
+The bad loop guard is prompt guidance asking agents to seek review of high-risk scope changes. Actual blocking requires host permissions and verification. Its documented triggers include:
 
 ```
 Domain keywords:  auth / payments / billing / database / production / security
@@ -304,7 +326,7 @@ loopEngineering/
 │   │   ├── project_map.md          ← Module-level map of the whole system
 │   │   └── flow.md                 ← End-to-end system flow reference
 │   │
-│   ├── 📂 skills/                  ← 22 specialist role directories and shared skills
+│   ├── 📂 skills/                  ← core, optional and shared specialist guidance
 │   │   ├── cto/                    ← CTO skill library (10 files)
 │   │   ├── architect/              ← Architect skills + product_graph_update.md (Fix 46A)
 │   │   ├── security_engineer/      ← Security skills (24 files)
@@ -467,7 +489,11 @@ The prompt hook provides process guidance. Its behavior depends on the Kiro vers
 
 #### Step 1 — Bootstrap a new project (recommended)
 
-Use the included script to create a complete, Kiro-ready project in one command:
+Use Bash, Git, Python 3.11 or newer, and a filesystem that supports symlinks.
+Kiro integration must be verified in your installed host. To run the migration
+integration tests, install the pinned test dependencies described below.
+
+Use the included script to create a new project snapshot:
 
 ```bash
 cd ~/MyTechExploration/loopEngineering
@@ -605,6 +631,34 @@ bootstrap and Kiro discovery. `required_roles` is for the core catalog; adding
 an optional role makes its profile available without requiring it on each task.
 The generator fails on conflicting custom files—review them rather than
 deleting or overwriting them automatically.
+
+#### Updating an existing snapshot
+
+The upgrade tool needs the **exact framework checkout used to create the
+existing snapshot** as its baseline. If that baseline is unknown or a file was
+customized, stop and reconcile it manually; do not guess or replace it. Close or
+pause sessions that may write to the project during an upgrade. Preview first:
+
+```bash
+python3 scripts/framework_upgrade.py --source . --baseline /path/to/old-framework --target /path/to/project
+python3 scripts/framework_upgrade.py --source . --baseline /path/to/old-framework --target /path/to/project --apply --backup-dir /path/outside/project/new-backup
+python3 scripts/validate-framework.py --root /path/to/project
+```
+
+The backup directory must not already exist. The tool checks all managed paths
+before applying, retains files removed upstream, and leaves project documents,
+memory, reference documents and unknown files alone. If updated guidance refers
+to new reference documents, review and reconcile those separately before use.
+To roll back, run:
+
+```bash
+python3 scripts/framework_upgrade.py --target /path/to/project --restore /path/outside/project/new-backup
+```
+
+Rollback refuses to overwrite files edited after the upgrade. Keep the backup
+until the project is verified. A crash or concurrent edit can interrupt an
+operation; inspect the backup manifest and project before retrying. This tool
+does not restart existing agent sessions or prove they reloaded instructions.
 
 #### Specialist handoffs
 
@@ -765,7 +819,7 @@ run discovery questions
 1. Go to **[chat.openai.com](https://chat.openai.com)** → **"Explore GPTs"** → **"Create"**
 2. Click the **"Configure"** tab
 3. Set **Name:** `Loop Engineering Elite Team`
-4. Set **Description:** `Senior engineering orchestrator — 22 specialist roles, 5 execution modes, structured sprint pipeline with security gates`
+4. Set **Description:** `Experimental engineering orchestration guidance with task-selected specialists and review gates`
 5. In the **Instructions** field: open `kiro/adapters/chatgpt-system-prompt.md`, copy everything below the `# ─────` line, paste it in
 6. **Knowledge → Upload files:** same 8 steering files as Claude setup above
 7. **Capabilities:** enable ✅ Web Search + ✅ Code Interpreter
@@ -850,9 +904,13 @@ kiro/adapters/
 
 ## Local framework checks
 
-Run these commands from the repository root, without network access:
+Create a Python environment and install the pinned test dependencies once (the
+install requires package access). The checks themselves run locally:
 
 ```bash
+python3 -m venv .venv
+. .venv/bin/activate
+python3 -m pip install -r requirements-test.txt
 python3 scripts/validate-framework.py
 python3 -m unittest discover -s tests -v
 ```
@@ -867,16 +925,12 @@ proposed broader measurements.
 
 ## 🗜️ Token Compression — pxpipe
 
-> **What it is:** A local proxy that intercepts every API call from Kiro/Claude and converts bulky old context (system prompt, tool results, history) into PNG images before they leave your machine. Image tokens are billed by pixel area — not by content. Dense code/JSON runs at ~1 char/token as text, but ~3.1 chars/image-token, so you pay ~3x less per character of context.
+> **What it is:** An optional third-party proxy intended to compress selected context. Its behavior, compatibility, privacy implications and cost depend on the installed version and provider. Review them before use; Loop Engineering does not require the proxy.
 
-**Measured results on our workload:**
-- Potential token savings vary by workload and require independent measurement
-- Gist recall: **98/98** — decisions, values, paths, names survive perfectly
-- Verbatim recall: **13/15** — ~13% silent misread on exact hex strings (addressed by GUARD 3)
-- Effective context window: **~3x larger** — same 1M window, old turns take ⅓ the tokens
+**Historical observations:** earlier notes reported 98/98 gist and 13/15 verbatim recall on a limited sample. These numbers do not establish accuracy, safety or savings for another workload. Measure actual provider usage and independently validate exact strings.
 
 **Why this matters for Loop Engineering specifically:**
-Our hook fires on every prompt, sending the full orchestrator + 22 agent descriptions every time. That's ~15-25k tokens per prompt before any task begins. With pxpipe, that static slab compresses to ~5-8k image tokens — the biggest single saving in our setup.
+Context loading and billing depend on host configuration. No per-prompt savings are established for the current integration.
 
 ### Quick Start (30 seconds)
 
@@ -916,7 +970,7 @@ GUARD 3 (in `session-guards.md`) makes agents aware of image context. When pxpip
 
 ### Research & Benchmarks
 
-Full analysis in [`pxpipe-research.md`](pxpipe-research.md), including:
+Historical notes and limitations are in the [compression-fidelity methodology](docs/research/compression-fidelity-methodology.md). The previously referenced pxpipe report is not in this repository. Reported results are workload-specific claims, not independently verified savings for a new project. Topics include:
 - Benchmark table (gist recall 98/98, verbatim recall 13/15, SWE-bench 10/10 at -65% cost)
 - Why our workload is ideal (dense code/JSON, re-reads before edits)
 - Comparison with `/compact` (pxpipe keeps content as images vs. `/compact` discards it as prose)
@@ -963,10 +1017,10 @@ This system was built across **68 fix cycles** (FIX A–G from live MedVault Spr
 | GAP-48A | ✅ Lesson graduation triggers — SM-RETRO now auto-promotes Stage 1 → Stage 2 lessons |
 | GAP-48B | ✅ GUARD 4 pre-code artifact gate — blocks code before PRD + sprint plan + story card exist |
 | GAP-48C | ✅ GATE 5 mandatory HTML knowledge graph — D3 viz auto-emitted, GATE 5 blocks if missing |
-| GAP-48D | ✅ Role contract table — 23 roles with PRECONDITIONS/POSTCONDITIONS, enforced in hook |
+| GAP-48D | Role contract guidance defines preconditions and postconditions; host compliance must be checked |
 | Hook v4 | ✅ Kiro-native THREE-PHASE MODEL — THINK→DESIGN→DEVELOP, no injection-guard conflicts |
 | bootstrap | ✅ `scripts/bootstrap-project.sh` — one-command new project scaffolder with path fix |
-| FIX A | ✅ Bootstrap git init: step 9/9 — git init + initial commit on every new project |
+| FIX A | Bootstrap initializes Git; the user reviews and creates any initial commit |
 | FIX B | ✅ Story Commits Mandatory: git commit after every qa_engineer GATE3 PASS |
 | FIX C | ✅ Jira Two-Mode TRACKER_MODE: MCP detection at SM-PLAN, .txt fallback if unavailable |
 | FIX D | Story-level YAML graph patches; one cumulative HTML graph per project |
@@ -1006,7 +1060,7 @@ Three research documents park findings from experiments and third-party tool ana
 |------|-----------------|
 | [`docs/white-paper/loop-engineering-white-paper-v5.pdf`](docs/white-paper/loop-engineering-white-paper-v5.pdf) | **Publication draft white paper (34 pages).** Problem-first framing: the 2026 production reliability crisis → why existing approaches fail → the Loop Engineering Framework as the response. Includes 12-pattern failure taxonomy, gist/exact-string recall bifurcation finding, compression data, guard effectiveness analysis. |
 | [`docs/research/GOAT.md`](docs/research/GOAT.md) | **Honest gap analysis.** Where this framework is genuinely first in field (failure mode taxonomy, degradation tiers, compression-fidelity bifurcation, session continuity architecture) vs. what is missing for full academic validation (external reproducibility, controlled methodology, competitor comparison). |
-| [`docs/research/pxpipe-research.md`](docs/research/pxpipe-research.md) | Full pxpipe assessment: benchmarks, compression math, Loop Engineering fit analysis, gist vs verbatim recall boundary, GUARD 3 rationale |
+| [`docs/research/compression-fidelity-methodology.md`](docs/research/compression-fidelity-methodology.md) | Historical methodology for investigating compression fidelity; not a current performance guarantee |
 | [`docs/research/gstack-research.md`](docs/research/gstack-research.md) | gstack vs Loop Engineering: 30+ slash command inventory, 5 additive capabilities, architectural conflict analysis, decision log (Debugging Iron Law, Edit Scope Lock, QA Executor concept) |
 | [`docs/research/oneagent-search.md`](docs/research/oneagent-search.md) | 67TB logs/metrics/traces search: AI agent as query layer on ClickHouse + VictoriaMetrics + Tempo, MCP server spec, cross-signal correlation architecture |
 
@@ -1040,7 +1094,7 @@ Full reproduction guide: [CONTRIBUTING.md](CONTRIBUTING.md) · White paper: [loo
 
 ## 🗺️ Roadmap
 
-> Based on the [GOAT analysis](GOAT.md) — where the framework is already first in field, and what it needs to become the definitive reference.
+> Based on the historical [GOAT analysis](docs/research/GOAT.md); comparative claims remain unverified.
 
 The roadmap is organized into four horizons. Each is grounded in a specific gap identified during the white paper research and GOAT analysis.
 
@@ -1132,7 +1186,7 @@ The roadmap is organized into four horizons. Each is grounded in a specific gap 
 | **GUARD 1** | Constraint drift protection — re-reads binding constraints every session. |
 | **GUARD 2** | Bad loop protection — blocks agents from self-escalating dangerous scope changes. |
 | **GUARD 3** | pxpipe image context protection — prevents agents from recalling exact strings (SHAs, line numbers, identifiers) from compressed image history. |
-| **Ponytail** | The 7-rung lazy-load ladder. Forces agents to use what already exists before building from scratch. |
+| **Ponytail** | A 7-rung guide for considering existing options before custom work. |
 | **RDR** | Rung Disqualification Record — written when a dep on a rung is disqualified (CVE, license, etc.). |
 | **ADR** | Architecture Decision Record — permanent doc explaining WHY an architectural choice was made. |
 | **SM** | Scrum Master — the role that runs sprint planning, gates, and retrospectives. |
@@ -1175,7 +1229,7 @@ This snapshot records historical project claims and is not a current production-
 │  GAP-48A/B/C/D resolved        ✅ 61/61 implemented     │
 │  Hook v4 Kiro-native           ✅ THREE-PHASE MODEL     │
 │  bootstrap-project.sh          ✅ One-command scaffolder │
-│  FIX A — git init in bootstrap ✅ Auto-init + commit    │
+│  FIX A — git init in bootstrap ✅ User commits after review │
 │  FIX B — story commits         ✅ Mandatory after GATE3 │
 │  FIX C — Jira two-mode         ✅ MCP detect + .txt fallback│
 │  FIX D — story graph patches   → one cumulative graph   │

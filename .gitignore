@@ -1,2 +1,11 @@
 .DS_Store
 .claude/
+
+# Local project fixtures, caches and private environment files
+/.loop-*/
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example

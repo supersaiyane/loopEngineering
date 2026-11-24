@@ -9,6 +9,7 @@
   ],
   "resources": [
     "skill://.kiro/skills/loop-scrum-master/SKILL.md",
+    "file://.kiro/skills/scrum_master/SKILL.md",
     "skill://.kiro/skills/loop-shared/SKILL.md",
     "file://.kiro/steering/skill-selection-matrix.md"
   ]

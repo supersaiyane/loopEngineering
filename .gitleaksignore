@@ -1,0 +1,3 @@
+# Historical curl documentation example containing a known placeholder.
+# Suppress this exact finding only; later edits and other findings remain scanned.
+04b56096bf38005cdc456a368d611cb62eabb73c:kiro/skills/technical_writer/developer_handoff_kit.md:curl-auth-header:118

@@ -216,7 +216,7 @@ Run full Think → Design → Develop chain.
 
 **market_researcher RE-INVOCATION (Fix 13E):** If a Mode 2 request targets market_researcher AND the session already has a cto-strategy doc or PRD doc in context → re-invoke market_researcher first to cross-check its findings against those docs. market_researcher must flag any market assumptions that contradict the existing strategy before the new artifact is produced. Log: `[market_researcher re-invocation: validating against existing strategy docs]`
 
-**SKILL SELECTION IN MODE 2:** `skill-selection-matrix.md` still applies — Mode 2 is NOT exempt from Fix 9B. Before the role produces its artifact: (1) identify the activity from the user's request, (2) look up the matching row in `skill-selection-matrix.md` for that role, (3) load only the listed skill files (max 3). Skill activation summary (Fix 9B Step 4) is required before output is produced. If no $TRACKER labels exist (Mode 2 has no sprint stories), use matrix lookup as the primary skill-selection path.
+**SKILL SELECTION IN MODE 2:** Before the role produces its artifact, identify the activity and consult `skill-selection-matrix.md`; for optional specialists and new activities, also consult `optional-specialists.md`. Read the relevant activity skills and applicable universal defaults, without a fixed file-count cap. Record partial or unavailable reads and the actual skill paths used. If no $TRACKER labels exist, use the request and these guides to select the relevant activity.
 
 ---
 
@@ -290,7 +290,7 @@ Checker in lean mode = QUALITY role (fresh context invocation — not the same c
 - Fix 4: loop-engine.md still loads before BUILDER activates
 - Fix 7: use LEAN LOOP SPEC (above) — not full 4-section spec
 - Fix 8: degradation tiers apply, 4-read cap per iteration (not 2 — lean roles cover more ground)
-- Fix 9: skill activation still applies — ≤3 files per lean role per activation
+- Skill activation still applies: read relevant activity skills and applicable shared defaults, and record omissions; there is no fixed file-count cap.
 - Fix 10: GIT_MODE detection still applies. Branch lifecycle still applies.
 
 **Security gates S2 + S3 are NOT optional in lean mode.**
@@ -323,7 +323,7 @@ If user does not reply: HOLD. Do not proceed without acknowledgement.
 **NEVER in lean mode:**
 - Merge without QUALITY checker approval
 - Skip verifier
-- Read all skill files
+- Read unrelated skill files merely because they are present
 - Skip the Fix 44A advisory when security/rbac labels are present
 
 ---

@@ -1,4 +1,148 @@
 
+CURRENT FRAMEWORK FLOW — updated 2026-11-24
+==========================================
+
+This section describes the root Loop Engineering framework on
+improve/framework-reliability. The July 1 diagram and its fix list below are
+preserved as historical material, not current instructions or measured
+confidence. For current findings, evidence and status use
+docs/Audits/atlasats-live-findings-2026-11-23.txt. Canonical mode rules live in
+kiro/steering/execution-contract.md; the coordinator and host must actually
+execute each delegated task and check. User and host instructions take priority.
+
+                         USER REQUEST
+                              |
+                 +------------v-------------+
+                 | Project snapshot + host  |
+                 | permissions / context    |
+                 +------------+-------------+
+                              |
+                  +-----------v-----------+
+                  | New build or resume?  |
+                  +----+--------------+---+
+                       |              |
+                  new build      existing work
+                       |              |
+          Seven discovery questions  Resume context;
+          and supplied answers       do not restart discovery
+                       |              |
+          Score known answers;       |
+          report unknown/range        |
+          Recommend mode + model      |
+          User chooses or overrides   |
+                       |              |
+                       +------+-------+
+                              |
+                    +---------v----------+
+                    | Select work mode   |
+                    +--+---+---+---+----+
+                       |   |   |   |   |
+              Mode 1 Full  |   |   |   Mode 5 Lean
+                    Mode 2 focused |   Mode 4 Hybrid
+                         Mode 3 direct
+
+Modes and discovery recommendations
+-----------------------------------
+  1 Full       15-21: full Think -> Design -> Develop when appropriate.
+  2 Single     Explicit focused specialist task; not determined by the score.
+  3 Direct     0-4: proportionate response or small implementation.
+  4 Hybrid     10-14: user-selected/existing host spec, then development.
+  5 Lean       5-9: strategist, builder and quality responsibilities.
+An explicit choice overrides a recommendation; a requested discovery skip is
+respected. These numbers are heuristics, not confidence or reliability scores.
+
+Mode 1: intended full-project dependency flow
+----------------------------------------------
+  Market researcher -> CTO -> Gate 1: strategy review / decision
+      market evidence   strategy                 |
+                                                v
+                               product manager -> architect
+                                  PRD/stories     architecture and ADRs
+                                                        |
+              +-----------------------------------------+----------------+
+              |                         |                                |
+       database architect       cloud architect -> FinOps      security design
+              +-------------------------+--------------------------------+
+                                        |
+                      scrum master: foundation / pre-build gate
+                                        |
+                             sprint planning and stories
+                                        |
+             +--------------------------v----------------------------+
+             | PLAN -> DO -> CHECK -> ACT                            |
+             | Relevant engineering, QA, security and DevOps roles; |
+             | related optional specialists join where needed.      |
+             +--------------------------+----------------------------+
+                                        |
+            Reviewed story commit -> run actual checks -> evidence
+                   -> tracker status -> story/sprint checks
+                   -> graph patches + cumulative graph + reports
+                   -> checkpoint / handoff -> next sprint or release
+
+The branch points show dependencies, not a guarantee of parallel execution.
+Mode 4 uses the selected host spec for planning; Modes 2 and 3 do not require
+this full chain. The coordinator may use independent subagents only when the
+host supports and permits them; otherwise disclose the shared session. The
+security/QA gates in steering are not an independent permission boundary.
+
+Agents and skills
+-----------------
+There are 22 core specialist profiles, 28 optional specialist profiles and a
+coordinator. Shared skills are resources, not another specialist. Optional
+specialists are selected for relevant work or an explicit request; they are
+not all launched on every project. Each profile configures its role definition
+and skill wrapper as resources; optional profiles also include the routing catalog.
+
+  Core: market researcher, CTO, product manager, architect, database architect,
+  cloud architect, FinOps, security, scrum master, backend lead, frontend lead,
+  senior backend, senior frontend, ML, QA, DevOps, SRE, technical writer,
+  website creator, data engineer, data scientist, mobile engineer.
+
+  Optional data: analytics engineer, data analyst, data quality engineer,
+  data governance, BI developer, streaming engineer, data platform engineer.
+  Optional AI: AI engineer, agent evaluator, AI safety engineer, AI observability,
+  RAG engineer, MLOps engineer, LLMOps engineer, AI governance, knowledge
+  engineer, multimodal AI engineer, fine tuning engineer.
+  Optional product/engineering: product designer, learning designer, privacy
+  engineer, accessibility specialist, interactive learning engineer,
+  performance engineer, integration engineer, platform engineer, technical
+  researcher, business analyst.
+
+See kiro/steering/optional-specialists.md for the exact role names, triggers
+and 81 new activity guides, including guides for existing roles. The matrix at
+kiro/steering/skill-selection-matrix.md points to that catalog. Select the
+applicable activity skills and shared defaults; no fixed three-file cap applies
+to their selection. Actual reads, omissions and handoffs need host evidence.
+
+For a combined platform and AI product, the main product/architecture chain
+continues while relevant AI, RAG, data, learning, privacy and safety roles join
+at appropriate handoffs. A model provider or fine-tuning is a task decision;
+the framework does not imply one is required or already operational.
+
+Evidence, tools and upgrade boundaries
+--------------------------------------
+  - scripts/team_flow.py records declared dependencies and handoffs; a ledger or
+    hash does not authenticate a subagent or prove a skill read.
+  - scripts/sprint_gate.py checks actual story-linked Git and command evidence.
+    Local tracker records are explicitly local; real Jira requires authorized
+    access and verified readback. A prompt gate is not a host-enforced control.
+  - scripts/product_graph.py merges story patches into one cumulative graph;
+    sprint_report.py, project_index.py and usage_report.py report available
+    evidence and preserve unknowns rather than inventing measurements.
+  - security_scan.py and delivery_setup.py are opt-in and require actual scope,
+    installed tools and execution. A clean scan does not prove security.
+  - bootstrap-project.sh creates a new snapshot without an initial commit.
+    framework_upgrade.py previews against the exact prior framework baseline,
+    requires a separate backup to apply, blocks conflicting edits, and offers a
+    guarded rollback. It does not update project memory, documents or references.
+  - CI, host compatibility, actual skill reads, model costs, live sprint closure
+    and external integrations must be verified for the particular revision and
+    environment. The audit status table records what is done versus unverified.
+
+================ HISTORICAL SNAPSHOT BELOW — 2026-07-01 ================
+The following v6 flow, pending-fix labels, token figures and confidence
+percentages are retained for history only and are not current measurements.
+
 ╔══════════════════════════════════════════════════════════════════════════════════════════╗
 ║              KIRO AGENTIC ENGINEERING SYSTEM — COMPLETE FLOW (Fixes 1–26F)              ║
 ║                           ASCII Flowchart  |  v6  |  2026-07-01                         ║

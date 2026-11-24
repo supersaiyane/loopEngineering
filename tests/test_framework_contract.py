@@ -142,6 +142,7 @@ class FrameworkContractTests(unittest.TestCase):
             target = pathlib.Path(tmp) / "sample"
             self.assertFalse((target / "scripts/sheet_generator.py").exists())
             self.assertTrue((target / "scripts/team_flow.py").is_file())
+            self.assertTrue((target / "scripts/framework_upgrade.py").is_file())
             self.assertTrue((target / "scripts/sprint_report.py").is_file())
             self.assertTrue((target / "scripts/security_scan.py").is_file())
             self.assertTrue((target / "scripts/project_index.py").is_file())

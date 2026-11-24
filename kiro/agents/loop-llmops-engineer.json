@@ -9,7 +9,9 @@
   ],
   "resources": [
     "skill://.kiro/skills/loop-llmops-engineer/SKILL.md",
+    "file://.kiro/skills/llmops_engineer/SKILL.md",
     "skill://.kiro/skills/loop-shared/SKILL.md",
-    "file://.kiro/steering/skill-selection-matrix.md"
+    "file://.kiro/steering/skill-selection-matrix.md",
+    "file://.kiro/steering/optional-specialists.md"
   ]
 }

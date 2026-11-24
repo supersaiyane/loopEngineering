@@ -9,6 +9,7 @@
   ],
   "resources": [
     "skill://.kiro/skills/loop-senior-engineer-fe/SKILL.md",
+    "file://.kiro/skills/senior_engineer_fe/SKILL.md",
     "skill://.kiro/skills/loop-shared/SKILL.md",
     "file://.kiro/steering/skill-selection-matrix.md"
   ]

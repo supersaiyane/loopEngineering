@@ -93,6 +93,7 @@ if [[ -d "$FRAMEWORK_DIR/scripts" ]]; then
   cp "$FRAMEWORK_DIR/scripts/product_graph_template.html" "$TARGET/scripts/"
   cp "$FRAMEWORK_DIR/scripts/team_flow.py" "$TARGET/scripts/"
   cp "$FRAMEWORK_DIR/scripts/prepare_kiro_agents.py" "$TARGET/scripts/"
+  cp "$FRAMEWORK_DIR/scripts/framework_upgrade.py" "$TARGET/scripts/"
   chmod +x "$TARGET/scripts/"*.sh 2>/dev/null || true
   echo "     ✅ scripts copied ($(ls "$TARGET/scripts/"*.sh 2>/dev/null | wc -l | tr -d ' ') shell scripts)"
 else
@@ -370,6 +371,7 @@ check "$TARGET/scripts/product_graph.py"                      "script: product_g
 check "$TARGET/scripts/product_graph_template.html"           "template: product_graph_template.html"
 check "$TARGET/scripts/team_flow.py"                          "script: team_flow.py"
 check "$TARGET/scripts/prepare_kiro_agents.py"                "script: prepare_kiro_agents.py"
+check "$TARGET/scripts/framework_upgrade.py"                    "script: framework_upgrade.py"
 check "$TARGET/.kiro/agents/loop-coordinator.json"            "agent: loop coordinator"
 check "$TARGET/docs/reports/baseline.md"                       "report: discipline baseline"
 check "$TARGET/docs/reports/discipline-dashboard.md"           "report: discipline dashboard"
