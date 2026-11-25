@@ -8,6 +8,25 @@ SCRIPT = Path(__file__).resolve().parents[1] / 'scripts/sprint_report.py'
 
 
 class SprintReportTests(unittest.TestCase):
+    def test_project_without_repository_does_not_report_parent_history(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            parent = Path(tmp)
+            subprocess.run(['git', 'init', '-q', str(parent)], check=True)
+            subprocess.run(['git', '-C', str(parent), 'config', 'user.name', 'Test'], check=True)
+            subprocess.run(['git', '-C', str(parent), 'config', 'user.email', 'test@example.invalid'], check=True)
+            (parent / 'other.txt').write_text('other project')
+            subprocess.run(['git', '-C', str(parent), 'add', 'other.txt'], check=True)
+            subprocess.run(['git', '-C', str(parent), 'commit', '-qm', 'feat: S1-01 unrelated parent'], check=True)
+            root = parent / 'new-project'
+            stories = root / 'docs/sprint-1/stories'
+            stories.mkdir(parents=True)
+            (stories / 'S1-01.md').write_text('# Story\n')
+            result = subprocess.run(['python3', str(SCRIPT), '--root', str(root), '1'], text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            report = (root / 'docs/reports/sprint-1-git-tracker.md').read_text()
+            self.assertNotIn('unrelated parent', report)
+            self.assertIn('Unknown', report)
+
     def test_pending_planned_roles_and_completed_outputs_are_visible(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

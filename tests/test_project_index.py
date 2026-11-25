@@ -57,6 +57,23 @@ class ProjectIndexTests(unittest.TestCase):
             for value in ['Tenant isolation', 'S2-01', 'architect', '1.5', 'meeting record', 'backend', 'Unknown']:
                 self.assertIn(value, report)
 
+    def test_work_report_includes_sprint_dependencies_and_planning_assumptions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            folder = root / 'docs/foundation'
+            folder.mkdir(parents=True)
+            (folder / 'sprint-plan.json').write_text(json.dumps({'sprints': [
+                {'number': 2, 'goal': 'Launch', 'stories': ['S2-01'],
+                 'dependencies': ['S1-01', 'security review'],
+                 'parallelism': 'Design and QA can overlap',
+                 'duration_assumptions': 'One engineer, six-hour days',
+                 'stages': []}]}))
+            result = subprocess.run(['python3', str(SCRIPT), '--root', str(root)], text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            report = (folder / 'project-work-report.md').read_text()
+            for value in ('S1-01', 'security review', 'Design and QA can overlap', 'six-hour days', 'Generated:'):
+                self.assertIn(value, report)
+
     def test_records_document_creation_sequence_without_renaming(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

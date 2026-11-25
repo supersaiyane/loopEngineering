@@ -30,9 +30,11 @@ non-generated documents. Review and supplement the output with actual agent
 calls, dependencies, timing evidence and all relevant project plans.
 
 When future sprints are planned, maintain `docs/foundation/sprint-plan.json`:
-`{"sprints":[{"number":1,"goal":"...","stories":["S1-01"],"stages":[{"stage":"Design","role":"architect","planned_days":2,"actual_days":null,"evidence":""}]}]}`.
+`{"sprints":[{"number":1,"goal":"...","stories":["S1-01"],"dependencies":["..."],"parallelism":"...","duration_assumptions":"...","stages":[{"stage":"Design","role":"architect","planned_days":2,"actual_days":null,"evidence":""}]}]}`.
 The work report includes these declared plans even before story directories
-exist. Actual times are reported values and should cite their evidence.
+exist. Leave unavailable fields unknown. Actual times are reported values and
+should cite their evidence. Preserve any supplemental review outside the
+generated report, which is replaced on refresh.
 
 ## System design, diagrams and databases
 
@@ -171,4 +173,8 @@ Optional `input_tokens`, `output_tokens` and `cached_tokens` must be measured
 nonnegative counts. Run `python3 scripts/usage_report.py --input PATH` to
 render a sprint report; distinguish estimates and billed values. This helper
 does not fetch provider data or verify attribution and does not establish that
-all sessions are represented. Do not save credentials or sensitive prompts.
+all sessions are represented. Multiple records are not summed unless the input
+includes `"aggregation":{"non_overlapping":true,"source":"..."}` with a
+source explaining why the records do not overlap. This is a supplied claim, not
+independent verification; do not use it to combine account snapshots with their
+constituent sessions. Do not save credentials or sensitive prompts.

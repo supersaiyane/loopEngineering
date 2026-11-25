@@ -23,6 +23,12 @@ def main():
     if not isinstance(data, dict) or type(data.get('sprint')) is not int or data['sprint'] < 1 or not isinstance(data.get('records'), list):
         raise ValueError('invalid sprint usage input')
     records = data['records']
+    aggregation = data.get('aggregation')
+    if aggregation is not None and (not isinstance(aggregation, dict)
+            or aggregation.get('non_overlapping') is not True
+            or not isinstance(aggregation.get('source'), str)
+            or not aggregation['source'].strip()):
+        raise ValueError('aggregation requires a sourced non-overlap attestation')
     for record in records:
         if not isinstance(record, dict) or not isinstance(record.get('source'), str) or not record['source'].strip():
             raise ValueError('every usage record requires a source')
@@ -45,12 +51,17 @@ def main():
     if not records:
         lines.append('| Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | Unknown | No records supplied |')
     lines += ['', '## Known totals', '']
+    can_sum = len(records) <= 1 or aggregation is not None
+    if len(records) > 1 and aggregation is None:
+        lines.append('Totals are unknown: supplied records may overlap; no sourced non-overlap attestation was supplied.')
+    elif aggregation is not None:
+        lines.append(f"Non-overlap attested by input source: {cell(aggregation['source'])}. This claim is not independently verified.")
     for key, label in [('input_tokens', 'Input tokens'), ('output_tokens', 'Output tokens'), ('cached_tokens', 'Cached tokens')]:
         known = [r[key] for r in records if r.get(key) is not None]
-        lines.append(f"- {label}: {sum(known) if known else 'Unknown'} ({'complete for supplied records' if records and len(known) == len(records) else 'incomplete; missing records or values are unknown'})")
+        lines.append(f"- {label}: {sum(known) if known and can_sum else 'Unknown'} ({'complete for supplied records' if can_sum and records and len(known) == len(records) else 'incomplete; missing records, values or non-overlap evidence'})")
     for kind in ('estimate', 'billed'):
         values = [r['credits'] for r in records if r.get('credits') is not None and r.get('credit_kind') == kind]
-        lines.append(f"- {kind.title()} credits: {sum(values) if values else 'Unknown'} ({'complete for supplied records' if records and len(values) == len(records) else 'incomplete; missing records or values are unknown'})")
+        lines.append(f"- {kind.title()} credits: {sum(values) if values and can_sum else 'Unknown'} ({'complete for supplied records' if can_sum and records and len(values) == len(records) else 'incomplete; missing records, values or non-overlap evidence'})")
     lines += ['', 'Totals cover supplied records only; they may omit sessions or overlap. Cached tokens may be included in input tokens by the provider.', '']
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text('\n'.join(lines), encoding='utf-8')

@@ -81,8 +81,13 @@ def main():
         if start in content and content.index(start) > content.index(end):
             raise ValueError(f'dashboard generated section markers are out of order: {path}')
         dashboards[path] = content
-    git = subprocess.run(['git', '-C', str(root), 'log', '--format=%H%x09%s'], text=True, capture_output=True)
-    git_status = subprocess.run(['git', '-C', str(root), 'status', '--short', '--untracked-files=all'], text=True, capture_output=True)
+    repo = subprocess.run(['git', '-C', str(root), 'rev-parse', '--show-toplevel'], text=True, capture_output=True)
+    if repo.returncode == 0 and Path(repo.stdout.strip()).resolve() == root:
+        git = subprocess.run(['git', '-C', str(root), 'log', '--format=%H%x09%s'], text=True, capture_output=True)
+        git_status = subprocess.run(['git', '-C', str(root), 'status', '--short', '--untracked-files=all'], text=True, capture_output=True)
+    else:
+        # Git searches parent directories; never attribute an enclosing repository to this project.
+        git = git_status = subprocess.CompletedProcess(['git'], 1, '', 'project is not a Git repository root')
     commits = [line.split('\t', 1) for line in git.stdout.splitlines() if '\t' in line] if git.returncode == 0 else []
     ledger_paths = [root / '.loop/team-flow.json'] + sorted(folder.glob('*ledger*.json'))
     events, planned_tasks = [], []

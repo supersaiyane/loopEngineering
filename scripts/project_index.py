@@ -47,6 +47,10 @@ def main():
             seen.add(sprint['number'])
             if not isinstance(sprint.get('stories', []), list) or not all(isinstance(x, str) for x in sprint.get('stories', [])) or not isinstance(sprint.get('stages', []), list):
                 raise ValueError('invalid sprint stories or stages')
+            if not isinstance(sprint.get('dependencies', []), list) or not all(isinstance(x, str) for x in sprint.get('dependencies', [])):
+                raise ValueError('invalid sprint dependencies')
+            if any(sprint.get(key) is not None and not isinstance(sprint[key], str) for key in ('parallelism', 'duration_assumptions')):
+                raise ValueError('invalid sprint planning assumptions')
             for stage in sprint.get('stages', []):
                 if not isinstance(stage, dict):
                     raise ValueError('invalid stage')
@@ -91,12 +95,15 @@ def main():
         lines.append(f'| {i:02d} | [{name}]({name}) | {"Unknown" if name in present else "Missing"} |')
     for name in [n for n in ORDER if n in present and n not in recorded] + sorted(set(present) - set(ORDER) - recorded):
         lines.append(f'| Unknown | [{name}]({name}) | Unknown |')
-    work = [MARKER, '# Project work report', '', 'Recorded statuses and roles are local data, not independently verified agent activity. Story points are not days.', '']
+    work = [MARKER, '# Project work report', '', f'Generated: {datetime.now(timezone.utc).isoformat()}', '', 'Recorded statuses and roles are local data, not independently verified agent activity. Story points are not days.', '']
     if planned:
         work += ['## Planned sprints', '', 'Values below are supplied in sprint-plan.json; reported actual time requires its own evidence.', '']
         for sprint in sorted(planned, key=lambda item: item['number']):
             work += [f"### Sprint {sprint['number']}", '', f"Goal: {text_cell(sprint.get('goal'))}",
-                     f"Stories: {text_cell(', '.join(sprint.get('stories', [])))}", '',
+                     f"Stories: {text_cell(', '.join(sprint.get('stories', [])))}",
+                     f"Dependencies: {text_cell(', '.join(sprint.get('dependencies', [])))}",
+                     f"Planned parallelism: {text_cell(sprint.get('parallelism'))}",
+                     f"Duration assumptions: {text_cell(sprint.get('duration_assumptions'))}", '',
                      '| Stage | Role | Planned days | Reported actual days | Evidence |', '|---|---|---|---|---|']
             for stage in sprint.get('stages', []):
                 work.append('| ' + ' | '.join(text_cell(stage.get(k)) for k in ('stage', 'role', 'planned_days', 'actual_days', 'evidence')) + ' |')
